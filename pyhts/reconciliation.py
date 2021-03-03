@@ -1,6 +1,6 @@
 import numpy as np
 
-from hts import Hts
+from pyhts.hts import Hts
 from copy import deepcopy
 
 
