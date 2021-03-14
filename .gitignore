@@ -3,7 +3,6 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,macos,pycharm,data
 
 ### Data ###
-*.csv
 *.dat
 *.efx
 *.gbr
@@ -14,8 +13,9 @@
 *.sdf
 *.tax2010
 *.vcf
-experiment
 *.xml
+*test.*
+*.pkl
 
 ### macOS ###
 # General

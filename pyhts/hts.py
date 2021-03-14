@@ -89,7 +89,7 @@ class Hts:
 
     def accuracy(self, y_true, y_pred, levels=0):
         # MASE
-        agg_ts = self.aggcd ..regate_ts(levels=levels) # history
+        agg_ts = self.aggregate_ts(levels=levels) # history
         agg_true = y_true.aggregate_ts(levels=levels)
         agg_pred = y_pred.aggregate_ts(levels=levels)
         mases = np.array(list(map(lambda x,y: mase(*x, y), zip(agg_ts.T, agg_true.T, agg_pred.T), [12]*agg_ts.shape[1])))
