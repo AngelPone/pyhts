@@ -1,7 +1,15 @@
 import numpy as np
+from pyhts.accuracy import *
 from typing import List
 
+import rpy2.robjects as robjects
+from rpy2.robjects.packages import importr
+from rpy2.robjects.vectors import FloatVector
+forecast = importr("forecast")
 
+
+
+#TODO: change to sparse matrix
 def _nodes2constraints(nodes: List):
     n = sum(nodes[-1])
     m = sum(map(sum, nodes)) + 1
@@ -19,7 +27,6 @@ def _nodes2constraints(nodes: List):
         c_row_start = c_row_start - len(level)
         new_bts_count = []
         c_row = c_row_start
-        print(c_row)
         for node_idx in range(len(nodes[level_idx])):
             n_x = c_x+level[node_idx]
             new_bts_count.append(sum(bts_count[c_x:n_x]))
@@ -40,12 +47,14 @@ class Hts:
         self.constraints = None
         self.bts = None
         self.node_level = None
+        self.m = None
 
     @classmethod
-    def from_hts(cls, bts, nodes):
+    def from_hts(cls, bts, nodes, m):
         hts = cls()
         hts.bts = bts
         hts.constraints, hts.node_level = _nodes2constraints(nodes)
+        hts.m = m
         return hts
 
     def aggregate_ts(self, levels=0):
@@ -57,6 +66,38 @@ class Hts:
             return s.dot(self.bts.T).T
         return None
 
+    def forecast(self, base_forecast, reconciliation_method="ols"):
+        import pyhts.reconciliation as fr
+        if reconciliation_method == "ols":
+
+            return fr.wls(self, base_forecast)
+        return None
+
+    def generate_base_forecast(self, method="arima", h=1):
+        ts = robjects.r['ts']
+
+        y = self.constraints.dot(self.bts.T)
+        f_casts = np.zeros([h, y.shape[0]])
+        if method == "arima":
+            auto_arima = forecast.auto_arima
+            for i in range(y.shape[0]):
+                series = ts(FloatVector(y[i, :]), frequency=self.m)
+                f_cast = forecast.forecast(auto_arima(series), h=12).rx2['mean']
+                f_casts[:, i] = np.array(f_cast)
+
+            return f_casts
+
+    def accuracy(self, y_true, y_pred, levels=0):
+        # MASE
+        agg_ts = self.aggcd ..regate_ts(levels=levels) # history
+        agg_true = y_true.aggregate_ts(levels=levels)
+        agg_pred = y_pred.aggregate_ts(levels=levels)
+        mases = np.array(list(map(lambda x,y: mase(*x, y), zip(agg_ts.T, agg_true.T, agg_pred.T), [12]*agg_ts.shape[1])))
+        return mases
+
+
+
+
 
 if __name__ == '__main__':
     a = np.random.random((100, 14))
@@ -64,3 +105,4 @@ if __name__ == '__main__':
     hts = Hts.from_hts(a, nodes)
     a = hts.aggregate_ts(levels=0)
     b = hts.aggregate_ts(levels=1)
+    hts.forecast()
