@@ -57,34 +57,43 @@ class Hts:
         hts.m = m
         return hts
 
-    def aggregate_ts(self, levels=0):
+    def aggregate_ts(self, levels=None):
         if isinstance(levels, int):
             s = self.constraints[np.where(self.node_level == levels)]
             return s.dot(self.bts.T).T
         if isinstance(levels, list):
             s = self.constraints[np.where(self.node_level in levels)]
             return s.dot(self.bts.T).T
-        return None
+        return self.constraints.dot(self.bts.T).T
 
+    # TODO: 优化结构
     def forecast(self, base_forecast, reconciliation_method="ols"):
         import pyhts.reconciliation as fr
         if reconciliation_method == "ols":
 
             return fr.wls(self, base_forecast)
+        if reconciliation_method in ["shrinkage", "wls", "nseries", "sample"]:
+            return fr.min_trace(self, base_forecast, reconciliation_method)
         return None
 
-    def generate_base_forecast(self, method="arima", h=1):
+    def generate_base_forecast(self, method="arima", h=1, keep_fitted=False):
         ts = robjects.r['ts']
 
         y = self.constraints.dot(self.bts.T)
-        f_casts = np.zeros([h, y.shape[0]])
+        if keep_fitted:
+            f_casts = np.zeros([h+y.shape[1], y.shape[0]])
+        else:
+            f_casts = np.zeros([h, y.shape[0]])
         if method == "arima":
             auto_arima = forecast.auto_arima
             for i in range(y.shape[0]):
                 series = ts(FloatVector(y[i, :]), frequency=self.m)
-                f_cast = forecast.forecast(auto_arima(series), h=12).rx2['mean']
-                f_casts[:, i] = np.array(f_cast)
-
+                model = forecast.forecast(auto_arima(series), h=12)
+                if keep_fitted:
+                    f_casts[:y.shape[1], i] = np.array(model.rx2["fitted"])
+                    f_casts[y.shape[1]:, i] = np.array(model.rx2["mean"])
+                else:
+                    f_casts[:, i] = np.array(model.rx2["mean"])
             return f_casts
 
     def accuracy(self, y_true, y_pred, levels=0):
@@ -96,13 +105,9 @@ class Hts:
         return mases
 
 
-
-
-
 if __name__ == '__main__':
     a = np.random.random((100, 14))
     nodes = [[2], [2, 2], [3, 4, 3, 4]]
-    hts = Hts.from_hts(a, nodes)
+    hts = Hts.from_hts(a, nodes, m=1)
     a = hts.aggregate_ts(levels=0)
     b = hts.aggregate_ts(levels=1)
-    hts.forecast()
