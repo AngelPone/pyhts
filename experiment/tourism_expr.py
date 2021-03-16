@@ -19,6 +19,6 @@ hts_trian, hts_test = load_tourismV4()
 with open("base_forecast.pkl", "rb") as f:
      res = pickle.load(f)
 
-res = hts_trian.forecast(res, "sample")
+res = hts_trian.forecast(res, "shrinkage")
 
 print(hts_trian.accuracy(hts_test, res))

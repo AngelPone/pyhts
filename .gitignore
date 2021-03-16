@@ -16,6 +16,8 @@
 *.xml
 *test.*
 *.pkl
+.RData
+.Rhistory
 
 ### macOS ###
 # General

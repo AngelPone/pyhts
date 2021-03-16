@@ -1,15 +1,15 @@
-import numpy as np
-from pyhts.accuracy import *
-from typing import List
-
 import rpy2.robjects as robjects
+import pyhts.reconciliation as fr
+from pyhts.accuracy import *
+
+from typing import List
 from rpy2.robjects.packages import importr
 from rpy2.robjects.vectors import FloatVector
+from scipy.sparse import csr_matrix
+
 forecast = importr("forecast")
 
 
-
-#TODO: change to sparse matrix
 def _nodes2constraints(nodes: List):
     n = sum(nodes[-1])
     m = sum(map(sum, nodes)) + 1
@@ -37,8 +37,22 @@ def _nodes2constraints(nodes: List):
             c_x = n_x
             node_level.insert(0, level_idx)
         bts_count = new_bts_count
+    return csr_matrix(s), np.array(node_level)
 
-    return s, np.array(node_level)
+
+def _constraints_from_chars(names: List, chars: List):
+    total_pos = 0
+    import pandas as pd
+    df = pd.DataFrame()
+    df["0"] = [1]*len(names)
+    for index in range(len(chars)):
+        a = list(map(lambda x: x[:(total_pos+chars[index])], names))
+        df[f"{index+1}"] = a
+        total_pos += chars[index]
+
+    constraints = pd.get_dummies(df).values.T
+
+    return constraints, np.array(list(map(lambda x: int(x.split("_")[0]), pd.get_dummies(df).columns)))
 
 
 class Hts:
@@ -50,10 +64,14 @@ class Hts:
         self.m = None
 
     @classmethod
-    def from_hts(cls, bts, nodes, m):
+    def from_hts(cls, bts, m, characters=None, nodes=None):
         hts = cls()
-        hts.bts = bts
-        hts.constraints, hts.node_level = _nodes2constraints(nodes)
+        if nodes:
+            hts.bts = bts
+            hts.constraints, hts.node_level = _nodes2constraints(nodes)
+        if characters:
+            hts.bts = bts.data
+            hts.constraints, hts.node_level = _constaints_from_chars(list(bts.columns), characters)
         hts.m = m
         return hts
 
@@ -67,14 +85,51 @@ class Hts:
         return self.constraints.dot(self.bts.T).T
 
     # TODO: 优化结构
-    def forecast(self, base_forecast, reconciliation_method="ols"):
-        import pyhts.reconciliation as fr
-        if reconciliation_method == "ols":
+    def forecast(self,
+                 h,
+                 base_method="arima",
+                 hf_method="comb",
+                 weights_method="ols",
+                 weights=None,
+                 variance="shrink",
+                 parallel=False
+                 ):
+        """
+        :param h: forecast horzion
+        :param base_method: method for generate base forecast
+        :param hf_method: method for hierarchical forecast: comb, bu, td, mo
+        :param weights_method: ols, wls, mint
+        :param weights: nseries, custom_matrix
+        :param variance: cov, var, shrink
+        :param parallel: Bool
+        :return: Hts: reconciled forecast
+        """
+        keep_fitted = False
+        if hf_method == "comb":
+            # generate base forecast
+            if weights_method == "wls":
+                keep_fitted = True
+            base_forecast = self.generate_base_forecast(base_method, h, keep_fitted)
 
-            return fr.wls(self, base_forecast)
-        if reconciliation_method in ["shrinkage", "wls", "nseries", "sample"]:
-            return fr.min_trace(self, base_forecast, reconciliation_method)
-        return None
+            # reconcile base forecasts
+            if weights_method == "ols":
+                reconciled_y = fr.wls(self, base_forecast)
+            elif weights_method == "wls":
+                if weights == "nseries":
+                    weight_matrix = np.diag(self.constraints.dot(np.array([1] * self.bts.shape[1])))
+                    reconciled_y = fr.wls(self, base_forecast, weight_matrix)
+                elif isinstance(weights, np.ndarray):
+                    reconciled_y = fr.wls(self, base_forecast, weights)
+                else:
+                    raise ValueError("weights for wls method is not supported")
+            elif weights_method == "mint":
+                reconciled_y = fr.min_trace(self, base_forecast, variance)
+            else:
+                raise ValueError("this comination method is not supported")
+        else:
+            raise NotImplementedError("this method is not implemented")
+
+        return reconciled_y
 
     def generate_base_forecast(self, method="arima", h=1, keep_fitted=False):
         ts = robjects.r['ts']
@@ -98,16 +153,8 @@ class Hts:
 
     def accuracy(self, y_true, y_pred, levels=0):
         # MASE
-        agg_ts = self.aggregate_ts(levels=levels) # history
+        agg_ts = self.aggregate_ts(levels=levels)
         agg_true = y_true.aggregate_ts(levels=levels)
         agg_pred = y_pred.aggregate_ts(levels=levels)
         mases = np.array(list(map(lambda x,y: mase(*x, y), zip(agg_ts.T, agg_true.T, agg_pred.T), [12]*agg_ts.shape[1])))
         return mases
-
-
-if __name__ == '__main__':
-    a = np.random.random((100, 14))
-    nodes = [[2], [2, 2], [3, 4, 3, 4]]
-    hts = Hts.from_hts(a, nodes, m=1)
-    a = hts.aggregate_ts(levels=0)
-    b = hts.aggregate_ts(levels=1)
