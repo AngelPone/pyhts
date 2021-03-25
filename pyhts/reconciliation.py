@@ -55,3 +55,25 @@ def min_trace(hts, base_forecast, weighting_method="shrink"):
     reconciled_hts = deepcopy(hts)
     reconciled_hts.bts = reconciled_y.T
     return reconciled_hts
+
+
+# TODO: support buttom up method
+def constrained_wls(hts, base_forecast, constrained_level=0, weight_matrix=None):
+    # prepare constraints matrix
+    x = hts.constraints[hts.node_level > constrained_level, :].toarray()
+    q = hts.constraints[hts.node_level == constrained_level].T.toarray()
+    base = base_forecast.T[hts.node_level > constrained_level]
+    c = base_forecast.T[hts.node_level == constrained_level]
+    if weight_matrix is None:
+        weight_matrix = np.identity(x.shape[0])
+
+    x_tr_x = np.linalg.inv(x.T.dot(weight_matrix).dot(x))
+    # calculate ols result
+    beta_hat = x_tr_x.dot(x.T).dot(weight_matrix).dot(base)
+    # calculate cls result
+    reconciled_bts = beta_hat - x_tr_x.dot(q).dot(np.linalg.inv(
+        q.T.dot(x_tr_x).dot(q)
+    )).dot(q.T.dot(beta_hat)-c)
+    reconciled_hts = deepcopy(hts)
+    reconciled_hts.bts = reconciled_bts.T
+    return reconciled_hts

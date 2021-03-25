@@ -52,9 +52,9 @@ def _constraints_from_chars(names: List, chars: List):
 
     constraints = pd.get_dummies(df).values.T
 
-    return constraints, np.array(list(map(lambda x: int(x.split("_")[0]), pd.get_dummies(df).columns)))
+    return csr_matrix(constraints), np.array(list(map(lambda x: int(x.split("_")[0]), pd.get_dummies(df).columns)))
 
-
+# TODO: 调整bts以及预测中用到的base foracast的维度，避免过多无用的转置
 class Hts:
 
     def __init__(self):
@@ -70,8 +70,8 @@ class Hts:
             hts.bts = bts
             hts.constraints, hts.node_level = _nodes2constraints(nodes)
         if characters:
-            hts.bts = bts.data
-            hts.constraints, hts.node_level = _constaints_from_chars(list(bts.columns), characters)
+            hts.bts = bts.values
+            hts.constraints, hts.node_level = _constraints_from_chars(list(bts.columns), characters)
         hts.m = m
         return hts
 
@@ -92,7 +92,9 @@ class Hts:
                  weights_method="ols",
                  weights=None,
                  variance="shrink",
-                 parallel=False
+                 parallel=False,
+                 constraint=False,
+                 constrain_level=0
                  ):
         """
         :param h: forecast horzion
@@ -102,6 +104,8 @@ class Hts:
         :param weights: nseries, custom_matrix
         :param variance: cov, var, shrink
         :param parallel: Bool
+        :param constraint: Bool, if constrained
+        :param constrain_level: int, if constrained, which level
         :return: Hts: reconciled forecast
         """
         keep_fitted = False
@@ -113,7 +117,10 @@ class Hts:
 
             # reconcile base forecasts
             if weights_method == "ols":
-                reconciled_y = fr.wls(self, base_forecast)
+                if constraint:
+                    reconciled_y = fr.constrained_wls(self, base_forecast, constrain_level)
+                else:
+                    reconciled_y = fr.wls(self, base_forecast)
             elif weights_method == "wls":
                 if weights == "nseries":
                     weight_matrix = np.diag(self.constraints.dot(np.array([1] * self.bts.shape[1])))
@@ -151,6 +158,7 @@ class Hts:
                     f_casts[:, i] = np.array(model.rx2["mean"])
             return f_casts
 
+    # TODO: 修正结构方便base forecast的比较
     def accuracy(self, y_true, y_pred, levels=0):
         # MASE
         agg_ts = self.aggregate_ts(levels=levels)
