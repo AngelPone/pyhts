@@ -6,9 +6,18 @@
 Welcome to pyhts's documentation!
 =================================
 
+
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: QuickStart
+
+   demo <tutorials/quickdemo.rst>
+
+.. toctree::
+   :caption: API References
+
+   API/hts.rst
+
 
 
 
