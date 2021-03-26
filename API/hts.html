@@ -7,14 +7,12 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Hts Object &mdash; pyhts  documentation</title>
+  <title>Hts &mdash; pyhts  documentation</title>
   
 
   
-  <link rel="stylesheet" href="../_static/css/style.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/explore.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/nbsphinx.css" type="text/css" />
 
   
   
@@ -34,99 +32,19 @@
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/js/custom.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="prev" title="Demo" href="../tutorials/quickdemo.html" />
-  <link rel="shortcut icon" href="../_static/images/favicon.ico"/>
-  
-  <meta name="Description" content="Hts Object">
-  <meta property="og:description" content="Hts Object">
-  <meta name="twitter:description" content="Hts Object" />
-  <meta property="og:title" content="pyhts  documentation - Hts Object">
-  <meta property="og:image" content="https://github.com/dask.png">
-  <meta property="og:image:secure_url" content="https://github.com/dask.png" />
-  <meta property="og:image:type" content="image/png" />
-  <meta property="og:image:width" content="380" />
-  <meta property="og:image:height" content="380" />
-  <meta property="og:url" content="API/hts.html">
-  <meta property="og:site_name" content="pyhts  documentation">
-
-  <meta name="twitter:site" content="https://dask.org" />
-  <meta name="twitter:creator" content="@dask_dev" />
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:image" content="https://github.com/dask.png" />
-  <meta name="twitter:image:alt" content="pyhts  documentation">
-  
-
+    <link rel="prev" title="Demo" href="../tutorials/quickdemo.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
 
-  
-    <nav id="explore-links">
-        <a href="https://docs.dask.org/">
-        <img class="caption" src="../_static/images/dask-horizontal-white.svg"/>
-        </a>
-
-        <ul>
-        <li>
-            <a>Get Started</a>
-            <ul>
-            <li><a href="https://docs.dask.org/en/latest/install.html"> Install </a></li>
-            <li><a href="https://examples.dask.org"> Examples </a></li>
-            <li><a href="https://github.com/dask/dask-tutorial"> Tutorial </a></li>
-            <li><a href="https://docs.dask.org/en/latest/why.html"> Why Dask? </a></li>
-            <li><a href="https://stories.dask.org/en/latest"> Use Cases </a></li>
-            <li><a href="https://www.youtube.com/watch?v=RA_2qdipVng&list=PLRtz5iA93T4PQvWuoMnIyEIz1fXiJ5Pri"> Talks </a></li>
-            <li><a href="https://mybinder.org/v2/gh/dask/dask-examples/master?urlpath=lab"> Try Online </a></li>
-            <li><a href="https://dask.org/slides"> Slides </a></li>
-            </ul>
-        </li>
-
-        <li>
-            <a href="">Algorithms</a>
-            <ul>
-            <li><a href="https://docs.dask.org/en/latest/array.html">Arrays</a></li>
-            <li><a href="https://docs.dask.org/en/latest/dataframe.html">Dataframes</a></li>
-            <li><a href="https://docs.dask.org/en/latest/bag.html">Bags</a></li>
-            <li><a href="https://docs.dask.org/en/latest/delayed.html">Delayed (custom)</a></li>
-            <li><a href="https://docs.dask.org/en/latest/futures.html">Futures (real-time)</a></li>
-            <li><a href="http://ml.dask.org">Machine Learning</a></li>
-            <li><a href="https://xarray.pydata.org/en/latest/">XArray</a></li>
-            </ul>
-        </li>
-
-        <li>
-            <a href="https://docs.dask.org/en/latest/setup.html">Setup</a>
-            <ul>
-            <li><a href="https://docs.dask.org/en/latest/setup/single-machine.html"> Local </a></li>
-            <li><a href="https://docs.dask.org/en/latest/setup/cloud.html"> Cloud </a></li>
-            <li><a href="https://docs.dask.org/en/latest/setup/hpc.html"> HPC </a></li>
-            <li><a href="https://kubernetes.dask.org/en/latest/"> Kubernetes </a></li>
-            <li><a href="https://yarn.dask.org/en/latest/"> Hadoop / Yarn </a></li>
-            </ul>
-        </li>
-
-        <li>
-            <a>Community</a>
-            <ul>
-            <li><a href="http://docs.dask.org/en/latest/support.html">Ask for Help</a></li>
-            <li><a href="https://github.com/dask">Github</a></li>
-            <li><a href="https://stackoverflow.com/questions/tagged/dask">Stack Overflow</a></li>
-            <li><a href="https://twitter.com/dask_dev">Twitter</a></li>
-            <li><a href="https://blog.dask.org/"> Developer Blog </a></li>
-            <li><a href="https://youtube.com/c/dask-dev"> YouTube Channel </a></li>
-            </ul>
-        </li>
-        </ul>
-
-    </nav>
-  
+   
   <div class="wy-grid-for-nav">
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
@@ -172,7 +90,7 @@
 </ul>
 <p class="caption"><span class="caption-text">API References</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Hts Object</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Hts</a></li>
 </ul>
 
             
@@ -221,13 +139,11 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Hts Object</li>
+      <li>Hts</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
-          
-            <a href="../_sources/API/hts.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -240,8 +156,70 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="hts-object">
-<h1>Hts Object<a class="headerlink" href="#hts-object" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="hts">
+<h1>Hts<a class="headerlink" href="#hts" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="pyhts.hts.Hts">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pyhts.hts.</span></code><code class="sig-name descname"><span class="pre">Hts</span></code><a class="headerlink" href="#pyhts.hts.Hts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for hierarchical time series, can be constructed from  cross-sectional multivariate time series
+like hierarchical or grouped time series and temporal hierarchies <a class="footnote-reference brackets" href="#id2" id="id1">1</a>.</p>
+<dl class="py method">
+<dt id="pyhts.hts.Hts.forecast">
+<code class="sig-name descname"><span class="pre">forecast</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'arima'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hf_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'comb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ols'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'shrink'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parallel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constrain_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.hts.Hts.forecast" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>h</strong> – forecast horzion</p></li>
+<li><p><strong>base_method</strong> – method for generate base forecast</p></li>
+<li><p><strong>hf_method</strong> – method for hierarchical forecast: comb, bu, td, mo</p></li>
+<li><p><strong>weights_method</strong> – ols, wls, mint</p></li>
+<li><p><strong>weights</strong> – nseries, custom_matrix</p></li>
+<li><p><strong>variance</strong> – cov, var, shrink</p></li>
+<li><p><strong>parallel</strong> – Bool</p></li>
+<li><p><strong>constraint</strong> – Bool, if constrained</p></li>
+<li><p><strong>constrain_level</strong> – int, if constrained, which level</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Hts: reconciled forecast</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyhts.hts.Hts.from_hts">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_hts</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">characters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.hts.Hts.from_hts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct hts from cross-sectional hierarchical time series.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bts</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – <span class="math notranslate nohighlight">\(m\times T\)</span> bottom level series.</p></li>
+<li><p><strong>m</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – frequency of time series</p></li>
+<li><p><strong>characters</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]) – length of characters of each level,
+for example, “ABC” ‘A’ represents ‘A’ series of  first level,  ‘B’ represents ‘B’ series under node ‘A’,
+‘C’ represents ‘C’ series under node ‘AB’. So the value of parameter is [1,1,1]</p></li>
+<li><p><strong>nodes</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>]]) – List of list to demonstrate the hierarchy, see details.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#pyhts.hts.Hts" title="pyhts.hts.Hts"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hts</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Hts object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<p>References</p>
+<dl class="footnote brackets">
+<dt class="label" id="id2"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><ol class="upperalpha simple" start="7">
+<li><p>Athanasopoulos, R. J. Hyndman, N. Kourentzes, and F. Petropoulos, “Forecasting with temporal hierarchies,” European Journal of Operational Research, vol. 262, no. 1, pp. 60–74, Oct. 2017, doi: 10.1016/j.ejor.2017.02.046.</p></li>
+</ol>
+</dd>
+</dl>
 </div>
 
 

@@ -16,7 +16,8 @@ Welcome to pyhts's documentation!
 .. toctree::
    :caption: API References
 
-   API/hts.rst
+   API/hts.md
+
 
 
 
