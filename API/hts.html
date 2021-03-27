@@ -39,7 +39,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="prev" title="Tutorials" href="../tutorials/Tutorials.html" /> 
+    <link rel="next" title="References" href="../references.html" />
+    <link rel="prev" title="Notation" href="../tutorials/notation.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -86,7 +87,8 @@
             
               <p class="caption"><span class="caption-text">QuickStart</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/Tutorials.html">tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/Tutorials.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/notation.html">Notation</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API References</span></p>
 <ul class="current">
@@ -97,6 +99,10 @@
 </li>
 </ul>
 </li>
+</ul>
+<p class="caption"><span class="caption-text">References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
 </ul>
 
             
@@ -168,7 +174,7 @@
 <dt id="pyhts.hts.Hts">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pyhts.hts.</span></code><code class="sig-name descname"><span class="pre">Hts</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constraints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.hts.Hts" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class for hierarchical time series, can be constructed from  cross-sectional hierarchical time series
-like hierarchical or grouped time series and temporal hierarchies <a class="footnote-reference brackets" href="#id2" id="id1">1</a>.</p>
+like hierarchical or grouped time series and temporal hierarchies <a class="reference internal" href="../references.html#references"><span class="std std-ref">References</span></a>.</p>
 <dl class="py method">
 <dt id="pyhts.hts.Hts.aggregate_ts">
 <code class="sig-name descname"><span class="pre">aggregate_ts</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.hts.Hts.aggregate_ts" title="Permalink to this definition">¶</a></dt>
@@ -189,22 +195,34 @@ like hierarchical or grouped time series and temporal hierarchies <a class="foot
 <dl class="py method">
 <dt id="pyhts.hts.Hts.forecast">
 <code class="sig-name descname"><span class="pre">forecast</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'arima'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hf_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'comb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ols'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'shrink'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parallel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constrain_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.hts.Hts.forecast" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>forecast Hts using specific reconciliation methods and base methods.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>h</strong> – forecast horzion</p></li>
-<li><p><strong>base_method</strong> – method for generate base forecast</p></li>
-<li><p><strong>hf_method</strong> – method for hierarchical forecast: comb, bu, td, mo</p></li>
-<li><p><strong>weights_method</strong> – ols, wls, mint</p></li>
-<li><p><strong>weights</strong> – nseries, custom_matrix</p></li>
-<li><p><strong>variance</strong> – cov, var, shrink</p></li>
-<li><p><strong>parallel</strong> – Bool</p></li>
-<li><p><strong>constraint</strong> – Bool, if constrained</p></li>
-<li><p><strong>constrain_level</strong> – int, if constrained, which level</p></li>
+<li><p><strong>h</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – forecasting horizon.</p></li>
+<li><p><strong>base_method</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>]) – method for generate base forecast, arima, ets, or custom function.
+arima and ets are implemented using <cite>forecast</cite> package in R.
+If custom forecast function is specified and using “mint” method, the function
+should return the in-sample forecasts for estimating the covariance matrix, e.g. the
+base forecast returned should be <span class="math notranslate nohighlight">\((T+h) \times n\)</span>.</p></li>
+<li><p><strong>hf_method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – method for hierarchical forecasting, “comb”, “bu”, “td”, “mo”</p></li>
+<li><p><strong>weights_method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – “ols”, “wls”, “mint”(e.g Minimum Trace <a class="reference internal" href="../references.html#mint"><span class="std std-ref">MinT</span></a> ), weights method used for “comb”(e.g. optimal combination)
+reconciliation method, if you choose “wls”, you should specify <cite>weights</cite>, or the result is same as ols. If
+you choose “mint”, you should specify <cite>variance</cite> parameter.</p></li>
+<li><p><strong>weights</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – <a class="reference internal" href="../references.html#references"><span class="std std-ref">References</span></a>
+weighting matrix used for “wls” method, can be “nseries” or custom_matrix, this custom matrix should be
+<span class="math notranslate nohighlight">\(n\times n\)</span></p></li>
+<li><p><strong>variance</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – “cov”, “var”, “shrink”, variance estimation method used for <cite>mint</cite> method.</p></li>
+<li><p><strong>parallel</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – If parallel, not supported for now.</p></li>
+<li><p><strong>constraint</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – If some levels are constrained to be unchangeable when reconciling base forecasts.</p></li>
+<li><p><strong>constrain_level</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Which level is constrained to be unchangeable when reconciling base forecasts.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Hts: reconciled forecast</p>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#pyhts.hts.Hts" title="pyhts.hts.Hts"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hts</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Hts: reconciled forecast.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -239,14 +257,6 @@ for example, “ABC” ‘A’ represents ‘A’ series of  first level,  ‘B�
 <h2>details<a class="headerlink" href="#details" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="construction-of-hts-object">
 <h3>Construction of Hts object<a class="headerlink" href="#construction-of-hts-object" title="Permalink to this headline">¶</a></h3>
-<p>References</p>
-<dl class="footnote brackets">
-<dt class="label" id="id2"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><ol class="upperalpha simple" start="7">
-<li><p>Athanasopoulos, R. J. Hyndman, N. Kourentzes, and F. Petropoulos, “Forecasting with temporal hierarchies,” European Journal of Operational Research, vol. 262, no. 1, pp. 60–74, Oct. 2017, doi: 10.1016/j.ejor.2017.02.046.</p></li>
-</ol>
-</dd>
-</dl>
 </div>
 </div>
 </div>
@@ -257,7 +267,8 @@ for example, “ABC” ‘A’ represents ‘A’ series of  first level,  ‘B�
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="../tutorials/Tutorials.html" class="btn btn-neutral float-left" title="Tutorials" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../references.html" class="btn btn-neutral float-right" title="References" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../tutorials/notation.html" class="btn btn-neutral float-left" title="Notation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

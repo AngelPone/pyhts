@@ -1,13 +1,15 @@
 Tutorials
 ============
 
+Before reading this tutorial, you'd better read :doc:`notation` first. If you're not familiar with Hierarchical
+forecasting and forecast reconciliation, read the papers provided in :ref:`references`.
 
 Construction of Hts object
 --------------------------
 
 There are three types of hierarchical time series supported for now, e.g. 
 cross-sectional hierarchical time series, cross-sectional grouped time
-series and temporal hierarchies [1]_. For the first two types, you can use
+series and temporal hierarchies :ref:`[1]<references>`. For the first two types, you can use
 :class:`~pyhts.hts.Hts` and construct from its classmethod,
 respectively :meth:`~pyhts.hts.Hts.from_hts()` and :meth:`~pyhts.hts.Hts.from_gts()`.
 
@@ -73,7 +75,3 @@ forecast
 
 
 
-
-References
-----------
-.. [1] G. Athanasopoulos, R. J. Hyndman, N. Kourentzes, and F. Petropoulos, “Forecasting with temporal hierarchies,” European Journal of Operational Research, vol. 262, no. 1, pp. 60–74, Oct. 2017, doi: 10.1016/j.ejor.2017.02.046.

@@ -38,7 +38,7 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Hts" href="../API/hts.html" />
+    <link rel="next" title="Notation" href="notation.html" />
     <link rel="prev" title="Welcome to pyhts’s documentation!" href="../index.html" /> 
 </head>
 
@@ -86,17 +86,21 @@
             
               <p class="caption"><span class="caption-text">QuickStart</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">tutorial</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#construction-of-hts-object">Construction of Hts object</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#aggregation">Aggregation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#forecast">forecast</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="notation.html">Notation</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API References</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../API/hts.html">Hts</a></li>
+</ul>
+<p class="caption"><span class="caption-text">References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
 </ul>
 
             
@@ -164,11 +168,13 @@
             
   <div class="section" id="tutorials">
 <h1>Tutorials<a class="headerlink" href="#tutorials" title="Permalink to this headline">¶</a></h1>
+<p>Before reading this tutorial, you’d better read <a class="reference internal" href="notation.html"><span class="doc">Notation</span></a> first. If you’re not familiar with Hierarchical
+forecasting and forecast reconciliation, read the papers provided in <a class="reference internal" href="../references.html#references"><span class="std std-ref">References</span></a>.</p>
 <div class="section" id="construction-of-hts-object">
 <h2>Construction of Hts object<a class="headerlink" href="#construction-of-hts-object" title="Permalink to this headline">¶</a></h2>
 <p>There are three types of hierarchical time series supported for now, e.g.
 cross-sectional hierarchical time series, cross-sectional grouped time
-series and temporal hierarchies <a class="footnote-reference brackets" href="#id2" id="id1">1</a>. For the first two types, you can use
+series and temporal hierarchies <a class="reference internal" href="../references.html#references"><span class="std std-ref">[1]</span></a>. For the first two types, you can use
 <a class="reference internal" href="../API/hts.html#pyhts.hts.Hts" title="pyhts.hts.Hts"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hts</span></code></a> and construct from its classmethod,
 respectively <a class="reference internal" href="../API/hts.html#pyhts.hts.Hts.from_hts" title="pyhts.hts.Hts.from_hts"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_hts()</span></code></a> and <code class="xref py py-meth docutils literal notranslate"><span class="pre">from_gts()</span></code>.</p>
 <p>As an example of the hierarchy shown in the figure below, use <a class="reference internal" href="../API/hts.html#pyhts.hts.Hts.from_hts" title="pyhts.hts.Hts.from_hts"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_hts()</span></code></a> to construct
@@ -222,16 +228,6 @@ Hts object.</p>
 <div class="section" id="forecast">
 <h2>forecast<a class="headerlink" href="#forecast" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="references">
-<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
-<dl class="footnote brackets">
-<dt class="label" id="id2"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><ol class="upperalpha simple" start="7">
-<li><p>Athanasopoulos, R. J. Hyndman, N. Kourentzes, and F. Petropoulos, “Forecasting with temporal hierarchies,” European Journal of Operational Research, vol. 262, no. 1, pp. 60–74, Oct. 2017, doi: 10.1016/j.ejor.2017.02.046.</p></li>
-</ol>
-</dd>
-</dl>
-</div>
 </div>
 
 
@@ -240,7 +236,7 @@ Hts object.</p>
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="../API/hts.html" class="btn btn-neutral float-right" title="Hts" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="notation.html" class="btn btn-neutral float-right" title="Notation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
         <a href="../index.html" class="btn btn-neutral float-left" title="Welcome to pyhts’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
