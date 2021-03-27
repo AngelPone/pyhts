@@ -11,7 +11,7 @@ Welcome to pyhts's documentation!
    :maxdepth: 2
    :caption: QuickStart
 
-   demo <tutorials/quickdemo.rst>
+   tutorial <tutorials/Tutorials.rst>
 
 .. toctree::
    :caption: API References
