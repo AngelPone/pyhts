@@ -1,8 +1,10 @@
+from __future__ import annotations
 import rpy2.robjects as robjects
 import pyhts.reconciliation as fr
 from pyhts.accuracy import *
+from pandas import DataFrame
 
-from typing import List
+from typing import List, Union, Optional
 from rpy2.robjects.packages import importr
 from rpy2.robjects.vectors import FloatVector
 from scipy.sparse import csr_matrix
@@ -54,33 +56,66 @@ def _constraints_from_chars(names: List, chars: List):
 
     return csr_matrix(constraints), np.array(list(map(lambda x: int(x.split("_")[0]), pd.get_dummies(df).columns)))
 
+
 # TODO: 调整bts以及预测中用到的base foracast的维度，避免过多无用的转置
 class Hts:
+    """
+    Class for hierarchical time series, can be constructed from  cross-sectional hierarchical time series
+    like hierarchical or grouped time series and temporal hierarchies [1]_.
 
-    def __init__(self):
-        self.constraints = None
-        self.bts = None
-        self.node_level = None
-        self.m = None
+    """
+    def __init__(self, constraints: Union[csr_matrix, np.ndarray], bts: np.ndarray, node_level: np.ndarray, m: int = 1):
+        if isinstance(constraints, np.ndarray):
+            constraints = csr_matrix(constraints)
+        self.constraints = constraints
+        self.bts = bts
+        self.node_level = node_level
+        self.m = m
 
     @classmethod
-    def from_hts(cls, bts, m, characters=None, nodes=None):
-        hts = cls()
-        if nodes:
-            hts.bts = bts
-            hts.constraints, hts.node_level = _nodes2constraints(nodes)
-        if characters:
-            hts.bts = bts.values
-            hts.constraints, hts.node_level = _constraints_from_chars(list(bts.columns), characters)
-        hts.m = m
+    def from_hts(cls, bts: Union[np.ndarray, DataFrame],
+                 m: int,
+                 characters: Optional[List[int]] = None,
+                 nodes: Optional[List[List]] = None) -> Hts:
+        """Construct hts from cross-sectional hierarchical time series.
+
+        :param bts: :math:`T\\times m` bottom level series.
+        :param m: frequency of time series
+        :param characters:
+            length of characters of each level,
+            for example, "ABC" 'A' represents 'A' series of  first level,  'B' represents 'B' series under node 'A',
+            'C' represents 'C' series under node 'AB'. So the value of parameter is [1,1,1]
+        :param nodes: List of list to demonstrate the hierarchy, see details.
+        :return: Hts object.
+        """
+        if isinstance(bts, DataFrame):
+            names = bts.columns
+            bts = bts.values
+        elif isinstance(bts, np.ndarray):
+            bts = bts
+            names = None
+        else:
+            raise TypeError("bts must be numpy.ndarray or pandas.DataFrame")
+        if nodes is not None:
+            constraints, node_level = _nodes2constraints(nodes)
+        elif characters is not None:
+            constraints, node_level = _constraints_from_chars(list(names), characters)
+        else:
+            constraints, node_level = _nodes2constraints([[bts.shape[1]]])
+        hts = cls(constraints, bts, node_level, m)
         return hts
 
-    def aggregate_ts(self, levels=None):
+    def aggregate_ts(self, levels: Union[int, List[int]] = None) -> np.ndarray:
+        """aggregate bottom-levels time series.
+
+        :param levels: which levels you want.
+        :return: upper-level time series.
+        """
         if isinstance(levels, int):
             s = self.constraints[np.where(self.node_level == levels)]
             return s.dot(self.bts.T).T
         if isinstance(levels, list):
-            s = self.constraints[np.where(self.node_level in levels)]
+            s = self.constraints[np.isin(self.node_level, levels)]
             return s.dot(self.bts.T).T
         return self.constraints.dot(self.bts.T).T
 
