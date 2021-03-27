@@ -11,13 +11,19 @@ Welcome to pyhts's documentation!
    :maxdepth: 2
    :caption: QuickStart
 
-   tutorial <tutorials/Tutorials.rst>
+   Tutorial <tutorials/Tutorials.rst>
+   Notation <tutorials/notation.rst>
+
 
 .. toctree::
    :caption: API References
 
    API/hts.md
 
+.. toctree::
+   :caption: References
+
+   References <references.rst>
 
 
 
