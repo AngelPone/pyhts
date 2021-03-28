@@ -13,6 +13,7 @@ Welcome to pyhts's documentation!
 
    Tutorial <tutorials/Tutorials.rst>
    Notation <tutorials/notation.rst>
+   Forecast reconciliation <tutorials/reconciliation.rst>
 
 
 .. toctree::

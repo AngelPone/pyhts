@@ -2,13 +2,12 @@
 
 ```eval_rst
 .. autoclass:: pyhts.hts.Hts
+   :undoc-members: 
    :members:
+   :member-order: bysource
 ```
 
 
-### details
-
-#### Construction of Hts object
 
 
    

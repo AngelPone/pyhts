@@ -40,7 +40,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="References" href="../references.html" />
-    <link rel="prev" title="Notation" href="../tutorials/notation.html" /> 
+    <link rel="prev" title="Forecast reconciliation" href="../tutorials/reconciliation.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -89,16 +89,11 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/Tutorials.html">Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/notation.html">Notation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/reconciliation.html">Forecast reconciliation</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API References</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Hts</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#details">details</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#construction-of-hts-object">Construction of Hts object</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Hts</a></li>
 </ul>
 <p class="caption"><span class="caption-text">References</span></p>
 <ul>
@@ -174,7 +169,31 @@
 <dt id="pyhts.hts.Hts">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pyhts.hts.</span></code><code class="sig-name descname"><span class="pre">Hts</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constraints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.hts.Hts" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class for hierarchical time series, can be constructed from  cross-sectional hierarchical time series
-like hierarchical or grouped time series and temporal hierarchies <a class="reference internal" href="../references.html#references"><span class="std std-ref">References</span></a>.</p>
+like hierarchical or grouped time series and temporal hierarchies <a class="reference internal" href="../references.html#references"><span class="std std-ref">[1]</span></a>.</p>
+<dl class="py method">
+<dt id="pyhts.hts.Hts.from_hts">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_hts</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">characters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.hts.Hts.from_hts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct hts from cross-sectional hierarchical time series.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bts</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – <span class="math notranslate nohighlight">\(T\times m\)</span> bottom level series.</p></li>
+<li><p><strong>m</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – frequency of time series</p></li>
+<li><p><strong>characters</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]) – length of characters of each level,
+for example, “ABC” ‘A’ represents ‘A’ series of  first level,  ‘B’ represents ‘B’ series under node ‘A’,
+‘C’ represents ‘C’ series under node ‘AB’. So the value of parameter is [1,1,1]</p></li>
+<li><p><strong>nodes</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>]]) – List of list to demonstrate the hierarchy, see details.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#pyhts.hts.Hts" title="pyhts.hts.Hts"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hts</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Hts object.</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt id="pyhts.hts.Hts.aggregate_ts">
 <code class="sig-name descname"><span class="pre">aggregate_ts</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.hts.Hts.aggregate_ts" title="Permalink to this definition">¶</a></dt>
@@ -209,8 +228,7 @@ base forecast returned should be <span class="math notranslate nohighlight">\((T
 <li><p><strong>weights_method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – “ols”, “wls”, “mint”(e.g Minimum Trace <a class="reference internal" href="../references.html#mint"><span class="std std-ref">MinT</span></a> ), weights method used for “comb”(e.g. optimal combination)
 reconciliation method, if you choose “wls”, you should specify <cite>weights</cite>, or the result is same as ols. If
 you choose “mint”, you should specify <cite>variance</cite> parameter.</p></li>
-<li><p><strong>weights</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – <a class="reference internal" href="../references.html#references"><span class="std std-ref">References</span></a>
-weighting matrix used for “wls” method, can be “nseries” or custom_matrix, this custom matrix should be
+<li><p><strong>weights</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – weighting matrix used for “wls” method, can be “nseries” or custom_matrix, this custom matrix should be
 <span class="math notranslate nohighlight">\(n\times n\)</span></p></li>
 <li><p><strong>variance</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – “cov”, “var”, “shrink”, variance estimation method used for <cite>mint</cite> method.</p></li>
 <li><p><strong>parallel</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – If parallel, not supported for now.</p></li>
@@ -228,37 +246,49 @@ weighting matrix used for “wls” method, can be “nseries” or custom_matri
 </dd></dl>
 
 <dl class="py method">
-<dt id="pyhts.hts.Hts.from_hts">
-<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_hts</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">characters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.hts.Hts.from_hts" title="Permalink to this definition">¶</a></dt>
-<dd><p>Construct hts from cross-sectional hierarchical time series.</p>
+<dt id="pyhts.hts.Hts.generate_base_forecast">
+<code class="sig-name descname"><span class="pre">generate_base_forecast</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'arima'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_fitted</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.hts.Hts.generate_base_forecast" title="Permalink to this definition">¶</a></dt>
+<dd><p>generate base forecasts by <cite>forecast</cite> in R with rpy2.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>bts</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – <span class="math notranslate nohighlight">\(T\times m\)</span> bottom level series.</p></li>
-<li><p><strong>m</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – frequency of time series</p></li>
-<li><p><strong>characters</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]) – length of characters of each level,
-for example, “ABC” ‘A’ represents ‘A’ series of  first level,  ‘B’ represents ‘B’ series under node ‘A’,
-‘C’ represents ‘C’ series under node ‘AB’. So the value of parameter is [1,1,1]</p></li>
-<li><p><strong>nodes</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>]]) – List of list to demonstrate the hierarchy, see details.</p></li>
+<li><p><strong>method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – base forecast method.</p></li>
+<li><p><strong>h</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – forecasting horizons.</p></li>
+<li><p><strong>keep_fitted</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – if keep in-sample fitted value, useful when mint method is specified.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="#pyhts.hts.Hts" title="pyhts.hts.Hts"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hts</span></code></a></p>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
 </dd>
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Hts object.</p>
+<dd class="field-odd"><p>base forecast</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyhts.hts.Hts.accuracy">
+<code class="sig-name descname"><span class="pre">accuracy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_true</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.hts.Hts.accuracy" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculate forecast accuracy, mase is supported only for now.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y_true</strong> (<a class="reference internal" href="#pyhts.hts.Hts" title="pyhts.hts.Hts"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hts</span></code></a>) – real observations.</p></li>
+<li><p><strong>y_pred</strong> (<a class="reference internal" href="#pyhts.hts.Hts" title="pyhts.hts.Hts"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hts</span></code></a>) – forecasts.</p></li>
+<li><p><strong>levels</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – which level.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>forecast accuracy.</p>
 </dd>
 </dl>
 </dd></dl>
 
 </dd></dl>
 
-<div class="section" id="details">
-<h2>details<a class="headerlink" href="#details" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="construction-of-hts-object">
-<h3>Construction of Hts object<a class="headerlink" href="#construction-of-hts-object" title="Permalink to this headline">¶</a></h3>
-</div>
-</div>
 </div>
 
 
@@ -268,7 +298,7 @@ for example, “ABC” ‘A’ represents ‘A’ series of  first level,  ‘B�
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
         <a href="../references.html" class="btn btn-neutral float-right" title="References" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="../tutorials/notation.html" class="btn btn-neutral float-left" title="Notation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../tutorials/reconciliation.html" class="btn btn-neutral float-left" title="Forecast reconciliation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>
