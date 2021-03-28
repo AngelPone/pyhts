@@ -1,10 +1,16 @@
 import numpy as np
 import scipy.linalg as lg
 
-from copy import deepcopy
+from typing import Union
+from pyhts.hts import Hts
 
 
-def lamb_estimate(x):
+def lamb_estimate(x: np.ndarray) -> float:
+    """estimate :math`\\lambda` used in :ref:`shrinkage` estimator of mint method
+
+    :param x: in-sample 1-step-ahead forecast error
+    :return: :math`\\lambda`
+    """
     T = x.shape[0]
     covm = x.T.dot(x)/T
     xs = x / np.sqrt(np.diag(covm))
@@ -18,62 +24,93 @@ def lamb_estimate(x):
     return lamb
 
 
-def wls(hts, base_forecast, weight_matrix=None):
+def wls(hts: Hts,
+        base_forecast: np.ndarray,
+        method: str = "ols",
+        weighting: Union[str, np.ndarray, None] = None,
+        constraint: bool = False,
+        constraint_level: int = 0) -> Hts:
+    """function for forecast reconciliation.
 
-    if not weight_matrix:
-        weight_matrix = np.identity(base_forecast.shape[1])
-    S = hts.constraints.toarray()
-    G = np.linalg.inv(S.T.dot(weight_matrix).dot(S)).dot(S.T).dot(weight_matrix)
-    reconciled_y = G.dot(base_forecast.T)
-    reconciled_hts = deepcopy(hts)
-    reconciled_hts.bts = reconciled_y.T
-
-    return reconciled_hts
-
-
-def min_trace(hts, base_forecast, weighting_method="shrink"):
+    :param hts: history time series.
+    :param base_forecast: base forecasts.
+    :param method: method used for forecast reconciliation, e.g. ols, wls, mint.
+    :param weighting:
+        method for calculating weight matrix used in reconciliation method, e.g. covariance matrix in mint
+        or wls, for details, refer to :doc:`tutorials/reconciliation`
+    :param constraint: If some levels are constrained to be unchangeable when reconciling base forecasts.
+    :param constraint_level: Which level is constrained to be unchangeable when reconciling base forecasts.
+    :return: reconciled forecasts
+    """
     y = hts.aggregate_ts()
     T = y.shape[0]
-
-    error = y - base_forecast[:T, :]
-    W = error.T.dot(error)/T
-    if weighting_method == "var":
-        weight_matrix = np.diag(np.diagonal(W))
-    elif weighting_method == "cov":
-        weight_matrix = W
-        if not np.all(np.linalg.eigvals(weight_matrix)>0):
-            raise ValueError("Sample method needs covariance matrix to be positive definite")
-    elif weighting_method == "shrink":
-        lamb = lamb_estimate(error)
-        weight_matrix = lamb * np.diag(np.diag(W)) + (1 - lamb) * W
-    else:
-        raise NotImplementedError("this min_trace method has not been implemented")
     S = hts.constraints.toarray()
+    n = S.shape[0]
+    m = S.shape[1]
+    if method == "mint":
+        out_sample_fcasts = base_forecast[T:, :]
+    else:
+        out_sample_fcasts = base_forecast
+
+    if method == "mint":
+        in_sample_fcasts = base_forecast[:T, :]
+        error = y - in_sample_fcasts
+        W = error.T.dot(error) / T
+        if weighting == "var":
+            weight_matrix = np.diag(np.diagonal(W))
+        elif weighting == "cov":
+            weight_matrix = W
+            if not np.all(np.linalg.eigvals(weight_matrix) > 0):
+                raise ValueError("Sample method needs covariance matrix to be positive definite")
+        elif weighting == "shrink":
+            lamb = lamb_estimate(error)
+            weight_matrix = lamb * np.diag(np.diag(W)) + (1 - lamb) * W
+        else:
+            raise NotImplementedError("this min_trace method has not been implemented")
+
+    elif method == "ols":
+        weight_matrix = np.identity(n)
+    else:
+        if isinstance(weighting, np.ndarray):
+            weight_matrix = np.linalg.inv(weighting)
+        elif weighting == "nseries":
+            weight_matrix = np.diag(S.dot(np.array([1]*m)))
+        else:
+            raise ValueError("this wls weights is not supported now.")
+
     w_inv = np.linalg.inv(weight_matrix)
-    G = lg.inv(S.T.dot(w_inv).dot(S)).dot(S.T).dot(w_inv)
-    reconciled_y = G.dot(base_forecast[T:, :].T)
-    reconciled_hts = deepcopy(hts)
-    reconciled_hts.bts = reconciled_y.T
+    if constraint:
+        reconciled_y = constrained(hts, w_inv, out_sample_fcasts, constraint_level)
+    else:
+        G = lg.inv(S.T.dot(w_inv).dot(S)).dot(S.T).dot(w_inv)
+        reconciled_y = G.dot(out_sample_fcasts.T)
+    reconciled_hts = Hts(hts.constraints, reconciled_y.T, hts.node_level, hts.m)
     return reconciled_hts
 
 
-# TODO: support buttom up method
-def constrained_wls(hts, base_forecast, constrained_level=0, weight_matrix=None):
-    # prepare constraints matrix
-    x = hts.constraints[hts.node_level > constrained_level, :].toarray()
-    q = hts.constraints[hts.node_level == constrained_level].T.toarray()
-    base = base_forecast.T[hts.node_level > constrained_level]
-    c = base_forecast.T[hts.node_level == constrained_level]
-    if weight_matrix is None:
-        weight_matrix = np.identity(x.shape[0])
+def constrained(hts: Hts, weights: np.ndarray, base_forecast: np.ndarray, constraint_level: int):
+    """function to compute constrained reconciled forecasts
 
-    x_tr_x = np.linalg.inv(x.T.dot(weight_matrix).dot(x))
+    :param hts: history Hts
+    :param weights: weight matrix used in unconstrained reconciliation method.
+    :param base_forecast: base forecasts.
+    :param constraint_level:
+    :return: Which level is constrained to be unchangeable when reconciling base forecasts.
+    """
+    if constraint_level == np.max(hts.node_level):
+        return base_forecast
+    a = hts.node_level > constraint_level
+    x = hts.constraints[a, :].toarray()
+    q = hts.constraints[hts.node_level == constraint_level].T.toarray()
+    weights = weights[np.ix_(a, a)]
+    base = base_forecast.T[a]
+    c = base_forecast.T[hts.node_level == constraint_level]
+    x_tr_x = np.linalg.inv(x.T.dot(weights).dot(x))
     # calculate ols result
-    beta_hat = x_tr_x.dot(x.T).dot(weight_matrix).dot(base)
+    beta_hat = x_tr_x.dot(x.T).dot(weights).dot(base)
     # calculate cls result
     reconciled_bts = beta_hat - x_tr_x.dot(q).dot(np.linalg.inv(
         q.T.dot(x_tr_x).dot(q)
-    )).dot(q.T.dot(beta_hat)-c)
-    reconciled_hts = deepcopy(hts)
-    reconciled_hts.bts = reconciled_bts.T
-    return reconciled_hts
+    )).dot(q.T.dot(beta_hat) - c)
+    return reconciled_bts
+
