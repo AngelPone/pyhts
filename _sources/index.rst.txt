@@ -20,6 +20,7 @@ Welcome to pyhts's documentation!
    :caption: API References
 
    API/hts.md
+   API/forecaster.rst
 
 .. toctree::
    :caption: References
