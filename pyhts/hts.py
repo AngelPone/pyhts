@@ -1,12 +1,11 @@
 from __future__ import annotations
-import rpy2.robjects as robjects
 from pyhts.accuracy import *
 from pandas import DataFrame
 
-from typing import List, Union, Optional, Callable
+from typing import List, Union, Optional, Type
 from rpy2.robjects.packages import importr
-from rpy2.robjects.vectors import FloatVector
 from scipy.sparse import csr_matrix
+from pyhts.forecaster import BaseForecaster, AutoArimaForecaster, EtsForecaster
 
 forecast = importr("forecast")
 
@@ -89,6 +88,7 @@ class Hts:
         self.bts = bts
         self.node_level = node_level
         self.m = m
+        self.base_forecast = None
 
     @classmethod
     def from_hts(cls, bts: Union[np.ndarray, DataFrame],
@@ -140,14 +140,16 @@ class Hts:
     # TODO: 优化结构
     def forecast(self,
                  h: int,
-                 base_method: Union[str, Callable] = "arima",
+                 base_method: Union[str, None] = "arima",
+                 base_forecaster: Union[List, None, Type[BaseForecaster]] = None,
                  hf_method: str = "comb",
                  weights_method: str = "ols",
                  weights: Optional[np.ndarray] = None,
                  variance: str = "shrink",
                  parallel: bool = False,
                  constraint: bool = False,
-                 constrain_level: int = 0
+                 constrain_level: int = 0,
+                 keep_base_forecast: bool = True,
                  ) -> Hts:
         """forecast Hts using specific reconciliation methods and base methods.
 
@@ -158,9 +160,12 @@ class Hts:
             If custom forecast function is specified and using "mint" method, the function
             should return the in-sample forecasts for estimating the covariance matrix, e.g. the
             base forecast returned should be :math:`(T+h) \\times n`.
+        :param base_forecaster:
+            list for base forecasters of each level. If you want different base forecast methods
+            for different levels, just pass a list of base forecasts, see :doc:forecaster.
         :param hf_method: method for hierarchical forecasting, "comb", "bu", "td", "mo"
         :param weights_method:
-            "ols", "wls", "mint"(e.g Minimum Trace :ref:`MinT<mint>` ), weights method used for "comb"(e.g. optimal combination)
+            "ols", "wls", "mint"(e.g Minimum Trace :ref:`[2]<mint>` ), weights method used for "comb"(e.g. optimal combination)
             reconciliation method, if you choose "wls", you should specify `weights`, or the result is same as ols. If
             you choose "mint", you should specify `variance` parameter.
         :param weights:
@@ -171,6 +176,8 @@ class Hts:
         :param parallel: If parallel, not supported for now.
         :param constraint: If some levels are constrained to be unchangeable when reconciling base forecasts.
         :param constrain_level: Which level is constrained to be unchangeable when reconciling base forecasts.
+        :param keep_base_forecast:
+            if keep keep_base_forecast, if True, attribute `Hts.base_forecast` is set. if false, it will be None
         :return: Hts: reconciled forecast.
         """
         keep_fitted = False
@@ -179,8 +186,20 @@ class Hts:
             # generate base forecast
             if weights_method == "mint":
                 keep_fitted = True
-            base_forecast = self.generate_base_forecast(base_method, h, keep_fitted)
-
+            if base_method == "arima":
+                base_forecaster = [AutoArimaForecaster]*int(max(self.node_level)+1)
+            elif base_method == "ets":
+                base_forecaster = [EtsForecaster]*int(max(self.node_level)+1)
+            elif base_method is not None:
+                raise ValueError("this base forecast method is not supported now.")
+            else:
+                if base_forecaster is None:
+                    raise ValueError("You should either give base_method of base_forecaster")
+                elif not isinstance(base_forecaster, List):
+                    base_forecaster = [base_forecaster] * int(max(self.node_level)+1)
+                else:
+                    assert len(base_forecaster) == int(max(self.node_level)+1)
+            base_forecast = self.generate_base_forecast(base_forecaster, h, keep_fitted)
             # reconcile base forecasts
             if weights_method == "ols":
                 reconciled_y = fr.wls(self, base_forecast, method="ols")
@@ -200,11 +219,11 @@ class Hts:
                 raise ValueError("this comination method is not supported")
         else:
             raise NotImplementedError("this method is not implemented")
-
+        if keep_base_forecast:
+            self.base_forecast = base_forecast
         return reconciled_y
 
-    # base forecast 也变成Hts对象，方便精度比较
-    def generate_base_forecast(self, method: str = "arima", h: int = 1, keep_fitted: bool = False)-> np.ndarray:
+    def generate_base_forecast(self, method: List[Type[BaseForecaster]], h: int = 1, keep_fitted: bool = False) -> np.ndarray:
         """generate base forecasts by `forecast` in R with rpy2.
 
         :param method: base forecast method.
@@ -212,26 +231,23 @@ class Hts:
         :param keep_fitted: if keep in-sample fitted value, useful when mint method is specified.
         :return: base forecast
         """
-        ts = robjects.r['ts']
-
-        y = self.constraints.dot(self.bts.T)
+        k = int(max(self.node_level)+1)
+        T = self.bts.shape[0]
+        n = len(self.node_level)
         if keep_fitted:
-            f_casts = np.zeros([h+y.shape[1], y.shape[0]])
+            f_casts = np.zeros([h + T, n])
         else:
-            f_casts = np.zeros([h, y.shape[0]])
-        if method == "arima":
-            auto_arima = forecast.auto_arima
-            for i in range(y.shape[0]):
-                series = ts(FloatVector(y[i, :]), frequency=self.m)
-                model = forecast.forecast(auto_arima(series), h=12)
-                if keep_fitted:
-                    f_casts[:y.shape[1], i] = np.array(model.rx2["fitted"])
-                    f_casts[y.shape[1]:, i] = np.array(model.rx2["mean"])
-                else:
-                    f_casts[:, i] = np.array(model.rx2["mean"])
-            return f_casts
+            f_casts = np.zeros([h, n])
+        j = 0
+        for i in range(k):
+            aggts = self.aggregate_ts(levels=i)
+            forecaster = method[i]
+            for ts in range(aggts.shape[1]):
+                f_casts[:, j] = forecaster.forecast(aggts[:, ts], h, freq=self.m,
+                                                    keep_fitted=keep_fitted)
+                j += 1
+        return f_casts
 
-    # TODO: 修正结构方便base forecast的比较
     def accuracy(self, y_true: Hts, y_pred: Hts, levels: int = 0) -> Union[float, np.ndarray]:
         """calculate forecast accuracy, mase is supported only for now.
 
@@ -244,5 +260,18 @@ class Hts:
         agg_ts = self.aggregate_ts(levels=levels)
         agg_true = y_true.aggregate_ts(levels=levels)
         agg_pred = y_pred.aggregate_ts(levels=levels)
-        mases = np.array(list(map(lambda x,y: mase(*x, y), zip(agg_ts.T, agg_true.T, agg_pred.T), [12]*agg_ts.shape[1])))
+        mases = np.array(list(map(lambda x, y: mase(*x, y), zip(agg_ts.T, agg_true.T, agg_pred.T), [12]*agg_ts.shape[1])))
+        return mases
+
+    def accuracy_base(self, y_true: Hts, levels: Union[int, None, List] = None) -> Union[float, np.ndarray]:
+        """calculate forecast accuracy of base forecast
+
+        :param y_true: real observations.
+        :param levels: which level.
+        :return: forecast accuracy of base forecasts.
+        """
+        agg_ts = self.aggregate_ts(levels=levels)
+        agg_true = y_true.aggregate_ts(levels=levels)
+        mases = np.array(
+            list(map(lambda x, y: mase(*x, y), zip(agg_ts.T, agg_true.T, self.base_forecast.T), [self.m] * agg_ts.shape[1])))
         return mases
