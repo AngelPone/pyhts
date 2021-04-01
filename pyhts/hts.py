@@ -141,7 +141,7 @@ class Hts:
     def forecast(self,
                  h: int,
                  base_method: Union[str, None] = "arima",
-                 base_forecaster: Union[List, None, Type[BaseForecaster]] = None,
+                 base_forecaster: Union[List, None, BaseForecaster] = None,
                  hf_method: str = "comb",
                  weights_method: str = "ols",
                  weights: Optional[np.ndarray] = None,
@@ -162,7 +162,7 @@ class Hts:
             base forecast returned should be :math:`(T+h) \\times n`.
         :param base_forecaster:
             list for base forecasters of each level. If you want different base forecast methods
-            for different levels, just pass a list of base forecasts, see :doc:forecaster.
+            for different levels, just pass a list of base forecasters, see :doc:forecaster.
         :param hf_method: method for hierarchical forecasting, "comb", "bu", "td", "mo"
         :param weights_method:
             "ols", "wls", "mint"(e.g Minimum Trace :ref:`[2]<mint>` ), weights method used for "comb"(e.g. optimal combination)
@@ -187,9 +187,9 @@ class Hts:
             if weights_method == "mint":
                 keep_fitted = True
             if base_method == "arima":
-                base_forecaster = [AutoArimaForecaster]*int(max(self.node_level)+1)
+                base_forecaster = [AutoArimaForecaster(self.m)]*int(max(self.node_level)+1)
             elif base_method == "ets":
-                base_forecaster = [EtsForecaster]*int(max(self.node_level)+1)
+                base_forecaster = [EtsForecaster(self.m)]*int(max(self.node_level)+1)
             elif base_method is not None:
                 raise ValueError("this base forecast method is not supported now.")
             else:
@@ -223,7 +223,7 @@ class Hts:
             self.base_forecast = base_forecast
         return reconciled_y
 
-    def generate_base_forecast(self, method: List[Type[BaseForecaster]], h: int = 1, keep_fitted: bool = False) -> np.ndarray:
+    def generate_base_forecast(self, method: List[BaseForecaster], h: int = 1, keep_fitted: bool = False) -> np.ndarray:
         """generate base forecasts by `forecast` in R with rpy2.
 
         :param method: base forecast method.
@@ -243,8 +243,7 @@ class Hts:
             aggts = self.aggregate_ts(levels=i)
             forecaster = method[i]
             for ts in range(aggts.shape[1]):
-                f_casts[:, j] = forecaster.forecast(aggts[:, ts], h, freq=self.m,
-                                                    keep_fitted=keep_fitted)
+                f_casts[:, j] = forecaster.forecast(hist=aggts[:, ts], h=h, keep_fitted=keep_fitted)
                 j += 1
         return f_casts
 

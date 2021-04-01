@@ -11,11 +11,7 @@ class BaseForecaster:
 
     """
 
-    def __int__(self, name=""):
-        self.name = name
-
-    @classmethod
-    def forecast(cls, hts: np.ndarray, h: int, freq: int, keep_fitted=False) -> np.ndarray:
+    def forecast(self, hist: np.ndarray, h: int, keep_fitted=False) -> np.ndarray:
         raise NotImplementedError
 
 
@@ -24,13 +20,12 @@ class AutoArimaForecaster(BaseForecaster):
 
     """
 
-    def __int__(self, name="auto.arima"):
-        self.name = name
+    def __init__(self, m: int = 12):
+        self.m = m
 
-    @classmethod
-    def forecast(cls, hist: np.ndarray, h: int, freq: int, keep_fitted=False) -> np.ndarray:
+    def forecast(self, hist: np.ndarray, h: int, keep_fitted=False) -> np.ndarray:
         auto_arima = forecast.auto_arima
-        series = ts(FloatVector(hist), frequency=freq)
+        series = ts(FloatVector(hist), frequency=self.m)
         model = forecast.forecast(auto_arima(series), h=12)
         if keep_fitted:
             return np.concatenate([np.array(model.rx2["fitted"]), np.array(model.rx2["mean"])])
@@ -43,13 +38,12 @@ class EtsForecaster(BaseForecaster):
 
     """
 
-    def __int__(self, name="ets"):
-        self.name = name
+    def __init__(self, m: int = 12):
+        self.m = m
 
-    @classmethod
-    def forecast(cls, hist: np.ndarray, h: int, freq: int, keep_fitted=False) -> np.ndarray:
+    def forecast(self, hist: np.ndarray, h: int, keep_fitted=False) -> np.ndarray:
         ets = forecast.ets
-        series = ts(FloatVector(hist), frequency=freq)
+        series = ts(FloatVector(hist), frequency=self.m)
         model = forecast.forecast(ets(series), h=12)
         if keep_fitted:
             return np.concatenate([np.array(model.rx2["fitted"]), np.array(model.rx2["mean"])])
