@@ -87,7 +87,8 @@
             
               <p class="caption"><span class="caption-text">QuickStart</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/Tutorials.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/Tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/Tutorials.html#forecast-with-builtin-base-method">forecast with builtin base method</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/notation.html">Notation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/reconciliation.html">Forecast reconciliation</a></li>
 </ul>
@@ -225,8 +226,8 @@ arima and ets are implemented using <cite>forecast</cite> package in R.
 If custom forecast function is specified and using “mint” method, the function
 should return the in-sample forecasts for estimating the covariance matrix, e.g. the
 base forecast returned should be <span class="math notranslate nohighlight">\((T+h) \times n\)</span>.</p></li>
-<li><p><strong>base_forecaster</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">BaseForecaster</span></code>]]) – list for base forecasters of each level. If you want different base forecast methods
-for different levels, just pass a list of base forecasts, see :doc:forecaster.</p></li>
+<li><p><strong>base_forecaster</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseForecaster</span></code>]) – list for base forecasters of each level. If you want different base forecast methods
+for different levels, just pass a list of base forecasters, see :doc:forecaster.</p></li>
 <li><p><strong>hf_method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – method for hierarchical forecasting, “comb”, “bu”, “td”, “mo”</p></li>
 <li><p><strong>weights_method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – “ols”, “wls”, “mint”(e.g Minimum Trace <a class="reference internal" href="../references.html#mint"><span class="std std-ref">[2]</span></a> ), weights method used for “comb”(e.g. optimal combination)
 reconciliation method, if you choose “wls”, you should specify <cite>weights</cite>, or the result is same as ols. If
@@ -256,7 +257,7 @@ you choose “mint”, you should specify <cite>variance</cite> parameter.</p></
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">BaseForecaster</span></code>]]) – base forecast method.</p></li>
+<li><p><strong>method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">BaseForecaster</span></code>]) – base forecast method.</p></li>
 <li><p><strong>h</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – forecasting horizons.</p></li>
 <li><p><strong>keep_fitted</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – if keep in-sample fitted value, useful when mint method is specified.</p></li>
 </ul>
@@ -272,14 +273,14 @@ you choose “mint”, you should specify <cite>variance</cite> parameter.</p></
 
 <dl class="py method">
 <dt id="pyhts.hts.Hts.accuracy">
-<code class="sig-name descname"><span class="pre">accuracy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_true</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.hts.Hts.accuracy" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">accuracy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_true</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.hts.Hts.accuracy" title="Permalink to this definition">¶</a></dt>
 <dd><p>calculate forecast accuracy, mase is supported only for now.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>y_true</strong> (<a class="reference internal" href="#pyhts.hts.Hts" title="pyhts.hts.Hts"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hts</span></code></a>) – real observations.</p></li>
 <li><p><strong>y_pred</strong> (<a class="reference internal" href="#pyhts.hts.Hts" title="pyhts.hts.Hts"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hts</span></code></a>) – forecasts.</p></li>
-<li><p><strong>levels</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – which level.</p></li>
+<li><p><strong>levels</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>]) – which level.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>

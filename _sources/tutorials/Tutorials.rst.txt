@@ -73,5 +73,70 @@ You can also specify `levels` to get aggregated time series of specific levels.
 forecast
 --------
 
+forecast with builtin base method
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. code-block:: python
+
+    >>> reconciled_forecast = hts.forecast(h=12, base_method = "arima", hf_method = "comb", weights_method="mint", variance="shrink")
+    >>> hts.accuracy(reconciled_forecast, levels=0)
+
+
+Customize Base forecaster
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Also, you can use different base forecaster for different level, just inherent
+:class:`~pyhts.forecaster.BaseForecaster` and implement :meth:`~pyhts.forecaster.BaseForecaster.forecast()`
+method, and pass list of baseforecasters into `base_forecaster` parameter of :meth:`~pyhts.hts.forecast()`.
+See examples below.
+
+Use same forecaster for all levels.
+
+.. code-block:: python
+
+    >>> from pyhts.forecaster import AutoArimaForecaster
+    >>> forecaster = AutoArimaForecaster(m=12)
+    >>> reconciled_forecast = hts.forecast(h=12, base_forecaster = forecaster, hf_method = "comb", weights_method="mint", variance="shrink")
+
+
+Use different forecaster for different levels.
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+
+.. code-block:: python
+
+    >>>  from pyhts.forecaster import AutoArimaForecaster, EtsForecaster
+    >>>  arima = AutoArimaForecaster(m=12)
+    >>>  ets = EtsForecaster(m=12)
+    >>>  base_forecasters = [arima, ets, ets, ets]
+    >>> reconciled_forecast = hts.forecast(h=12, base_forecaster = base_forecasters, hf_method = "comb", weights_method="mint", variance="shrink")
+
+Make your own forecasters, you can config you base forecasters, but it must
+implement `forecast` method, which at least takes hist, h, keep_fitted as parameters.
+
+* `hist`: history series
+* `h`: forecast horizon
+* `keep_fitted`: if in_sample fitted values are needed.
+
+This method should return :class:`~numpy.ndarray` as forecasts.
+
+.. code-block:: python
+
+    from pyhts.forecaster import Baseforecaster
+    class custom_forecaster(Baseforecaster):
+        def __init__(self, param1, param2):
+            self.param1 = param1
+            self.param2 = param2
+        def forecast(self, hist, h, keep_fitted, param3, param4):
+            return myforecast_method(hist, h, keep_fitted, param3, param4)
+
+
+
+
+
+
+
 
 

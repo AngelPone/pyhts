@@ -89,7 +89,12 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#construction-of-hts-object">Construction of Hts object</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#aggregation">Aggregation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#forecast">forecast</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#forecast">forecast</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#forecast-with-builtin-base-method">forecast with builtin base method</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#customize-base-forecaster">Customize Base forecaster</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#use-different-forecaster-for-different-levels">Use different forecaster for different levels.</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="notation.html">Notation</a></li>
@@ -229,6 +234,53 @@ Hts object.</p>
 </div>
 <div class="section" id="forecast">
 <h2>forecast<a class="headerlink" href="#forecast" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="forecast-with-builtin-base-method">
+<h3>forecast with builtin base method<a class="headerlink" href="#forecast-with-builtin-base-method" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">reconciled_forecast</span> <span class="o">=</span> <span class="n">hts</span><span class="o">.</span><span class="n">forecast</span><span class="p">(</span><span class="n">h</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">base_method</span> <span class="o">=</span> <span class="s2">&quot;arima&quot;</span><span class="p">,</span> <span class="n">hf_method</span> <span class="o">=</span> <span class="s2">&quot;comb&quot;</span><span class="p">,</span> <span class="n">weights_method</span><span class="o">=</span><span class="s2">&quot;mint&quot;</span><span class="p">,</span> <span class="n">variance</span><span class="o">=</span><span class="s2">&quot;shrink&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hts</span><span class="o">.</span><span class="n">accuracy</span><span class="p">(</span><span class="n">reconciled_forecast</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="customize-base-forecaster">
+<h3>Customize Base forecaster<a class="headerlink" href="#customize-base-forecaster" title="Permalink to this headline">¶</a></h3>
+<p>Also, you can use different base forecaster for different level, just inherent
+<code class="xref py py-class docutils literal notranslate"><span class="pre">BaseForecaster</span></code> and implement <code class="xref py py-meth docutils literal notranslate"><span class="pre">forecast()</span></code>
+method, and pass list of baseforecasters into <cite>base_forecaster</cite> parameter of <code class="xref py py-meth docutils literal notranslate"><span class="pre">forecast()</span></code>.
+See examples below.</p>
+<p>Use same forecaster for all levels.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyhts.forecaster</span> <span class="kn">import</span> <span class="n">AutoArimaForecaster</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">forecaster</span> <span class="o">=</span> <span class="n">AutoArimaForecaster</span><span class="p">(</span><span class="n">m</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reconciled_forecast</span> <span class="o">=</span> <span class="n">hts</span><span class="o">.</span><span class="n">forecast</span><span class="p">(</span><span class="n">h</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">base_forecaster</span> <span class="o">=</span> <span class="n">forecaster</span><span class="p">,</span> <span class="n">hf_method</span> <span class="o">=</span> <span class="s2">&quot;comb&quot;</span><span class="p">,</span> <span class="n">weights_method</span><span class="o">=</span><span class="s2">&quot;mint&quot;</span><span class="p">,</span> <span class="n">variance</span><span class="o">=</span><span class="s2">&quot;shrink&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="use-different-forecaster-for-different-levels">
+<h3>Use different forecaster for different levels.<a class="headerlink" href="#use-different-forecaster-for-different-levels" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span> <span class="kn">from</span> <span class="nn">pyhts.forecaster</span> <span class="kn">import</span> <span class="n">AutoArimaForecaster</span><span class="p">,</span> <span class="n">EtsForecaster</span>
+<span class="gp">&gt;&gt;&gt; </span> <span class="n">arima</span> <span class="o">=</span> <span class="n">AutoArimaForecaster</span><span class="p">(</span><span class="n">m</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span> <span class="n">ets</span> <span class="o">=</span> <span class="n">EtsForecaster</span><span class="p">(</span><span class="n">m</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span> <span class="n">base_forecasters</span> <span class="o">=</span> <span class="p">[</span><span class="n">arima</span><span class="p">,</span> <span class="n">ets</span><span class="p">,</span> <span class="n">ets</span><span class="p">,</span> <span class="n">ets</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reconciled_forecast</span> <span class="o">=</span> <span class="n">hts</span><span class="o">.</span><span class="n">forecast</span><span class="p">(</span><span class="n">h</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">base_forecaster</span> <span class="o">=</span> <span class="n">base_forecasters</span><span class="p">,</span> <span class="n">hf_method</span> <span class="o">=</span> <span class="s2">&quot;comb&quot;</span><span class="p">,</span> <span class="n">weights_method</span><span class="o">=</span><span class="s2">&quot;mint&quot;</span><span class="p">,</span> <span class="n">variance</span><span class="o">=</span><span class="s2">&quot;shrink&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Make your own forecasters, you can config you base forecasters, but it must
+implement <cite>forecast</cite> method, which at least takes hist, h, keep_fitted as parameters.</p>
+<ul class="simple">
+<li><p><cite>hist</cite>: history series</p></li>
+<li><p><cite>h</cite>: forecast horizon</p></li>
+<li><p><cite>keep_fitted</cite>: if in_sample fitted values are needed.</p></li>
+</ul>
+<p>This method should return <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code> as forecasts.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyhts.forecaster</span> <span class="kn">import</span> <span class="n">Baseforecaster</span>
+<span class="k">class</span> <span class="nc">custom_forecaster</span><span class="p">(</span><span class="n">Baseforecaster</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param1</span><span class="p">,</span> <span class="n">param2</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param1</span> <span class="o">=</span> <span class="n">param1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param2</span> <span class="o">=</span> <span class="n">param2</span>
+    <span class="k">def</span> <span class="nf">forecast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hist</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">keep_fitted</span><span class="p">,</span> <span class="n">param3</span><span class="p">,</span> <span class="n">param4</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">myforecast_method</span><span class="p">(</span><span class="n">hist</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">keep_fitted</span><span class="p">,</span> <span class="n">param3</span><span class="p">,</span> <span class="n">param4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
 </div>
 </div>
 
