@@ -149,7 +149,7 @@ class Hts:
                  parallel: bool = False,
                  constraint: bool = False,
                  constrain_level: int = 0,
-                 keep_base_forecast: bool = True,
+                 keep_base_forecast: bool = True
                  ) -> Hts:
         """forecast Hts using specific reconciliation methods and base methods.
 
@@ -248,7 +248,7 @@ class Hts:
                 j += 1
         return f_casts
 
-    def accuracy(self, y_true: Hts, y_pred: Hts, levels: int = 0) -> Union[float, np.ndarray]:
+    def accuracy(self, y_true: Hts, y_pred: Hts, levels: Union[int, None, List] = None) -> Union[float, np.ndarray]:
         """calculate forecast accuracy, mase is supported only for now.
 
         :param y_true: real observations.
