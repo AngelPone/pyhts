@@ -66,7 +66,6 @@ def _constraints_from_chars(names: List, chars: List) -> [csr_matrix, np.ndarray
     return csr_matrix(constraints), np.array(list(map(lambda x: int(x.split("_")[0]), pd.get_dummies(df).columns)))
 
 
-# TODO: 调整bts以及预测中用到的base foracast的维度，避免过多无用的转置
 class Hts:
     """
     Class for hierarchical time series, can be constructed from  cross-sectional hierarchical time series
@@ -90,39 +89,6 @@ class Hts:
         self.m = m
         self.base_forecast = None
 
-    @classmethod
-    def from_hts(cls, bts: Union[np.ndarray, DataFrame],
-                 m: int,
-                 characters: Optional[List[int]] = None,
-                 nodes: Optional[List[List]] = None) -> Hts:
-        """Construct hts from cross-sectional hierarchical time series.
-
-        :param bts: :math:`T\\times m` bottom level series.
-        :param m: frequency of time series
-        :param characters:
-            length of characters of each level,
-            for example, "ABC" 'A' represents 'A' series of  first level,  'B' represents 'B' series under node 'A',
-            'C' represents 'C' series under node 'AB'. So the value of parameter is [1,1,1]
-        :param nodes: List of list to demonstrate the hierarchy, see details.
-        :return: Hts object.
-        """
-        if isinstance(bts, DataFrame):
-            names = bts.columns
-            bts = bts.values
-        elif isinstance(bts, np.ndarray):
-            bts = bts
-            names = None
-        else:
-            raise TypeError("bts must be numpy.ndarray or pandas.DataFrame")
-        if nodes is not None:
-            constraints, node_level = _nodes2constraints(nodes)
-        elif characters is not None:
-            constraints, node_level = _constraints_from_chars(list(names), characters)
-        else:
-            constraints, node_level = _nodes2constraints([[bts.shape[1]]])
-        hts = cls(constraints, bts, node_level, m)
-        return hts
-
     def aggregate_ts(self, levels: Union[int, List[int]] = None) -> np.ndarray:
         """aggregate bottom-levels time series.
 
@@ -137,7 +103,6 @@ class Hts:
             return s.dot(self.bts.T).T
         return self.constraints.dot(self.bts.T).T
 
-    # TODO: 优化结构
     def forecast(self,
                  h: int,
                  base_method: Union[str, None] = "arima",
@@ -247,6 +212,80 @@ class Hts:
                 j += 1
         return f_casts
 
+    @classmethod
+    def from_temporal_hierarchy(cls, ts: np.ndarray, m: int, aggregate_lens: List[int]):
+        """Construct Hts from temporal hierarchy.
+
+        :param ts: a time series.
+        :param m: frequency
+        :param aggregate_lens:
+            length of bottom level time series used for aggregation. For example, for monthly data,
+            3 means quarterly data, 6 mean half-annual data, 12 means annual time series.  The time
+            series should include 1 at least.
+        :return: Hts object.
+        """
+        aggregate_lens.sort()
+
+        S = np.zeros([sum([int(m / k) for k in aggregate_lens]), m])
+        node_level = []
+        if len(ts) % m != 0:
+            Warning("length of history time series is not multiple of m, some observations at very beginning "
+                    "would be cut out.")
+            ts = ts[len(ts) % m:]
+
+        if aggregate_lens[0] != 1:
+            raise ValueError("You'd better always include 1 in the aggregate_lens")
+
+        aggregate_lens.reverse()
+        index = 0
+        for i in range(len(aggregate_lens)):
+            k = aggregate_lens[i]
+            if (m % k) != 0:
+                raise ValueError("aggregate length should be factor of m")
+            mk = m // k
+            for j in range(mk):
+                S[index, j * k:(j + 1) * k] = 1
+                index += 1
+                node_level.append(i)
+        constraints = csr_matrix(S)
+        bts = ts.reshape([len(ts) // m, m])
+        node_level = np.array(node_level)
+        hts = Hts(constraints, bts, node_level, m)
+        return hts
+
+    @classmethod
+    def from_hts(cls, bts: Union[np.ndarray, DataFrame],
+                 m: int,
+                 characters: Optional[List[int]] = None,
+                 nodes: Optional[List[List]] = None) -> Hts:
+        """Construct hts from cross-sectional hierarchical time series.
+
+        :param bts: :math:`T\\times m` bottom level series.
+        :param m: frequency of time series
+        :param characters:
+            length of characters of each level,
+            for example, "ABC" 'A' represents 'A' series of  first level,  'B' represents 'B' series under node 'A',
+            'C' represents 'C' series under node 'AB'. So the value of parameter is [1,1,1]
+        :param nodes: List of list to demonstrate the hierarchy, see details.
+        :return: Hts object.
+        """
+        if isinstance(bts, DataFrame):
+            names = bts.columns
+            bts = bts.values
+        elif isinstance(bts, np.ndarray):
+            bts = bts
+            names = None
+        else:
+            raise TypeError("bts must be numpy.ndarray or pandas.DataFrame")
+        if nodes is not None:
+            constraints, node_level = _nodes2constraints(nodes)
+        elif characters is not None:
+            constraints, node_level = _constraints_from_chars(list(names), characters)
+        else:
+            constraints, node_level = _nodes2constraints([[bts.shape[1]]])
+        hts = cls(constraints, bts, node_level, m)
+        return hts
+
     def accuracy(self, y_true: Hts, y_pred: Hts, levels: Union[int, None, List] = None) -> Union[float, np.ndarray]:
         """calculate forecast accuracy, mase is supported only for now.
 
@@ -274,3 +313,4 @@ class Hts:
         mases = np.array(
             list(map(lambda x, y: mase(*x, y), zip(agg_ts.T, agg_true.T, self.base_forecast.T), [self.m] * agg_ts.shape[1])))
         return mases
+
