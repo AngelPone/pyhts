@@ -21,6 +21,8 @@ Welcome to pyhts's documentation!
 
    API/hts.md
    API/forecaster.rst
+   API/reconciliation.rst
+   API/accuracy.rst
 
 .. toctree::
    :caption: References

@@ -39,6 +39,14 @@ Also, parameter `characters` can be used to represent hierarchical structures, s
     bts.columns = ["AAA", "AAB", "ABC", "ABD"]
     hts = Hts.from_hts(bts, m=m, characters=[1,1,1])
 
+You can build Temporal Hierarchy with :meth:`~pyhts.hts.from_temporal_hierarchy()`.
+
+.. code-block:: python
+
+    import numpy as np
+    ts = np.random.random(480)
+    ts = Hts.from_temporal_hierarchy(ts, m=12, aggregate_lens=[1, 2, 3, 4, 6, 12])
+
 Aggregation
 -----------
 

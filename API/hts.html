@@ -87,8 +87,7 @@
             
               <p class="caption"><span class="caption-text">QuickStart</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/Tutorials.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/Tutorials.html#forecast-with-builtin-base-method">forecast with builtin base method</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/Tutorials.html">Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/notation.html">Notation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/reconciliation.html">Forecast reconciliation</a></li>
 </ul>
@@ -96,6 +95,8 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Hts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="forecaster.html">forecaster</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reconciliation.html">reconciliation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="accuracy.html">accuracy</a></li>
 </ul>
 <p class="caption"><span class="caption-text">References</span></p>
 <ul>
@@ -173,30 +174,6 @@
 <dd><p>Class for hierarchical time series, can be constructed from  cross-sectional hierarchical time series
 like hierarchical or grouped time series and temporal hierarchies <a class="reference internal" href="../references.html#references"><span class="std std-ref">[1]</span></a>.</p>
 <dl class="py method">
-<dt id="pyhts.hts.Hts.from_hts">
-<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_hts</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">characters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.hts.Hts.from_hts" title="Permalink to this definition">¶</a></dt>
-<dd><p>Construct hts from cross-sectional hierarchical time series.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>bts</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – <span class="math notranslate nohighlight">\(T\times m\)</span> bottom level series.</p></li>
-<li><p><strong>m</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – frequency of time series</p></li>
-<li><p><strong>characters</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]) – length of characters of each level,
-for example, “ABC” ‘A’ represents ‘A’ series of  first level,  ‘B’ represents ‘B’ series under node ‘A’,
-‘C’ represents ‘C’ series under node ‘AB’. So the value of parameter is [1,1,1]</p></li>
-<li><p><strong>nodes</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>]]) – List of list to demonstrate the hierarchy, see details.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="#pyhts.hts.Hts" title="pyhts.hts.Hts"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hts</span></code></a></p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Hts object.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt id="pyhts.hts.Hts.aggregate_ts">
 <code class="sig-name descname"><span class="pre">aggregate_ts</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.hts.Hts.aggregate_ts" title="Permalink to this definition">¶</a></dt>
 <dd><p>aggregate bottom-levels time series.</p>
@@ -215,37 +192,35 @@ for example, “ABC” ‘A’ represents ‘A’ series of  first level,  ‘B�
 
 <dl class="py method">
 <dt id="pyhts.hts.Hts.forecast">
-<code class="sig-name descname"><span class="pre">forecast</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'arima'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_forecaster</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hf_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'comb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ols'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'shrink'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parallel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constrain_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_base_forecast</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.hts.Hts.forecast" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">forecast</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'arima'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_forecaster</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hf_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'comb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comb_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ols'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parallel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constrain_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_base_forecast</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.hts.Hts.forecast" title="Permalink to this definition">¶</a></dt>
 <dd><p>forecast Hts using specific reconciliation methods and base methods.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>h</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – forecasting horizon.</p></li>
-<li><p><strong>base_method</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – method for generate base forecast, arima, ets, or custom function.
+<li><p><strong>h</strong> – forecasting horizon.</p></li>
+<li><p><strong>base_method</strong> – method for generate base forecast, arima, ets, or custom function.
 arima and ets are implemented using <cite>forecast</cite> package in R.
 If custom forecast function is specified and using “mint” method, the function
 should return the in-sample forecasts for estimating the covariance matrix, e.g. the
 base forecast returned should be <span class="math notranslate nohighlight">\((T+h) \times n\)</span>.</p></li>
-<li><p><strong>base_forecaster</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseForecaster</span></code>]) – list for base forecasters of each level. If you want different base forecast methods
+<li><p><strong>base_forecaster</strong> – list for base forecasters of each level. If you want different base forecast methods
 for different levels, just pass a list of base forecasters, see :doc:forecaster.</p></li>
-<li><p><strong>hf_method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – method for hierarchical forecasting, “comb”, “bu”, “td”, “mo”</p></li>
-<li><p><strong>weights_method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – “ols”, “wls”, “mint”(e.g Minimum Trace <a class="reference internal" href="../references.html#mint"><span class="std std-ref">[2]</span></a> ), weights method used for “comb”(e.g. optimal combination)
+<li><p><strong>hf_method</strong> – method for hierarchical forecasting, “comb”, “bu”, “td”, “mo”</p></li>
+<li><p><strong>comb_method</strong> – “ols”, “wls”, “mint”(e.g Minimum Trace <a class="reference internal" href="../references.html#mint"><span class="std std-ref">[2]</span></a> ), weights method used for “comb”(e.g. optimal combination)
 reconciliation method, if you choose “wls”, you should specify <cite>weights</cite>, or the result is same as ols. If
 you choose “mint”, you should specify <cite>variance</cite> parameter.</p></li>
-<li><p><strong>weights</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – weighting matrix used for “wls” method, can be “nseries” or custom_matrix, this custom matrix should be
-<span class="math notranslate nohighlight">\(n\times n\)</span></p></li>
-<li><p><strong>variance</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – “cov”, “var”, “shrink”, variance estimation method used for <cite>mint</cite> method.</p></li>
-<li><p><strong>parallel</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – If parallel, not supported for now.</p></li>
-<li><p><strong>constraint</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – If some levels are constrained to be unchangeable when reconciling base forecasts.</p></li>
-<li><p><strong>constrain_level</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Which level is constrained to be unchangeable when reconciling base forecasts.</p></li>
-<li><p><strong>keep_base_forecast</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – if keep keep_base_forecast, if True, attribute <cite>Hts.base_forecast</cite> is set. if false, it will be None</p></li>
+<li><p><strong>weights</strong> – weighting matrix used for <cite>wls</cite> combination method and variance used for <cite>mint</cite> combination method,
+if <cite>wls</cite>, can be “structural” or custom_matrix, this custom matrix should be
+<span class="math notranslate nohighlight">\(n\times n\)</span> symmetric matrix.
+If <cite>mint</cite>, can be “sample”, “variance” or “shinkage”, please refer to <a class="reference internal" href="../tutorials/reconciliation.html"><span class="doc">Forecast reconciliation</span></a>.</p></li>
+<li><p><strong>parallel</strong> – If parallel, not supported for now.</p></li>
+<li><p><strong>constraint</strong> – If some levels are constrained to be unchangeable when reconciling base forecasts.</p></li>
+<li><p><strong>constrain_level</strong> – Which level is constrained to be unchangeable when reconciling base forecasts.</p></li>
+<li><p><strong>keep_base_forecast</strong> – if keep keep_base_forecast, if True, attribute <cite>Hts.base_forecast</cite> is set. if false, it will be None</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="#pyhts.hts.Hts" title="pyhts.hts.Hts"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hts</span></code></a></p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Hts: reconciled forecast.</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Hts: reconciled forecast.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -272,8 +247,52 @@ you choose “mint”, you should specify <cite>variance</cite> parameter.</p></
 </dd></dl>
 
 <dl class="py method">
+<dt id="pyhts.hts.Hts.from_temporal_hierarchy">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_temporal_hierarchy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate_lens</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.hts.Hts.from_temporal_hierarchy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct Hts from temporal hierarchy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ts</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – a time series.</p></li>
+<li><p><strong>m</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – frequency</p></li>
+<li><p><strong>aggregate_lens</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – length of bottom level time series used for aggregation. For example, for monthly data,
+3 means quarterly data, 6 mean half-annual data, 12 means annual time series.  The time
+series should include 1 at least.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Hts object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyhts.hts.Hts.from_hts">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_hts</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">characters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.hts.Hts.from_hts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct hts from cross-sectional hierarchical time series.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bts</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]) – <span class="math notranslate nohighlight">\(T\times m\)</span> bottom level series.</p></li>
+<li><p><strong>m</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – frequency of time series</p></li>
+<li><p><strong>characters</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]) – length of characters of each level,
+for example, “ABC” ‘A’ represents ‘A’ series of  first level,  ‘B’ represents ‘B’ series under node ‘A’,
+‘C’ represents ‘C’ series under node ‘AB’. So the value of parameter is [1,1,1]</p></li>
+<li><p><strong>nodes</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>]]) – List of list to demonstrate the hierarchy, see details.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#pyhts.hts.Hts" title="pyhts.hts.Hts"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hts</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Hts object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="pyhts.hts.Hts.accuracy">
-<code class="sig-name descname"><span class="pre">accuracy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_true</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.hts.Hts.accuracy" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">accuracy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_true</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">measure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.hts.Hts.accuracy" title="Permalink to this definition">¶</a></dt>
 <dd><p>calculate forecast accuracy, mase is supported only for now.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -281,10 +300,12 @@ you choose “mint”, you should specify <cite>variance</cite> parameter.</p></
 <li><p><strong>y_true</strong> (<a class="reference internal" href="#pyhts.hts.Hts" title="pyhts.hts.Hts"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hts</span></code></a>) – real observations.</p></li>
 <li><p><strong>y_pred</strong> (<a class="reference internal" href="#pyhts.hts.Hts" title="pyhts.hts.Hts"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hts</span></code></a>) – forecasts.</p></li>
 <li><p><strong>levels</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>]) – which level.</p></li>
+<li><p><strong>measure</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – mase, mse is supported for now. e.g. [‘mase’], [‘mse’, ‘mase’].
+if None, mase is calculated.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</p>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>]</p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>forecast accuracy.</p>
@@ -294,17 +315,19 @@ you choose “mint”, you should specify <cite>variance</cite> parameter.</p></
 
 <dl class="py method">
 <dt id="pyhts.hts.Hts.accuracy_base">
-<code class="sig-name descname"><span class="pre">accuracy_base</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_true</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.hts.Hts.accuracy_base" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">accuracy_base</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_true</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">measure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.hts.Hts.accuracy_base" title="Permalink to this definition">¶</a></dt>
 <dd><p>calculate forecast accuracy of base forecast</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>y_true</strong> (<a class="reference internal" href="#pyhts.hts.Hts" title="pyhts.hts.Hts"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hts</span></code></a>) – real observations.</p></li>
 <li><p><strong>levels</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>]) – which level.</p></li>
+<li><p><strong>measure</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – mase, mse is supported for now. e.g. [‘mase’], [‘mse’, ‘mase’].
+if None, mase is calculated.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</p>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>forecast accuracy of base forecasts.</p>
