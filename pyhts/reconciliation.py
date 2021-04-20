@@ -37,7 +37,7 @@ def wls(hts: Hts,
     :param method: method used for forecast reconciliation, e.g. ols, wls, mint.
     :param weighting:
         method for calculating weight matrix used in reconciliation method, e.g. covariance matrix in mint
-        or wls, for details, refer to :doc:`tutorials/reconciliation`
+        or wls, for details, refer to :doc:`/tutorials/reconciliation`
     :param constraint: If some levels are constrained to be unchangeable when reconciling base forecasts.
     :param constraint_level: Which level is constrained to be unchangeable when reconciling base forecasts.
     :return: reconciled forecasts

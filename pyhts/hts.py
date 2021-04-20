@@ -139,7 +139,7 @@ class Hts:
             weighting matrix used for `wls` combination method and variance used for `mint` combination method,
             if `wls`, can be "structural" or custom_matrix, this custom matrix should be
             :math:`n\\times n` symmetric matrix.
-            If `mint`, can be "sample", "variance" or "shinkage", please refer to :doc:`tutorials/reconciliation`.
+            If `mint`, can be "sample", "variance" or "shinkage", please refer to :doc:`/tutorials/reconciliation`.
         :param parallel: If parallel, not supported for now.
         :param constraint: If some levels are constrained to be unchangeable when reconciling base forecasts.
         :param constrain_level: Which level is constrained to be unchangeable when reconciling base forecasts.
