@@ -111,9 +111,8 @@ class Hts:
                  base_method: Union[str, None] = "arima",
                  base_forecaster: Union[List, None, BaseForecaster] = None,
                  hf_method: str = "comb",
-                 weights_method: str = "ols",
-                 weights: Optional[np.ndarray] = None,
-                 variance: str = "shrink",
+                 comb_method: str = "ols",
+                 weights: Optional[np.ndarray, str] = None,
                  parallel: bool = False,
                  constraint: bool = False,
                  constrain_level: int = 0,
@@ -132,15 +131,15 @@ class Hts:
             list for base forecasters of each level. If you want different base forecast methods
             for different levels, just pass a list of base forecasters, see :doc:forecaster.
         :param hf_method: method for hierarchical forecasting, "comb", "bu", "td", "mo"
-        :param weights_method:
+        :param comb_method:
             "ols", "wls", "mint"(e.g Minimum Trace :ref:`[2]<mint>` ), weights method used for "comb"(e.g. optimal combination)
             reconciliation method, if you choose "wls", you should specify `weights`, or the result is same as ols. If
             you choose "mint", you should specify `variance` parameter.
         :param weights:
-            weighting matrix used for "wls" method, can be "nseries" or custom_matrix, this custom matrix should be
-            :math:`n\\times n`
-        :param variance:
-            "cov", "var", "shrink", variance estimation method used for `mint` method.
+            weighting matrix used for `wls` combination method and variance used for `mint` combination method,
+            if `wls`, can be "structural" or custom_matrix, this custom matrix should be
+            :math:`n\\times n` symmetric matrix.
+            If `mint`, can be "sample", "variance" or "shinkage", please refer to :doc:`tutorials/reconciliation`.
         :param parallel: If parallel, not supported for now.
         :param constraint: If some levels are constrained to be unchangeable when reconciling base forecasts.
         :param constrain_level: Which level is constrained to be unchangeable when reconciling base forecasts.
@@ -151,7 +150,7 @@ class Hts:
         import pyhts.reconciliation as fr
         if hf_method == "comb":
             # generate base forecast
-            if weights_method == "mint":
+            if comb_method == "mint":
                 self.keep_fitted = True
             if base_method == "arima":
                 base_forecaster = [AutoArimaForecaster(self.m)]*int(max(self.node_level)+1)
@@ -168,19 +167,19 @@ class Hts:
                     assert len(base_forecaster) == int(max(self.node_level)+1)
             base_forecast = self.generate_base_forecast(base_forecaster, h, self.keep_fitted)
             # reconcile base forecasts
-            if weights_method == "ols":
+            if comb_method == "ols":
                 reconciled_y = fr.wls(self, base_forecast, method="ols")
-            elif weights_method == "wls":
-                if weights == "nseries":
-                    reconciled_y = fr.wls(self, base_forecast, method="wls", weighting="nseries", constraint=constraint,
+            elif comb_method == "wls":
+                if weights == "structural":
+                    reconciled_y = fr.wls(self, base_forecast, method="wls", weighting="structural", constraint=constraint,
                                           constraint_level=constrain_level)
                 elif isinstance(weights, np.ndarray):
                     reconciled_y = fr.wls(self, base_forecast, method="wls", weighting=weights,
                                           constraint=constraint, constraint_level=constrain_level)
                 else:
                     raise ValueError("weights for wls method is not supported")
-            elif weights_method == "mint":
-                reconciled_y = fr.wls(self, base_forecast, method="mint", weighting=variance,
+            elif comb_method == "mint":
+                reconciled_y = fr.wls(self, base_forecast, method="mint", weighting=weights,
                                       constraint=constraint, constraint_level=constrain_level)
             else:
                 raise ValueError("this comination method is not supported")
@@ -299,7 +298,6 @@ class Hts:
             if None, mase is calculated.
         :return: forecast accuracy.
         """
-        # MASE
         if measure is None:
             measure = ['mase']
         agg_ts = self.aggregate_ts(levels=levels)

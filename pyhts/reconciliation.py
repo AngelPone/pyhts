@@ -56,13 +56,13 @@ def wls(hts: Hts,
         in_sample_fcasts = base_forecast[:T, :]
         error = y - in_sample_fcasts
         W = error.T.dot(error) / T
-        if weighting == "var":
+        if weighting == "variance":
             weight_matrix = np.diag(np.diagonal(W))
-        elif weighting == "cov":
+        elif weighting == "sample":
             weight_matrix = W
             if not np.all(np.linalg.eigvals(weight_matrix) > 0):
                 raise ValueError("Sample method needs covariance matrix to be positive definite")
-        elif weighting == "shrink":
+        elif weighting == "shrinkage":
             lamb = lamb_estimate(error)
             weight_matrix = lamb * np.diag(np.diag(W)) + (1 - lamb) * W
         else:
@@ -73,7 +73,7 @@ def wls(hts: Hts,
     else:
         if isinstance(weighting, np.ndarray):
             weight_matrix = np.linalg.inv(weighting)
-        elif weighting == "nseries":
+        elif weighting == "structural":
             weight_matrix = np.diag(S.dot(np.array([1]*m)))
         else:
             raise ValueError("this wls weights is not supported now.")
