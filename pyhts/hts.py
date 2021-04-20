@@ -1,6 +1,7 @@
 from __future__ import annotations
 from pyhts.accuracy import *
 from pandas import DataFrame
+from copy import copy
 
 from typing import List, Union, Optional, Type
 from rpy2.robjects.packages import importr
@@ -16,6 +17,7 @@ def _nodes2constraints(nodes: List[List[int]]) -> [csr_matrix, np.ndarray]:
     :param nodes: nodes that demonstrate hierarchy
     :return: constraints
     """
+    nodes = copy(nodes)
     n = sum(nodes[-1])
     m = sum(map(sum, nodes)) + 1
     node_level = n * [len(nodes)]
@@ -88,6 +90,7 @@ class Hts:
         self.node_level = node_level
         self.m = m
         self.base_forecast = None
+        self.keep_fitted = False
 
     def aggregate_ts(self, levels: Union[int, List[int]] = None) -> np.ndarray:
         """aggregate bottom-levels time series.
@@ -145,12 +148,11 @@ class Hts:
             if keep keep_base_forecast, if True, attribute `Hts.base_forecast` is set. if false, it will be None
         :return: Hts: reconciled forecast.
         """
-        keep_fitted = False
         import pyhts.reconciliation as fr
         if hf_method == "comb":
             # generate base forecast
             if weights_method == "mint":
-                keep_fitted = True
+                self.keep_fitted = True
             if base_method == "arima":
                 base_forecaster = [AutoArimaForecaster(self.m)]*int(max(self.node_level)+1)
             elif base_method == "ets":
@@ -164,7 +166,7 @@ class Hts:
                     base_forecaster = [base_forecaster] * int(max(self.node_level)+1)
                 else:
                     assert len(base_forecaster) == int(max(self.node_level)+1)
-            base_forecast = self.generate_base_forecast(base_forecaster, h, keep_fitted)
+            base_forecast = self.generate_base_forecast(base_forecaster, h, self.keep_fitted)
             # reconcile base forecasts
             if weights_method == "ols":
                 reconciled_y = fr.wls(self, base_forecast, method="ols")
@@ -286,31 +288,62 @@ class Hts:
         hts = cls(constraints, bts, node_level, m)
         return hts
 
-    def accuracy(self, y_true: Hts, y_pred: Hts, levels: Union[int, None, List] = None) -> Union[float, np.ndarray]:
+    def accuracy(self, y_true: Hts, y_pred: Hts, levels: Union[int, None, List] = None, measure: List[str] = None) -> Union[float, DataFrame]:
         """calculate forecast accuracy, mase is supported only for now.
 
         :param y_true: real observations.
         :param y_pred: forecasts.
         :param levels: which level.
+        :param measure:
+            mase, mse is supported for now. e.g. ['mase'], ['mse', 'mase'].
+            if None, mase is calculated.
         :return: forecast accuracy.
         """
         # MASE
+        if measure is None:
+            measure = ['mase']
         agg_ts = self.aggregate_ts(levels=levels)
         agg_true = y_true.aggregate_ts(levels=levels)
         agg_pred = y_pred.aggregate_ts(levels=levels)
-        mases = np.array(list(map(lambda x, y: mase(*x, y), zip(agg_ts.T, agg_true.T, agg_pred.T), [12]*agg_ts.shape[1])))
-        return mases
+        accs = DataFrame()
+        for me in measure:
+            if me == 'mase':
+                mases = np.array(list(map(lambda x, y: mase(*x, y), zip(agg_ts.T, agg_true.T, agg_pred.T), [12]*agg_ts.shape[1])))
+            elif me == 'mse':
+                mases = np.array(list(map(lambda x, y: mse(*x, y), zip(agg_ts.T, agg_true.T, agg_pred.T), [12]*agg_ts.shape[1])))
+            else:
+                raise ValueError(f'not supported measure {me}.')
+            accs[me] = mases
+        return accs
 
-    def accuracy_base(self, y_true: Hts, levels: Union[int, None, List] = None) -> Union[float, np.ndarray]:
+    def accuracy_base(self, y_true: Hts, levels: Union[int, None, List] = None, measure: List[str] = None) -> DataFrame:
         """calculate forecast accuracy of base forecast
 
         :param y_true: real observations.
         :param levels: which level.
+        :param measure:
+            mase, mse is supported for now. e.g. ['mase'], ['mse', 'mase'].
+            if None, mase is calculated.
         :return: forecast accuracy of base forecasts.
         """
         agg_ts = self.aggregate_ts(levels=levels)
         agg_true = y_true.aggregate_ts(levels=levels)
-        mases = np.array(
-            list(map(lambda x, y: mase(*x, y), zip(agg_ts.T, agg_true.T, self.base_forecast.T), [self.m] * agg_ts.shape[1])))
-        return mases
+        T = agg_true.shape[0]
+        if measure is None:
+            measure = ['mase']
+        accs = DataFrame()
+        for me in measure:
+            if me == 'mase':
+                mases = np.array(
+                    list(map(lambda x, y: mase(*x, y), zip(agg_ts.T, agg_true.T, self.base_forecast.T[:, -T:]), [self.m] * agg_ts.shape[1])))
+            elif me == 'mse':
+                mases = np.array(
+                    list(map(lambda x, y: mse(*x, y), zip(agg_ts.T, agg_true.T, self.base_forecast.T[:, -T:]), [self.m] * agg_ts.shape[1])))
+            else:
+                raise ValueError(f'not supported measure {me}.')
+            accs[me] = mases
+        return accs
 
+
+if __name__ == '__main__':
+    print(_nodes2constraints([[2], [2, 2]]))
