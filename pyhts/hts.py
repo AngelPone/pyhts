@@ -1,5 +1,6 @@
 from __future__ import annotations
-from pyhts.accuracy import *
+import numpy as np
+from pyhts import accuracy
 from pandas import DataFrame
 from copy import copy
 
@@ -305,13 +306,12 @@ class Hts:
         agg_pred = y_pred.aggregate_ts(levels=levels)
         accs = DataFrame()
         for me in measure:
-            if me == 'mase':
-                mases = np.array(list(map(lambda x, y: mase(*x, y), zip(agg_ts.T, agg_true.T, agg_pred.T), [12]*agg_ts.shape[1])))
-            elif me == 'mse':
-                mases = np.array(list(map(lambda x, y: mse(*x, y), zip(agg_ts.T, agg_true.T, agg_pred.T), [12]*agg_ts.shape[1])))
-            else:
-                raise ValueError(f'not supported measure {me}.')
-            accs[me] = mases
+            try:
+                accs[me] = np.array(map(lambda x, y: getattr(accuracy, me)(*x, y), zip(agg_ts.T, agg_true.T,
+                                                                                   agg_pred.T,
+                                                                                   [self.m] * agg_ts.shape[1])))
+            except AttributeError:
+                print('this forecasting measure is not supported!')
         return accs
 
     def accuracy_base(self, y_true: Hts, levels: Union[int, None, List] = None, measure: List[str] = None) -> DataFrame:
@@ -331,15 +331,12 @@ class Hts:
             measure = ['mase']
         accs = DataFrame()
         for me in measure:
-            if me == 'mase':
-                mases = np.array(
-                    list(map(lambda x, y: mase(*x, y), zip(agg_ts.T, agg_true.T, self.base_forecast.T[:, -T:]), [self.m] * agg_ts.shape[1])))
-            elif me == 'mse':
-                mases = np.array(
-                    list(map(lambda x, y: mse(*x, y), zip(agg_ts.T, agg_true.T, self.base_forecast.T[:, -T:]), [self.m] * agg_ts.shape[1])))
-            else:
-                raise ValueError(f'not supported measure {me}.')
-            accs[me] = mases
+            try:
+                accs[me] = np.array(map(lambda x, y: getattr(accuracy, me)(*x, y), zip(agg_ts.T, agg_true.T,
+                                                                                   self.base_forecast.T[:, -T:],
+                                                                                   [self.m] * agg_ts.shape[1])))
+            except AttributeError:
+                print('this forecasting measure is not supported!')
         return accs
 
 
