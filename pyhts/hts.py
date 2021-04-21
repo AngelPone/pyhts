@@ -307,9 +307,8 @@ class Hts:
         accs = DataFrame()
         for me in measure:
             try:
-                accs[me] = np.array(map(lambda x, y: getattr(accuracy, me)(*x, y), zip(agg_ts.T, agg_true.T,
-                                                                                   agg_pred.T,
-                                                                                   [self.m] * agg_ts.shape[1])))
+                accs[me] = np.array(list(map(lambda x: getattr(accuracy, me)(*x),
+                                             zip(agg_ts.T, agg_true.T, agg_pred.T, [self.m] * agg_ts.shape[1]))))
             except AttributeError:
                 print('this forecasting measure is not supported!')
         return accs
@@ -327,16 +326,16 @@ class Hts:
         agg_ts = self.aggregate_ts(levels=levels)
         agg_true = y_true.aggregate_ts(levels=levels)
         T = agg_true.shape[0]
+        agg_pred = self.base_forecast[-T:, :]
         if measure is None:
             measure = ['mase']
         accs = DataFrame()
         for me in measure:
             try:
-                accs[me] = np.array(map(lambda x, y: getattr(accuracy, me)(*x, y), zip(agg_ts.T, agg_true.T,
-                                                                                   self.base_forecast.T[:, -T:],
-                                                                                   [self.m] * agg_ts.shape[1])))
+                accs[me] = np.array(list(map(lambda x: getattr(accuracy, me)(*x),
+                                             zip(agg_ts.T, agg_true.T, agg_pred.T, [self.m] * agg_ts.shape[1]))))
             except AttributeError:
-                print('this forecasting measure is not supported!')
+                print(f'Forecasting measure {me} is not supported!')
         return accs
 
 
