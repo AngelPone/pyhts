@@ -4,7 +4,7 @@ from pyhts import accuracy
 from pandas import DataFrame
 from copy import copy
 
-from typing import List, Union, Optional, Type
+from typing import List, Union, Optional
 from rpy2.robjects.packages import importr
 from scipy.sparse import csr_matrix
 from pyhts.forecaster import BaseForecaster, AutoArimaForecaster, EtsForecaster
@@ -133,14 +133,14 @@ class Hts:
             for different levels, just pass a list of base forecasters, see :doc:forecaster.
         :param hf_method: method for hierarchical forecasting, "comb", "bu", "td", "mo"
         :param comb_method:
-            "ols", "wls", "mint"(e.g Minimum Trace :ref:`[2]<mint>` ), weights method used for "comb"(e.g. optimal combination)
-            reconciliation method, if you choose "wls", you should specify `weights`, or the result is same as ols. If
-            you choose "mint", you should specify `variance` parameter.
+            "ols", "wls", "mint"(e.g Minimum Trace :ref:`[2]<mint>` ), weights method used for "comb"(e.g. optimal
+            combination) reconciliation method, if you choose "wls", you should specify `weights`, or the result is same
+            as ols. If you choose "mint", you should specify `variance` parameter.
         :param weights:
             weighting matrix used for `wls` combination method and variance used for `mint` combination method,
             if `wls`, can be "structural" or custom_matrix, this custom matrix should be
             :math:`n\\times n` symmetric matrix.
-            If `mint`, can be "sample", "variance" or "shinkage", please refer to :doc:`/tutorials/reconciliation`.
+            If `mint`, can be "sample", "variance" or "shrinkage", please refer to :doc:`/tutorials/reconciliation`.
         :param parallel: If parallel, not supported for now.
         :param constraint: If some levels are constrained to be unchangeable when reconciling base forecasts.
         :param constrain_level: Which level is constrained to be unchangeable when reconciling base forecasts.
@@ -172,8 +172,8 @@ class Hts:
                 reconciled_y = fr.wls(self, base_forecast, method="ols")
             elif comb_method == "wls":
                 if weights == "structural":
-                    reconciled_y = fr.wls(self, base_forecast, method="wls", weighting="structural", constraint=constraint,
-                                          constraint_level=constrain_level)
+                    reconciled_y = fr.wls(self, base_forecast, method="wls", weighting="structural",
+                                          constraint=constraint, constraint_level=constrain_level)
                 elif isinstance(weights, np.ndarray):
                     reconciled_y = fr.wls(self, base_forecast, method="wls", weighting=weights,
                                           constraint=constraint, constraint_level=constrain_level)
@@ -199,10 +199,10 @@ class Hts:
         :return: base forecast
         """
         k = int(max(self.node_level)+1)
-        T = self.bts.shape[0]
+        length = self.bts.shape[0]
         n = len(self.node_level)
         if keep_fitted:
-            f_casts = np.zeros([h + T, n])
+            f_casts = np.zeros([h + length, n])
         else:
             f_casts = np.zeros([h, n])
         j = 0
@@ -228,7 +228,7 @@ class Hts:
         """
         aggregate_lens.sort()
 
-        S = np.zeros([sum([int(m / k) for k in aggregate_lens]), m])
+        smatrix = np.zeros([sum([int(m / k) for k in aggregate_lens]), m])
         node_level = []
         if len(ts) % m != 0:
             Warning("length of history time series is not multiple of m, some observations at very beginning "
@@ -246,10 +246,10 @@ class Hts:
                 raise ValueError("aggregate length should be factor of m")
             mk = m // k
             for j in range(mk):
-                S[index, j * k:(j + 1) * k] = 1
+                smatrix[index, j * k:(j + 1) * k] = 1
                 index += 1
                 node_level.append(i)
-        constraints = csr_matrix(S)
+        constraints = csr_matrix(smatrix)
         bts = ts.reshape([len(ts) // m, m])
         node_level = np.array(node_level)
         hts = Hts(constraints, bts, node_level, m)
@@ -325,8 +325,8 @@ class Hts:
         """
         agg_ts = self.aggregate_ts(levels=levels)
         agg_true = y_true.aggregate_ts(levels=levels)
-        T = agg_true.shape[0]
-        agg_pred = self.base_forecast[-T:, :]
+        horizon = agg_true.shape[0]
+        agg_pred = self.base_forecast[-horizon:, :]
         if measure is None:
             measure = ['mase']
         accs = DataFrame()

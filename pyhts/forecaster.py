@@ -10,27 +10,34 @@ class BaseForecaster:
     """Base Class for forecaster
 
     """
+    def __init__(self, m: int = 12):
+        self.m = m
+        self.model = None
+        self.hist = None
+        self.fitted = None
 
-    def forecast(self, hist: np.ndarray, h: int, keep_fitted=False) -> np.ndarray:
+    def forecast(self, h: int, **kwargs) -> np.ndarray:
         raise NotImplementedError
 
 
 class AutoArimaForecaster(BaseForecaster):
-    """auto.arima forecaster
+    """auto.arima forecaster.
 
     """
 
-    def __init__(self, m: int = 12):
-        self.m = m
+    def __init__(self, m: int = 12, **kwargs):
+        super().__init__(m)
+        self.model_params = kwargs
 
-    def forecast(self, hist: np.ndarray, h: int, keep_fitted=False) -> np.ndarray:
-        auto_arima = forecast.auto_arima
-        series = ts(FloatVector(hist), frequency=self.m)
-        model = forecast.forecast(auto_arima(series), h=12)
-        if keep_fitted:
-            return np.concatenate([np.array(model.rx2["fitted"]), np.array(model.rx2["mean"])])
-        else:
-            return np.array(model.rx2["mean"])
+    def fit(self, hist: np.ndarray):
+        self.hist = ts(FloatVector(hist), frequency=self.m)
+        arima = forecast.auto_arima
+        self.model = arima(self.hist, **self.model_params)
+        self.fitted = self.model.rx2["fitted"]
+        return self
+
+    def forecast(self, h: int, **kwargs) -> np.ndarray:
+        return np.array(forecast.forecast(self.model, h=h, **kwargs).rx2["mean"])
 
 
 class EtsForecaster(BaseForecaster):
@@ -38,14 +45,16 @@ class EtsForecaster(BaseForecaster):
 
     """
 
-    def __init__(self, m: int = 12):
-        self.m = m
+    def __init__(self, m: int = 12, **kwargs):
+        super().__init__(m)
+        self.model_params = kwargs
 
-    def forecast(self, hist: np.ndarray, h: int, keep_fitted=False) -> np.ndarray:
+    def fit(self, hist: np.ndarray):
+        self.hist = ts(FloatVector(hist), frequency=self.m)
         ets = forecast.ets
-        series = ts(FloatVector(hist), frequency=self.m)
-        model = forecast.forecast(ets(series), h=12)
-        if keep_fitted:
-            return np.concatenate([np.array(model.rx2["fitted"]), np.array(model.rx2["mean"])])
-        else:
-            return np.array(model.rx2["mean"])
+        self.model = ets(self.hist, **self.model_params)
+        self.fitted = self.model.rx2["fitted"]
+        return self
+
+    def forecast(self, h: int, **kwargs) -> np.ndarray:
+        return np.array(forecast.forecast(self.model, h=h, **kwargs).rx2["mean"])

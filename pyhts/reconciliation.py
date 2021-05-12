@@ -1,11 +1,10 @@
 import numpy as np
-import scipy.linalg as lg
 
 from typing import Union
-from pyhts.hts import Hts
+from pyhts.hierarchy import Hierarchy
 
 
-def lamb_estimate(x: np.ndarray) -> float:
+def _lamb_estimate(x: np.ndarray) -> float:
     """estimate :math`\\lambda` used in :ref:`shrinkage` estimator of mint method
 
     :param x: in-sample 1-step-ahead forecast error
@@ -24,16 +23,15 @@ def lamb_estimate(x: np.ndarray) -> float:
     return lamb
 
 
-def wls(hts: Hts,
-        base_forecast: np.ndarray,
+def wls(hierarchy: Hierarchy,
+        error: np.ndarray = None,
         method: str = "ols",
         weighting: Union[str, np.ndarray, None] = None,
-        constraint: bool = False,
-        constraint_level: int = 0) -> Hts:
+        constraint_level: int = -1) -> np.ndarray:
     """function for forecast reconciliation.
 
-    :param hts: history time series.
-    :param base_forecast: base forecasts.
+    :param hierarchy: history time series.
+    :param error: insample error.
     :param method: method used for forecast reconciliation, e.g. ols, wls, mint.
     :param weighting:
         method for calculating weight matrix used in reconciliation method, e.g. covariance matrix in mint
@@ -42,20 +40,12 @@ def wls(hts: Hts,
     :param constraint_level: Which level is constrained to be unchangeable when reconciling base forecasts.
     :return: reconciled forecasts
     """
-    y = hts.aggregate_ts()
-    T = y.shape[0]
-    S = hts.constraints.toarray()
+    S = hierarchy.s_mat.toarray().astype('int32')
     n = S.shape[0]
     m = S.shape[1]
     if method == "mint":
-        out_sample_fcasts = base_forecast[T:, :]
-    else:
-        out_sample_fcasts = base_forecast
-
-    if method == "mint":
-        in_sample_fcasts = base_forecast[:T, :]
-        error = y - in_sample_fcasts
-        W = error.T.dot(error) / T
+        T = error.shape[1]
+        W = error.dot(error.T) / T
         if weighting == "variance":
             weight_matrix = np.diag(np.diagonal(W))
         elif weighting == "sample":
@@ -63,7 +53,7 @@ def wls(hts: Hts,
             if not np.all(np.linalg.eigvals(weight_matrix) > 0):
                 raise ValueError("Sample method needs covariance matrix to be positive definite")
         elif weighting == "shrinkage":
-            lamb = lamb_estimate(error)
+            lamb = _lamb_estimate(error)
             weight_matrix = lamb * np.diag(np.diag(W)) + (1 - lamb) * W
         else:
             raise NotImplementedError("this min_trace method has not been implemented")
@@ -77,40 +67,43 @@ def wls(hts: Hts,
             weight_matrix = np.diag(S.dot(np.array([1]*m)))
         else:
             raise ValueError("this wls weights is not supported now.")
-
-    w_inv = np.linalg.inv(weight_matrix)
-    if constraint:
-        reconciled_y = constrained(hts, w_inv, out_sample_fcasts, constraint_level)
-    else:
-        G = lg.inv(S.T.dot(w_inv).dot(S)).dot(S.T).dot(w_inv)
-        reconciled_y = G.dot(out_sample_fcasts.T)
-    reconciled_hts = Hts(hts.constraints, reconciled_y.T, hts.node_level, hts.m)
-    return reconciled_hts
+    G = compute_g_mat(hierarchy, weight_matrix, constraint_level)
+    return G
 
 
-def constrained(hts: Hts, weights: np.ndarray, base_forecast: np.ndarray, constraint_level: int):
-    """function to compute constrained reconciled forecasts
+def _construct_u_mat(hierarchy: Hierarchy, constraint_level=-1):
+    """construct U' mat used in solution
 
-    :param hts: history Hts
-    :param weights: weight matrix used in unconstrained reconciliation method.
-    :param base_forecast: base forecasts.
+    :param s_mat:
     :param constraint_level:
-    :return: Which level is constrained to be unchangeable when reconciling base forecasts.
+    :return:
     """
-    if constraint_level == np.max(hts.node_level):
-        return base_forecast
-    a = hts.node_level > constraint_level
-    x = hts.constraints[a, :].toarray()
-    q = hts.constraints[hts.node_level == constraint_level].T.toarray()
-    weights = weights[np.ix_(a, a)]
-    base = base_forecast.T[a]
-    c = base_forecast.T[hts.node_level == constraint_level]
-    x_tr_x = np.linalg.inv(x.T.dot(weights).dot(x))
-    # calculate ols result
-    beta_hat = x_tr_x.dot(x.T).dot(weights).dot(base)
-    # calculate cls result
-    reconciled_bts = beta_hat - x_tr_x.dot(q).dot(np.linalg.inv(
-        q.T.dot(x_tr_x).dot(q)
-    )).dot(q.T.dot(beta_hat) - c)
-    return reconciled_bts
+    s_mat = hierarchy.s_mat
+    n, m = s_mat.shape
+    u1 = np.identity(n - m)
+    u2 = -s_mat[:(n-m), :]
+    u_mat = np.concatenate([u1, u2], axis=1)
+    if constraint_level < 0:
+        return u_mat.T
+    u_up = np.identity(n)[hierarchy.node_level == constraint_level]
+    return np.concatenate([u_up, u_mat], axis=0).T
+
+
+def compute_g_mat(hierarchy: Hierarchy, weight_matrix, constraint_level=-1):
+    """compute G matrix given weight_matrix
+
+    :param hierarchy:
+    :param weight_matrix:
+    :param constraint_level:
+    :return:
+    """
+    n, m = hierarchy.s_mat.shape
+    u = _construct_u_mat(hierarchy, constraint_level=constraint_level)
+    c = np.concatenate([np.zeros([m, n-m]), np.identity(m)], axis=1)
+    a = np.zeros([n - m, n])
+    if constraint_level >= 0:
+        a = np.concatenate([np.identity(n)[hierarchy.node_level == constraint_level], a])
+    return c - c.dot(weight_matrix).dot(u).dot(np.linalg.inv((u.T.dot(weight_matrix).dot(u)))).dot(u.T-a)
+
+
 
