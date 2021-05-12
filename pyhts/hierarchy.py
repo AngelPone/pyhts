@@ -1,8 +1,8 @@
-from typing import List, Iterable
+from typing import List
 import numpy as np
 import pandas as pd
 from copy import copy
-from typing import Union, Optional
+from typing import Union
 from . import accuracy
 
 
@@ -13,9 +13,9 @@ class Hierarchy:
 
     def __init__(self, s_mat, node_level, names, period):
         self.s_mat = s_mat
-        self.node_level = node_level
+        self.node_level = np.array(node_level)
         self.level_n = max(node_level) + 1
-        self.node_name = names
+        self.node_name = np.array(names)
         self.period = period
 
     @classmethod
@@ -170,7 +170,7 @@ class Hierarchy:
             f" {real.shape} true observations have different length with {real.shape} forecasts"
         agg_true = self.aggregate_ts(real, levels=levels)
         if measure is None:
-            measure = ['mase', 'mse', 'mae', 'mape']
+            measure = ['mase', 'mape', 'rmse']
         if 'mase' in measure or 'smape' in measure or 'rmsse' in measure:
             assert hist is not None
             hist = self.aggregate_ts(hist, levels=levels)
@@ -180,9 +180,10 @@ class Hierarchy:
         for me in measure:
             try:
                 accs[me] = np.array(list(map(lambda x: getattr(accuracy, me)(*x),
-                                             zip(agg_true.T, pred.T, [self.period] * self.s_mat.shape[0], hist))))
+                                             zip(agg_true.T, pred.T, hist.T, [self.period] * self.s_mat.shape[0]))))
             except AttributeError:
                 print(f'Forecasting measure {me} is not supported!')
+        accs.index = self.node_name[np.isin(self.node_level, levels)]
         return accs
 
     def accuracy(self, real, pred, hist=None,
@@ -218,7 +219,7 @@ class Hierarchy:
                                              zip(agg_true.T, agg_pred.T, hist, [self.period] * self.s_mat.shape[0]))))
             except AttributeError:
                 print('this forecasting measure is not supported!')
-        accs.index = self.node_name
+        accs.index = self.node_name[np.isin(self.node_level, levels)]
         return accs
 
 

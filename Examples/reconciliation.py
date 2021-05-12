@@ -6,7 +6,7 @@ from pyhts.HFModel import HFModel
 import pickle as pkl
 
 
-def reconciliation_ols():
+def example1():
     df = pd.read_csv('data/Tourism.csv')
     df_train = df.iloc[:-12, :]
     df_test = df.iloc[-12:, :]
@@ -23,7 +23,7 @@ def reconciliation_ols():
     print(hierarchy.accuracy(df_test, forecast, hist=df_train))
 
 
-def mint_test():
+def example2():
     df = pd.read_csv('data/Tourism.csv')
     df_train = df.iloc[:-12, :]
     df_test = df.iloc[-12:, :]
@@ -35,16 +35,19 @@ def mint_test():
     model = HFModel(hierarchy, forecasters, hf_method='comb', comb_method='mint', weights='shrinkage',
                     constrain_level=-1)
     model.fit(df_train)
-    model.predict(horizon=12)
+    forecasts = model.predict(horizon=12)
+    print(hierarchy.accuracy(df_test, forecasts, hist=df_train, levels=[0]))
 
-    model = HFModel(hierarchy, forecasters, hf_method='comb', comb_method='ols')
+    model = HFModel(hierarchy, forecasters, hf_method='comb', comb_method='ols', constrain_level=0)
     model.fit(df_train)
-    model.predict(horizon=12)
+    forecasts = model.predict(horizon=12)
+    print(hierarchy.accuracy(df_test, forecasts, hist=df_train, levels=[0]))
 
-    model = HFModel(hierarchy, forecasters, hf_method='comb', comb_method='ols')
+    model = HFModel(hierarchy, forecasters, hf_method='comb', comb_method='ols', constrain_level=1)
     model.fit(df_train)
-    model.predict(horizon=12)
+    forecasts = model.predict(horizon=12)
+    print(hierarchy.accuracy(df_test, forecasts, hist=df_train, levels=[0]))
 
+    base_forecasts = model.generate_base_forecast(12)
+    print(hierarchy.accuracy_base(df_test, base_forecasts, hist=df_train, levels=[0]))
 
-if __name__ == '__main__':
-    reconciliation_ols()

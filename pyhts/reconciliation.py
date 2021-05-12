@@ -40,7 +40,7 @@ def wls(hierarchy: Hierarchy,
     :param constraint_level: Which level is constrained to be unchangeable when reconciling base forecasts.
     :return: reconciled forecasts
     """
-    S = hierarchy.s_mat.toarray().astype('int32')
+    S = hierarchy.s_mat
     n = S.shape[0]
     m = S.shape[1]
     if method == "mint":
@@ -81,7 +81,7 @@ def _construct_u_mat(hierarchy: Hierarchy, constraint_level=-1):
     s_mat = hierarchy.s_mat
     n, m = s_mat.shape
     u1 = np.identity(n - m)
-    u2 = -s_mat[:(n-m), :]
+    u2 = 0-s_mat[:(n-m), :].astype('int32')
     u_mat = np.concatenate([u1, u2], axis=1)
     if constraint_level < 0:
         return u_mat.T

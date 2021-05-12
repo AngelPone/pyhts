@@ -74,10 +74,10 @@ class HFModel:
 
     def generate_base_forecast(self, horizon: int = 1, **kwargs):
         forecasts = np.stack([model.forecast(h=horizon, **kwargs) for model in self.base_forecasters])
-        return forecasts
+        return forecasts.T
 
     def predict(self, horizon: int = 1, **kwargs):
         forecasts = self.generate_base_forecast(horizon=horizon, **kwargs)
-        return self.G.dot(forecasts).T
+        return self.G.dot(forecasts.T).T
 
 
