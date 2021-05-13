@@ -7,7 +7,7 @@ import pickle as pkl
 
 
 def example1():
-    df = pd.read_csv('data/Tourism.csv')
+    df = pd.read_csv('../pyhts/data/Tourism.csv')
     df_train = df.iloc[:-12, :]
     df_test = df.iloc[-12:, :]
     hierarchy = Hierarchy.from_names(df.columns, chars=[1, 1, 1], period=12)
@@ -24,7 +24,7 @@ def example1():
 
 
 def example2():
-    df = pd.read_csv('data/Tourism.csv')
+    df = pd.read_csv('../pyhts/data/Tourism.csv')
     df_train = df.iloc[:-12, :]
     df_test = df.iloc[-12:, :]
     hierarchy = Hierarchy.from_names(df.columns, [1, 1, 1], 12)

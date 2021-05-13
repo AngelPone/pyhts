@@ -32,7 +32,7 @@ class HFModel:
         :param ts: DataFrame that each column contains a bottom time series.
         :return: HFModel
         """
-        assert self.hierarchy.check_hierarchy(ts)
+        assert self.hierarchy.check_hierarchy(ts), "only bottom series are needed to fit the model."
         s_matrix = self.hierarchy.s_mat
         n, m = self.hierarchy.s_mat.shape
         try:

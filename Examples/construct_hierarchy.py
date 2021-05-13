@@ -4,7 +4,7 @@ from pyhts.hierarchy import Hierarchy
 
 
 def construct_hierarchy_from_names():
-    df = pd.read_csv('data/Tourism.csv')
+    df = pd.read_csv('../pyhts/data/Tourism.csv')
     hts = Hierarchy.from_names(df.columns, chars=[1, 1, 1], period=12)
     return hts
 
