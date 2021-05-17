@@ -13,6 +13,8 @@
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,6 +31,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
@@ -86,20 +89,17 @@
             
               <p class="caption"><span class="caption-text">QuickStart</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/Tutorials.html">Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/notation.html">Notation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/reconciliation.html">Forecast reconciliation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/Tutorials.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/hierarchy.html">Define Hierarchy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/hfmodel.html">Define HFModel</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API References</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="hts.html">Hts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hierarchy.html">Hierarchy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hfmodel.html">HFModel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="forecaster.html">forecaster</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">reconciliation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="accuracy.html">accuracy</a></li>
-</ul>
-<p class="caption"><span class="caption-text">References</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
 </ul>
 
             
@@ -168,23 +168,23 @@
   <div class="section" id="reconciliation">
 <h1>reconciliation<a class="headerlink" href="#reconciliation" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt id="pyhts.reconciliation.wls">
-<code class="sig-prename descclassname"><span class="pre">pyhts.reconciliation.</span></code><code class="sig-name descname"><span class="pre">wls</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_forecast</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ols'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weighting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.reconciliation.wls" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyhts.reconciliation.wls">
+<span class="sig-prename descclassname"><span class="pre">pyhts.reconciliation.</span></span><span class="sig-name descname"><span class="pre">wls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hierarchy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ols'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weighting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.reconciliation.wls" title="Permalink to this definition">¶</a></dt>
 <dd><p>function for forecast reconciliation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>hts</strong> (<a class="reference internal" href="hts.html#pyhts.hts.Hts" title="pyhts.hts.Hts"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hts</span></code></a>) – history time series.</p></li>
-<li><p><strong>base_forecast</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – base forecasts.</p></li>
+<li><p><strong>hierarchy</strong> (<a class="reference internal" href="hierarchy.html#pyhts.hierarchy.Hierarchy" title="pyhts.hierarchy.Hierarchy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hierarchy</span></code></a>) – history time series.</p></li>
+<li><p><strong>error</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – insample error.</p></li>
 <li><p><strong>method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – method used for forecast reconciliation, e.g. ols, wls, mint.</p></li>
 <li><p><strong>weighting</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – method for calculating weight matrix used in reconciliation method, e.g. covariance matrix in mint
-or wls, for details, refer to <a class="reference internal" href="../tutorials/reconciliation.html"><span class="doc">Forecast reconciliation</span></a></p></li>
-<li><p><strong>constraint</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – If some levels are constrained to be unchangeable when reconciling base forecasts.</p></li>
+or wls.</p></li>
+<li><p><strong>constraint</strong> – If some levels are constrained to be unchangeable when reconciling base forecasts.</p></li>
 <li><p><strong>constraint_level</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Which level is constrained to be unchangeable when reconciling base forecasts.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="hts.html#pyhts.hts.Hts" title="pyhts.hts.Hts"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hts</span></code></a></p>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>reconciled forecasts</p>

@@ -11,30 +11,16 @@ Welcome to pyhts's documentation!
    :maxdepth: 2
    :caption: QuickStart
 
-   Tutorial <tutorials/Tutorials.rst>
-   Notation <tutorials/notation.rst>
-   Forecast reconciliation <tutorials/reconciliation.rst>
+   Quick Start <tutorials/Tutorials.rst>
+   Define Hierarchy <tutorials/hierarchy.rst>
+   Define HFModel <tutorials/hfmodel.rst>
 
 
 .. toctree::
    :caption: API References
 
-   API/hts.md
+   API/hierarchy.rst
+   API/hfmodel.rst
    API/forecaster.rst
    API/reconciliation.rst
    API/accuracy.rst
-
-.. toctree::
-   :caption: References
-
-   References <references.rst>
-
-
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

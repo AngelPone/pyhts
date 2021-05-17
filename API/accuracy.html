@@ -13,6 +13,8 @@
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,6 +31,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
@@ -38,7 +41,6 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="References" href="../references.html" />
     <link rel="prev" title="reconciliation" href="reconciliation.html" /> 
 </head>
 
@@ -86,20 +88,17 @@
             
               <p class="caption"><span class="caption-text">QuickStart</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/Tutorials.html">Tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/notation.html">Notation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/reconciliation.html">Forecast reconciliation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/Tutorials.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/hierarchy.html">Define Hierarchy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/hfmodel.html">Define HFModel</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API References</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="hts.html">Hts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hierarchy.html">Hierarchy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hfmodel.html">HFModel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="forecaster.html">forecaster</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reconciliation.html">reconciliation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">accuracy</a></li>
-</ul>
-<p class="caption"><span class="caption-text">References</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
 </ul>
 
             
@@ -168,13 +167,13 @@
   <div class="section" id="accuracy">
 <h1>accuracy<a class="headerlink" href="#accuracy" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt id="pyhts.accuracy.mase">
-<code class="sig-prename descclassname"><span class="pre">pyhts.accuracy.</span></code><code class="sig-name descname"><span class="pre">mase</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">history</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_true</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.accuracy.mase" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyhts.accuracy.mase">
+<span class="sig-prename descclassname"><span class="pre">pyhts.accuracy.</span></span><span class="sig-name descname"><span class="pre">mase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_true</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">history</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.accuracy.mase" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt id="pyhts.accuracy.mse">
-<code class="sig-prename descclassname"><span class="pre">pyhts.accuracy.</span></code><code class="sig-name descname"><span class="pre">mse</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">history</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_true</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.accuracy.mse" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyhts.accuracy.mse">
+<span class="sig-prename descclassname"><span class="pre">pyhts.accuracy.</span></span><span class="sig-name descname"><span class="pre">mse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_true</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">history</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.accuracy.mse" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -185,7 +184,6 @@
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="../references.html" class="btn btn-neutral float-right" title="References" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
         <a href="reconciliation.html" class="btn btn-neutral float-left" title="reconciliation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 

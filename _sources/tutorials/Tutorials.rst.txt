@@ -1,150 +1,121 @@
-Tutorials
-============
+Quick Start
+===========
 
-Before reading this tutorial, you'd better read :doc:`notation` first. If you're not familiar with Hierarchical
-forecasting and forecast reconciliation, read the papers provided in :ref:`references`.
 
-Construction of Hts object
---------------------------
+Introduction
+------------
 
-There are three types of hierarchical time series supported for now, e.g. 
-cross-sectional hierarchical time series, cross-sectional grouped time
-series and temporal hierarchies :ref:`[1]<references>`. For the first two types, you can use
-:class:`~pyhts.hts.Hts` and construct from its classmethod,
-respectively :meth:`~pyhts.hts.Hts.from_hts()` and :meth:`~pyhts.hts.Hts.from_gts()`.
+:code:`pyths` is a python package used for hierarchical forecasting, it implements multiple forecast reconciliation methods which are popular in forecasting literatures such as
+ols [#ols]_ 、wls [#wls]_ 、mint [#mint]_ et al.
 
-As an example of the hierarchy shown in the figure below, use :meth:`~pyhts.hts.Hts.from_hts()` to construct
-Hts object.
+**features**:
+
+- support popular forecast reconciliation models in the literature, e.g. ols, wls, mint et al. Temporal Hierarchy will be supported in the future.
+
+- multiple methods for the construction of hierarchy.
+
+- use different base forecasters for different hierarchical levels.
+
+- familiar sklearn-like API.
+
+The steps of using this package are as follows:
+
+1. Define a hierarchy structure according to your data.
+
+2. Define a :class:`~pyhts.HFModel.HFModel`
+
+3. fit the :class:`~pyhts.HFModel.HFModel` using history time series
+
+4. generate base forecasts and reconcile the forecasts to obtain coherent point forecasts.
+
+Define the Hierarchy
+--------------------
+
+You can use classmethods of :class:`pyhts.hierarchy.Hierarchy` to define hierarchy structure. see details in :doc:`/tutorials/hierarchy`
+
+As an example of the hierarchy shown in the figure below, let’s construct the hierarchy using :class:`pyhts.hierarchy.Hierarchy.from_node_list()` and :class:`pyhts.hierarchy.Hierarchy.from_names()`.
 
 .. image:: ../media/01_hierarchy.png
 
 .. code-block:: python
 
-    from pyhts.hts import Hts
+    from pyhts.hierarchy import Hierarchy
+    node_list = [[2], [2, 2]]
+    period = 12
+    hierarchy = Hierarchy.from_node_list(node_list, period=period)
+
+    col_names = ['AA', 'AB', 'BC', 'BD']
+    hierarchy2 = Hierarchy.from_names(col_names, chars=[1,1], period=period)
+    print(hierarchy2.node_name)
+    # array(['Total', 'A', 'B', 'AA', 'AB', 'BC', 'BD'], dtype='<U5')
+
+where period is frequency of time series, m=12 means monthly series.
+
+Define HFModel
+---------------
+
+Let’s define a simple ols reconciliation model that use :code:`auto.arima` as the base forecasting model, see details in :doc:`/tutorials/hfmodel` .
+
+.. code-block:: python
+
+    from pyhts.HFModel import HFModel
+    ols_model = HFModel(hierarchy=hierarchy, base_forecasters='arima', hf_method='comb', comb_method='ols')
+
+where
+
+- :code:`hierarchy` is the hierarchy define above.
+- :code:`base_forecasters` are base methods that used to generate base forecasts. :code:`arima` and :code:`ets` are supported for now, which are implemented by :code:`forecast` package in R called by :code:`rpy2`.You can also define your custom base forecasters for each level, see details in :ref:`base`.
+- :code:`hf_model` is the method used for hierarchical forecasting, :code:`comb` that means forecast reconciliation is supported for now. Classical methods such as Top-Down、Bottom-up and middle-out will be supported in the future.
+- :code:`comb_method` is the forecast reconciliation method. mint、wls、ols are supported. see details in :doc:`/tutorials/hfmodel`.
+
+fit model
+---------
+
+:meth:`pyhts.HFModel.HFModel.fit()` would fit base forecasting models for each time series and compute the reconciliation matrix.
+
+.. code-block:: python
+
     import numpy as np
-    bts = np.random.random(96).reshape([24, 4])
-    nodes = [[2], [2, 2]]
-    m = 12
-    hts = Hts.from_hts(bts, m=m, nodes=nodes)
-
-use `nodes` to demonstrate the hierarchy, and we construct a hts of 4 bottom series with 24 observations each.
-`m` is frequency of time series, `m=12` means monthly series.
-
-Also, parameter `characters` can be used to represent hierarchical structures, see code examples below.
-
-.. code-block:: python
-
-    import pandas as pd
-    bts = pd.DataFrame(bts)
-    bts.columns = ["AAA", "AAB", "ABC", "ABD"]
-    hts = Hts.from_hts(bts, m=m, characters=[1,1,1])
-
-You can build Temporal Hierarchy with :meth:`~pyhts.hts.from_temporal_hierarchy()`.
-
-.. code-block:: python
-
-    import numpy as np
-    ts = np.random.random(480)
-    ts = Hts.from_temporal_hierarchy(ts, m=12, aggregate_lens=[1, 2, 3, 4, 6, 12])
-
-Aggregation
------------
-
-You can use :meth:`~pyhts.hts.Hts.aggregate_ts()` to aggregate bottom-level time series.
-
-.. code-block:: python
-
-    >>> hts.aggregate_ts()
-    array([[1.24324536, 0.70214108, 0.54110428, 0.46049853, 0.24164255,
-        0.0250346 , 0.51606968],
-        ...
-       [2.63623735, 1.04859469, 1.58764265, 0.97204591, 0.07654878,
-        0.84455429, 0.74308837]])
-    >>> hts.aggregate_ts().shape
-    (24, 7)
-
-You can also specify `levels` to get aggregated time series of specific levels.
-
-.. code-block:: python
-
-    >>> hts.aggregate_ts(levels=0)
-    array([[1.24324536],
-           ...
-           [2.63623735]])
-    >>> hts.aggregate_ts(levels=[0, 1])
-    array([[1.24324536, 0.70214108, 0.54110428],
-           ...
-           [2.63623735, 1.04859469, 1.58764265]])
-    >>> hts.aggregate_ts(levels=[0, 1]).shape
-    (24, 3)
+    data = np.random.random((108, 4))
+    train = data[:-12, :]
+    test = data[-12:, :]
+    model.fit(train)
 
 forecast
 --------
 
-forecast with builtin base method
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
+:meth:`pyhts.HFModel.HFModel.forecast()` would generate base forecasts for each time series and reconcile base forecasts to get coherent forecasts.
 
 .. code-block:: python
 
-    >>> reconciled_forecast = hts.forecast(h=12, base_method = "arima", hf_method = "comb", weights_method="mint", variance="shrink")
-    >>> hts.accuracy(reconciled_forecast, levels=0)
+    reconciled_forecasts = model.predict(horizon=12)
+    print(reconciled_forecasts.shape)
+    # (12, 4)
 
-
-Customize Base forecaster
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Also, you can use different base forecaster for different level, just inherent
-:class:`~pyhts.forecaster.BaseForecaster` and implement :meth:`~pyhts.forecaster.BaseForecaster.forecast()`
-method, and pass list of baseforecasters into `base_forecaster` parameter of :meth:`~pyhts.hts.forecast()`.
-See examples below.
-
-Use same forecaster for all levels.
+:code:`reconciled_forecasts` just contain reconciled forecasts of bottom level, you can use :meth:`~pyhts.hierarchy.Hierarchy.aggregate_ts()` to get reconciled forecasts of all levels.
 
 .. code-block:: python
 
-    >>> from pyhts.forecaster import AutoArimaForecaster
-    >>> forecaster = AutoArimaForecaster(m=12)
-    >>> reconciled_forecast = hts.forecast(h=12, base_forecaster = forecaster, hf_method = "comb", weights_method="mint", variance="shrink")
+    reconciled_forecasts_all_levels = hierarchy.aggregate_ts(reconciled_forecasts)
+    # (12, 7)
 
-
-Use different forecaster for different levels.
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
+measurement
+-----------
+You can evaluate forecasting accuracy of both base forecasts and reconciled forecasts, using :meth:`~pyhts.hierarchy.Hierarchy.accuray_base()` and :meth:`~pyhts.hierarchy.Hierarchy.accuracy()` respectively.
 
 .. code-block:: python
 
-    >>>  from pyhts.forecaster import AutoArimaForecaster, EtsForecaster
-    >>>  arima = AutoArimaForecaster(m=12)
-    >>>  ets = EtsForecaster(m=12)
-    >>>  base_forecasters = [arima, ets, ets, ets]
-    >>> reconciled_forecast = hts.forecast(h=12, base_forecaster = base_forecasters, hf_method = "comb", weights_method="mint", variance="shrink")
+    base_forecasts = model.generate_base_forecasts(horizon=12)
+    hierarchy.accuracy_base(test, base_forecasts, hist=train, levels=None, measure=['mase', 'mape'])
+    hierarchy.accuracy(test, reconciled_forecasts, hist=train, levels=None, measure=['mase', 'mape'])
 
-Make your own forecasters, you can config you base forecasters, but it must
-implement `forecast` method, which at least takes hist, h, keep_fitted as parameters.
-
-* `hist`: history series
-* `h`: forecast horizon
-* `keep_fitted`: if in_sample fitted values are needed.
-
-This method should return :class:`~numpy.ndarray` as forecasts.
-
-.. code-block:: python
-
-    from pyhts.forecaster import Baseforecaster
-    class custom_forecaster(Baseforecaster):
-        def __init__(self, param1, param2):
-            self.param1 = param1
-            self.param2 = param2
-        def forecast(self, hist, h, keep_fitted, param3, param4):
-            return myforecast_method(hist, h, keep_fitted, param3, param4)
+where :code:`levels=None` means accuracy of all levels are returned. :code:`hist` are history time series that are needed by :code:`mase` measure.
 
 
+.. [#ols] Hyndman, R. A. Ahmed, G. Athanasopoulos, and H. L. Shang, “Optimal combination forecasts for hierarchical time series,” Computational Statistics & Data Analysis, vol. 55, no. 9, pp. 2579–2589, Sep. 2011, doi: 10.1016/j.csda.2011.03.006.
 
 
+.. [#wls] Panagiotelis, G. Athanasopoulos, P. Gamakumara, and R. J. Hyndman, “Forecast reconciliation: A geometric view with new insights on bias correction,” International Journal of Forecasting, vol. 37, no. 1, pp. 343–359, Jan. 2021, doi: 10.1016/j.ijforecast.2020.06.004.
 
 
-
-
-
+.. [#mint] Wickramasuriya, G. Athanasopoulos, and R. J. Hyndman, “Optimal Forecast Reconciliation for Hierarchical and Grouped Time Series Through Trace Minimization,” Journal of the American Statistical Association, vol. 114, no. 526, pp. 804–819, Apr. 2019, doi: 10.1080/01621459.2018.1448825.

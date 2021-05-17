@@ -7,12 +7,14 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Tutorials &mdash; pyhts  documentation</title>
+  <title>Quick Start &mdash; pyhts  documentation</title>
   
 
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
 
   
   
@@ -29,6 +31,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
@@ -38,7 +41,7 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Notation" href="notation.html" />
+    <link rel="next" title="Define Hierarchy" href="hierarchy.html" />
     <link rel="prev" title="Welcome to pyhts’s documentation!" href="../index.html" /> 
 </head>
 
@@ -86,30 +89,25 @@
             
               <p class="caption"><span class="caption-text">QuickStart</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#construction-of-hts-object">Construction of Hts object</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#aggregation">Aggregation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#forecast">forecast</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#forecast-with-builtin-base-method">forecast with builtin base method</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#customize-base-forecaster">Customize Base forecaster</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#use-different-forecaster-for-different-levels">Use different forecaster for different levels.</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Quick Start</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#define-the-hierarchy">Define the Hierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#define-hfmodel">Define HFModel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#fit-model">fit model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#forecast">forecast</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#measurement">measurement</a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="notation.html">Notation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reconciliation.html">Forecast reconciliation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hierarchy.html">Define Hierarchy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hfmodel.html">Define HFModel</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API References</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../API/hts.html">Hts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/hierarchy.html">Hierarchy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../API/hfmodel.html">HFModel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../API/forecaster.html">forecaster</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../API/reconciliation.html">reconciliation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../API/accuracy.html">accuracy</a></li>
-</ul>
-<p class="caption"><span class="caption-text">References</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
 </ul>
 
             
@@ -158,7 +156,7 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Tutorials</li>
+      <li>Quick Start</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -175,120 +173,105 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="tutorials">
-<h1>Tutorials<a class="headerlink" href="#tutorials" title="Permalink to this headline">¶</a></h1>
-<p>Before reading this tutorial, you’d better read <a class="reference internal" href="notation.html"><span class="doc">Notation</span></a> first. If you’re not familiar with Hierarchical
-forecasting and forecast reconciliation, read the papers provided in <a class="reference internal" href="../references.html#references"><span class="std std-ref">References</span></a>.</p>
-<div class="section" id="construction-of-hts-object">
-<h2>Construction of Hts object<a class="headerlink" href="#construction-of-hts-object" title="Permalink to this headline">¶</a></h2>
-<p>There are three types of hierarchical time series supported for now, e.g.
-cross-sectional hierarchical time series, cross-sectional grouped time
-series and temporal hierarchies <a class="reference internal" href="../references.html#references"><span class="std std-ref">[1]</span></a>. For the first two types, you can use
-<a class="reference internal" href="../API/hts.html#pyhts.hts.Hts" title="pyhts.hts.Hts"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hts</span></code></a> and construct from its classmethod,
-respectively <a class="reference internal" href="../API/hts.html#pyhts.hts.Hts.from_hts" title="pyhts.hts.Hts.from_hts"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_hts()</span></code></a> and <code class="xref py py-meth docutils literal notranslate"><span class="pre">from_gts()</span></code>.</p>
-<p>As an example of the hierarchy shown in the figure below, use <a class="reference internal" href="../API/hts.html#pyhts.hts.Hts.from_hts" title="pyhts.hts.Hts.from_hts"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_hts()</span></code></a> to construct
-Hts object.</p>
+  <div class="section" id="quick-start">
+<h1>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p><code class="code docutils literal notranslate"><span class="pre">pyths</span></code> is a python package used for hierarchical forecasting, it implements multiple forecast reconciliation methods which are popular in forecasting literatures such as
+ols <a class="footnote-reference brackets" href="#ols" id="id1">1</a> 、wls <a class="footnote-reference brackets" href="#wls" id="id2">2</a> 、mint <a class="footnote-reference brackets" href="#mint" id="id3">3</a> et al.</p>
+<p><strong>features</strong>:</p>
+<ul class="simple">
+<li><p>support popular forecast reconciliation models in the literature, e.g. ols, wls, mint et al. Temporal Hierarchy will be supported in the future.</p></li>
+<li><p>multiple methods for the construction of hierarchy.</p></li>
+<li><p>use different base forecasters for different hierarchical levels.</p></li>
+<li><p>familiar sklearn-like API.</p></li>
+</ul>
+<p>The steps of using this package are as follows:</p>
+<ol class="arabic simple">
+<li><p>Define a hierarchy structure according to your data.</p></li>
+<li><p>Define a <code class="xref py py-class docutils literal notranslate"><span class="pre">HFModel</span></code></p></li>
+<li><p>fit the <code class="xref py py-class docutils literal notranslate"><span class="pre">HFModel</span></code> using history time series</p></li>
+<li><p>generate base forecasts and reconcile the forecasts to obtain coherent point forecasts.</p></li>
+</ol>
+</div>
+<div class="section" id="define-the-hierarchy">
+<h2>Define the Hierarchy<a class="headerlink" href="#define-the-hierarchy" title="Permalink to this headline">¶</a></h2>
+<p>You can use classmethods of <a class="reference internal" href="../API/hierarchy.html#pyhts.hierarchy.Hierarchy" title="pyhts.hierarchy.Hierarchy"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyhts.hierarchy.Hierarchy</span></code></a> to define hierarchy structure. see details in <a class="reference internal" href="hierarchy.html"><span class="doc">Define Hierarchy</span></a></p>
+<p>As an example of the hierarchy shown in the figure below, let’s construct the hierarchy using <a class="reference internal" href="../API/hierarchy.html#pyhts.hierarchy.Hierarchy.from_node_list" title="pyhts.hierarchy.Hierarchy.from_node_list"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyhts.hierarchy.Hierarchy.from_node_list()</span></code></a> and <a class="reference internal" href="../API/hierarchy.html#pyhts.hierarchy.Hierarchy.from_names" title="pyhts.hierarchy.Hierarchy.from_names"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyhts.hierarchy.Hierarchy.from_names()</span></code></a>.</p>
 <img alt="../_images/01_hierarchy.png" src="../_images/01_hierarchy.png" />
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyhts.hts</span> <span class="kn">import</span> <span class="n">Hts</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="n">bts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">96</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="mi">24</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
-<span class="n">nodes</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]]</span>
-<span class="n">m</span> <span class="o">=</span> <span class="mi">12</span>
-<span class="n">hts</span> <span class="o">=</span> <span class="n">Hts</span><span class="o">.</span><span class="n">from_hts</span><span class="p">(</span><span class="n">bts</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="n">m</span><span class="p">,</span> <span class="n">nodes</span><span class="o">=</span><span class="n">nodes</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyhts.hierarchy</span> <span class="kn">import</span> <span class="n">Hierarchy</span>
+<span class="n">node_list</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]]</span>
+<span class="n">period</span> <span class="o">=</span> <span class="mi">12</span>
+<span class="n">hierarchy</span> <span class="o">=</span> <span class="n">Hierarchy</span><span class="o">.</span><span class="n">from_node_list</span><span class="p">(</span><span class="n">node_list</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="n">period</span><span class="p">)</span>
+
+<span class="n">col_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;AA&#39;</span><span class="p">,</span> <span class="s1">&#39;AB&#39;</span><span class="p">,</span> <span class="s1">&#39;BC&#39;</span><span class="p">,</span> <span class="s1">&#39;BD&#39;</span><span class="p">]</span>
+<span class="n">hierarchy2</span> <span class="o">=</span> <span class="n">Hierarchy</span><span class="o">.</span><span class="n">from_names</span><span class="p">(</span><span class="n">col_names</span><span class="p">,</span> <span class="n">chars</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">period</span><span class="o">=</span><span class="n">period</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">hierarchy2</span><span class="o">.</span><span class="n">node_name</span><span class="p">)</span>
+<span class="c1"># array([&#39;Total&#39;, &#39;A&#39;, &#39;B&#39;, &#39;AA&#39;, &#39;AB&#39;, &#39;BC&#39;, &#39;BD&#39;], dtype=&#39;&lt;U5&#39;)</span>
 </pre></div>
 </div>
-<p>use <cite>nodes</cite> to demonstrate the hierarchy, and we construct a hts of 4 bottom series with 24 observations each.
-<cite>m</cite> is frequency of time series, <cite>m=12</cite> means monthly series.</p>
-<p>Also, parameter <cite>characters</cite> can be used to represent hierarchical structures, see code examples below.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="n">bts</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">bts</span><span class="p">)</span>
-<span class="n">bts</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;AAA&quot;</span><span class="p">,</span> <span class="s2">&quot;AAB&quot;</span><span class="p">,</span> <span class="s2">&quot;ABC&quot;</span><span class="p">,</span> <span class="s2">&quot;ABD&quot;</span><span class="p">]</span>
-<span class="n">hts</span> <span class="o">=</span> <span class="n">Hts</span><span class="o">.</span><span class="n">from_hts</span><span class="p">(</span><span class="n">bts</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="n">m</span><span class="p">,</span> <span class="n">characters</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+<p>where period is frequency of time series, m=12 means monthly series.</p>
+</div>
+<div class="section" id="define-hfmodel">
+<h2>Define HFModel<a class="headerlink" href="#define-hfmodel" title="Permalink to this headline">¶</a></h2>
+<p>Let’s define a simple ols reconciliation model that use <code class="code docutils literal notranslate"><span class="pre">auto.arima</span></code> as the base forecasting model, see details in <a class="reference internal" href="hfmodel.html"><span class="doc">Hierarchical Forecasting Model</span></a> .</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyhts.HFModel</span> <span class="kn">import</span> <span class="n">HFModel</span>
+<span class="n">ols_model</span> <span class="o">=</span> <span class="n">HFModel</span><span class="p">(</span><span class="n">hierarchy</span><span class="o">=</span><span class="n">hierarchy</span><span class="p">,</span> <span class="n">base_forecasters</span><span class="o">=</span><span class="s1">&#39;arima&#39;</span><span class="p">,</span> <span class="n">hf_method</span><span class="o">=</span><span class="s1">&#39;comb&#39;</span><span class="p">,</span> <span class="n">comb_method</span><span class="o">=</span><span class="s1">&#39;ols&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>You can build Temporal Hierarchy with <code class="xref py py-meth docutils literal notranslate"><span class="pre">from_temporal_hierarchy()</span></code>.</p>
+<p>where</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">hierarchy</span></code> is the hierarchy define above.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">base_forecasters</span></code> are base methods that used to generate base forecasts. <code class="code docutils literal notranslate"><span class="pre">arima</span></code> and <code class="code docutils literal notranslate"><span class="pre">ets</span></code> are supported for now, which are implemented by <code class="code docutils literal notranslate"><span class="pre">forecast</span></code> package in R called by <code class="code docutils literal notranslate"><span class="pre">rpy2</span></code>.You can also define your custom base forecasters for each level, see details in <a class="reference internal" href="hfmodel.html#base"><span class="std std-ref">customize base forecasters</span></a>.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">hf_model</span></code> is the method used for hierarchical forecasting, <code class="code docutils literal notranslate"><span class="pre">comb</span></code> that means forecast reconciliation is supported for now. Classical methods such as Top-Down、Bottom-up and middle-out will be supported in the future.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">comb_method</span></code> is the forecast reconciliation method. mint、wls、ols are supported. see details in <a class="reference internal" href="hfmodel.html"><span class="doc">Hierarchical Forecasting Model</span></a>.</p></li>
+</ul>
+</div>
+<div class="section" id="fit-model">
+<h2>fit model<a class="headerlink" href="#fit-model" title="Permalink to this headline">¶</a></h2>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyhts.HFModel.HFModel.fit()</span></code> would fit base forecasting models for each time series and compute the reconciliation matrix.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="n">ts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">480</span><span class="p">)</span>
-<span class="n">ts</span> <span class="o">=</span> <span class="n">Hts</span><span class="o">.</span><span class="n">from_temporal_hierarchy</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">m</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">aggregate_lens</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">12</span><span class="p">])</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="aggregation">
-<h2>Aggregation<a class="headerlink" href="#aggregation" title="Permalink to this headline">¶</a></h2>
-<p>You can use <a class="reference internal" href="../API/hts.html#pyhts.hts.Hts.aggregate_ts" title="pyhts.hts.Hts.aggregate_ts"><code class="xref py py-meth docutils literal notranslate"><span class="pre">aggregate_ts()</span></code></a> to aggregate bottom-level time series.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">hts</span><span class="o">.</span><span class="n">aggregate_ts</span><span class="p">()</span>
-<span class="go">array([[1.24324536, 0.70214108, 0.54110428, 0.46049853, 0.24164255,</span>
-<span class="go">    0.0250346 , 0.51606968],</span>
-<span class="go">    ...</span>
-<span class="go">   [2.63623735, 1.04859469, 1.58764265, 0.97204591, 0.07654878,</span>
-<span class="go">    0.84455429, 0.74308837]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">hts</span><span class="o">.</span><span class="n">aggregate_ts</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span>
-<span class="go">(24, 7)</span>
-</pre></div>
-</div>
-<p>You can also specify <cite>levels</cite> to get aggregated time series of specific levels.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">hts</span><span class="o">.</span><span class="n">aggregate_ts</span><span class="p">(</span><span class="n">levels</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<span class="go">array([[1.24324536],</span>
-<span class="go">       ...</span>
-<span class="go">       [2.63623735]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">hts</span><span class="o">.</span><span class="n">aggregate_ts</span><span class="p">(</span><span class="n">levels</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-<span class="go">array([[1.24324536, 0.70214108, 0.54110428],</span>
-<span class="go">       ...</span>
-<span class="go">       [2.63623735, 1.04859469, 1.58764265]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">hts</span><span class="o">.</span><span class="n">aggregate_ts</span><span class="p">(</span><span class="n">levels</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">shape</span>
-<span class="go">(24, 3)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">108</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">train</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:</span><span class="o">-</span><span class="mi">12</span><span class="p">,</span> <span class="p">:]</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">12</span><span class="p">:,</span> <span class="p">:]</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="forecast">
 <h2>forecast<a class="headerlink" href="#forecast" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="forecast-with-builtin-base-method">
-<h3>forecast with builtin base method<a class="headerlink" href="#forecast-with-builtin-base-method" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">reconciled_forecast</span> <span class="o">=</span> <span class="n">hts</span><span class="o">.</span><span class="n">forecast</span><span class="p">(</span><span class="n">h</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">base_method</span> <span class="o">=</span> <span class="s2">&quot;arima&quot;</span><span class="p">,</span> <span class="n">hf_method</span> <span class="o">=</span> <span class="s2">&quot;comb&quot;</span><span class="p">,</span> <span class="n">weights_method</span><span class="o">=</span><span class="s2">&quot;mint&quot;</span><span class="p">,</span> <span class="n">variance</span><span class="o">=</span><span class="s2">&quot;shrink&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">hts</span><span class="o">.</span><span class="n">accuracy</span><span class="p">(</span><span class="n">reconciled_forecast</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyhts.HFModel.HFModel.forecast()</span></code> would generate base forecasts for each time series and reconcile base forecasts to get coherent forecasts.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">reconciled_forecasts</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">horizon</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">reconciled_forecasts</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="c1"># (12, 4)</span>
+</pre></div>
+</div>
+<p><code class="code docutils literal notranslate"><span class="pre">reconciled_forecasts</span></code> just contain reconciled forecasts of bottom level, you can use <a class="reference internal" href="../API/hierarchy.html#pyhts.hierarchy.Hierarchy.aggregate_ts" title="pyhts.hierarchy.Hierarchy.aggregate_ts"><code class="xref py py-meth docutils literal notranslate"><span class="pre">aggregate_ts()</span></code></a> to get reconciled forecasts of all levels.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">reconciled_forecasts_all_levels</span> <span class="o">=</span> <span class="n">hierarchy</span><span class="o">.</span><span class="n">aggregate_ts</span><span class="p">(</span><span class="n">reconciled_forecasts</span><span class="p">)</span>
+<span class="c1"># (12, 7)</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="customize-base-forecaster">
-<h3>Customize Base forecaster<a class="headerlink" href="#customize-base-forecaster" title="Permalink to this headline">¶</a></h3>
-<p>Also, you can use different base forecaster for different level, just inherent
-<code class="xref py py-class docutils literal notranslate"><span class="pre">BaseForecaster</span></code> and implement <code class="xref py py-meth docutils literal notranslate"><span class="pre">forecast()</span></code>
-method, and pass list of baseforecasters into <cite>base_forecaster</cite> parameter of <code class="xref py py-meth docutils literal notranslate"><span class="pre">forecast()</span></code>.
-See examples below.</p>
-<p>Use same forecaster for all levels.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyhts.forecaster</span> <span class="kn">import</span> <span class="n">AutoArimaForecaster</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">forecaster</span> <span class="o">=</span> <span class="n">AutoArimaForecaster</span><span class="p">(</span><span class="n">m</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">reconciled_forecast</span> <span class="o">=</span> <span class="n">hts</span><span class="o">.</span><span class="n">forecast</span><span class="p">(</span><span class="n">h</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">base_forecaster</span> <span class="o">=</span> <span class="n">forecaster</span><span class="p">,</span> <span class="n">hf_method</span> <span class="o">=</span> <span class="s2">&quot;comb&quot;</span><span class="p">,</span> <span class="n">weights_method</span><span class="o">=</span><span class="s2">&quot;mint&quot;</span><span class="p">,</span> <span class="n">variance</span><span class="o">=</span><span class="s2">&quot;shrink&quot;</span><span class="p">)</span>
+<div class="section" id="measurement">
+<h2>measurement<a class="headerlink" href="#measurement" title="Permalink to this headline">¶</a></h2>
+<p>You can evaluate forecasting accuracy of both base forecasts and reconciled forecasts, using <code class="xref py py-meth docutils literal notranslate"><span class="pre">accuray_base()</span></code> and <a class="reference internal" href="../API/hierarchy.html#pyhts.hierarchy.Hierarchy.accuracy" title="pyhts.hierarchy.Hierarchy.accuracy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">accuracy()</span></code></a> respectively.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">base_forecasts</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate_base_forecasts</span><span class="p">(</span><span class="n">horizon</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">hierarchy</span><span class="o">.</span><span class="n">accuracy_base</span><span class="p">(</span><span class="n">test</span><span class="p">,</span> <span class="n">base_forecasts</span><span class="p">,</span> <span class="n">hist</span><span class="o">=</span><span class="n">train</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">measure</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;mase&#39;</span><span class="p">,</span> <span class="s1">&#39;mape&#39;</span><span class="p">])</span>
+<span class="n">hierarchy</span><span class="o">.</span><span class="n">accuracy</span><span class="p">(</span><span class="n">test</span><span class="p">,</span> <span class="n">reconciled_forecasts</span><span class="p">,</span> <span class="n">hist</span><span class="o">=</span><span class="n">train</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">measure</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;mase&#39;</span><span class="p">,</span> <span class="s1">&#39;mape&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="use-different-forecaster-for-different-levels">
-<h3>Use different forecaster for different levels.<a class="headerlink" href="#use-different-forecaster-for-different-levels" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span> <span class="kn">from</span> <span class="nn">pyhts.forecaster</span> <span class="kn">import</span> <span class="n">AutoArimaForecaster</span><span class="p">,</span> <span class="n">EtsForecaster</span>
-<span class="gp">&gt;&gt;&gt; </span> <span class="n">arima</span> <span class="o">=</span> <span class="n">AutoArimaForecaster</span><span class="p">(</span><span class="n">m</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span> <span class="n">ets</span> <span class="o">=</span> <span class="n">EtsForecaster</span><span class="p">(</span><span class="n">m</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span> <span class="n">base_forecasters</span> <span class="o">=</span> <span class="p">[</span><span class="n">arima</span><span class="p">,</span> <span class="n">ets</span><span class="p">,</span> <span class="n">ets</span><span class="p">,</span> <span class="n">ets</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">reconciled_forecast</span> <span class="o">=</span> <span class="n">hts</span><span class="o">.</span><span class="n">forecast</span><span class="p">(</span><span class="n">h</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">base_forecaster</span> <span class="o">=</span> <span class="n">base_forecasters</span><span class="p">,</span> <span class="n">hf_method</span> <span class="o">=</span> <span class="s2">&quot;comb&quot;</span><span class="p">,</span> <span class="n">weights_method</span><span class="o">=</span><span class="s2">&quot;mint&quot;</span><span class="p">,</span> <span class="n">variance</span><span class="o">=</span><span class="s2">&quot;shrink&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Make your own forecasters, you can config you base forecasters, but it must
-implement <cite>forecast</cite> method, which at least takes hist, h, keep_fitted as parameters.</p>
-<ul class="simple">
-<li><p><cite>hist</cite>: history series</p></li>
-<li><p><cite>h</cite>: forecast horizon</p></li>
-<li><p><cite>keep_fitted</cite>: if in_sample fitted values are needed.</p></li>
-</ul>
-<p>This method should return <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code> as forecasts.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyhts.forecaster</span> <span class="kn">import</span> <span class="n">Baseforecaster</span>
-<span class="k">class</span> <span class="nc">custom_forecaster</span><span class="p">(</span><span class="n">Baseforecaster</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param1</span><span class="p">,</span> <span class="n">param2</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">param1</span> <span class="o">=</span> <span class="n">param1</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">param2</span> <span class="o">=</span> <span class="n">param2</span>
-    <span class="k">def</span> <span class="nf">forecast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hist</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">keep_fitted</span><span class="p">,</span> <span class="n">param3</span><span class="p">,</span> <span class="n">param4</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">myforecast_method</span><span class="p">(</span><span class="n">hist</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">keep_fitted</span><span class="p">,</span> <span class="n">param3</span><span class="p">,</span> <span class="n">param4</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
+<p>where <code class="code docutils literal notranslate"><span class="pre">levels=None</span></code> means accuracy of all levels are returned. <code class="code docutils literal notranslate"><span class="pre">hist</span></code> are history time series that are needed by <code class="code docutils literal notranslate"><span class="pre">mase</span></code> measure.</p>
+<dl class="footnote brackets">
+<dt class="label" id="ols"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>Hyndman, R. A. Ahmed, G. Athanasopoulos, and H. L. Shang, “Optimal combination forecasts for hierarchical time series,” Computational Statistics &amp; Data Analysis, vol. 55, no. 9, pp. 2579–2589, Sep. 2011, doi: 10.1016/j.csda.2011.03.006.</p>
+</dd>
+<dt class="label" id="wls"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dd><p>Panagiotelis, G. Athanasopoulos, P. Gamakumara, and R. J. Hyndman, “Forecast reconciliation: A geometric view with new insights on bias correction,” International Journal of Forecasting, vol. 37, no. 1, pp. 343–359, Jan. 2021, doi: 10.1016/j.ijforecast.2020.06.004.</p>
+</dd>
+<dt class="label" id="mint"><span class="brackets"><a class="fn-backref" href="#id3">3</a></span></dt>
+<dd><p>Wickramasuriya, G. Athanasopoulos, and R. J. Hyndman, “Optimal Forecast Reconciliation for Hierarchical and Grouped Time Series Through Trace Minimization,” Journal of the American Statistical Association, vol. 114, no. 526, pp. 804–819, Apr. 2019, doi: 10.1080/01621459.2018.1448825.</p>
+</dd>
+</dl>
 </div>
 </div>
 
@@ -298,7 +281,7 @@ implement <cite>forecast</cite> method, which at least takes hist, h, keep_fitte
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="notation.html" class="btn btn-neutral float-right" title="Notation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="hierarchy.html" class="btn btn-neutral float-right" title="Define Hierarchy" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
         <a href="../index.html" class="btn btn-neutral float-left" title="Welcome to pyhts’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
