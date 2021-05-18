@@ -19,7 +19,6 @@ Welcome to pyhts's documentation!
 .. toctree::
    :caption: API References
 
-   API/hierarchy.rst
    API/hfmodel.rst
    API/forecaster.rst
    API/reconciliation.rst
