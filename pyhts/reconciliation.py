@@ -1,7 +1,6 @@
 import numpy as np
-
 from typing import Union
-from pyhts.hierarchy import Hierarchy
+from .hierarchy import Hierarchy
 
 
 def _lamb_estimate(x: np.ndarray) -> float:
@@ -35,7 +34,7 @@ def wls(hierarchy: Hierarchy,
     :param method: method used for forecast reconciliation, e.g. ols, wls, mint.
     :param weighting:
         method for calculating weight matrix used in reconciliation method, e.g. covariance matrix in mint
-        or wls, for details, refer to :doc:`/tutorials/reconciliation`
+        or wls.
     :param constraint: If some levels are constrained to be unchangeable when reconciling base forecasts.
     :param constraint_level: Which level is constrained to be unchangeable when reconciling base forecasts.
     :return: reconciled forecasts
@@ -105,5 +104,9 @@ def compute_g_mat(hierarchy: Hierarchy, weight_matrix, constraint_level=-1):
         a = np.concatenate([np.identity(n)[hierarchy.node_level == constraint_level], a])
     return c - c.dot(weight_matrix).dot(u).dot(np.linalg.inv((u.T.dot(weight_matrix).dot(u)))).dot(u.T-a)
 
+
+__all__ = [
+    "wls"
+]
 
 

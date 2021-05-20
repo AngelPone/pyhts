@@ -1,12 +1,15 @@
 import numpy as np
-from pyhts.hierarchy import Hierarchy
 from typing import List, Union, Optional
-from pyhts.forecaster import BaseForecaster, EtsForecaster, AutoArimaForecaster
-import pyhts.reconciliation as fr
+from .forecaster import BaseForecaster, EtsForecaster, AutoArimaForecaster
+from . import reconciliation as fr
+from .hierarchy import Hierarchy
 import pandas as pd
 
 
 class HFModel:
+    """Model for hierarchical forecasting.
+
+    """
 
     def __init__(self,
                  hierarchy: Hierarchy,
@@ -14,23 +17,31 @@ class HFModel:
                  hf_method: str = 'comb',
                  comb_method: str = 'ols',
                  weights: Optional[Union[str, np.ndarray]] = None,
-                 constrain_level: int = -1,
-                 **kwargs):
+                 constrain_level: int = -1):
+        """Define a Hierarchical Forecasting Model.
+
+        :param hierarchy: hierarchical structure of data.
+        :param base_forecasters: base forecasting method, custom forecasters or arima, ets, implemented by :code:`forecast` in R called by :code:`rpy2`
+        :param hf_method: method for hierarchical forecasting, :code:`comb` is only supported for now, which represents optimal combination method.
+        :param comb_method: method for forecast reconciliation, ols, wls or mint.
+        :param weights: weighting matrix used in wls and mint, "structural" or custom symmetric matrix for wls. "shrinkage", "sample", "variance" for mint.
+        :param constrain_level: -1 means no constraints.
+        """
         self.hierarchy = hierarchy
         self.base_forecasters = base_forecasters
         self.hf_method = hf_method
         self.comb_method = comb_method
         self.period = self.hierarchy.period
         self.weights = weights
-        self.model_params = kwargs
         self.constrain_level = constrain_level
         self.G = None
 
-    def fit(self, ts: pd.DataFrame) -> "HFModel":
-        """Fit base forecast model and calculate :math:`SG` used for reconciliation.
+    def fit(self, ts: pd.DataFrame, x_reg: Optional[np.array]=None, **kwargs) -> "HFModel":
+        """Fit base forecast model and calculate reconciliation matrix used for reconciliation.
 
         :param ts: DataFrame that each column contains a bottom time series.
-        :return: HFModel
+        :param x_reg: explantory variables with shape (n, T, k), where n is number of time series, T is history length, k is dimension of explantory variables.
+        :return: fitted HFModel
         """
         assert self.hierarchy.check_hierarchy(ts), "only bottom series are needed to fit the model."
         s_matrix = self.hierarchy.s_mat
@@ -41,12 +52,25 @@ class HFModel:
             ts = s_matrix.dot(ts)
         if isinstance(self.base_forecasters, str):
             if self.base_forecasters == 'arima':
-                self.base_forecasters = [AutoArimaForecaster(m=self.period, **self.model_params).fit(ts[i, :])
+                self.base_forecasters = [AutoArimaForecaster(m=self.period).fit(ts[i, :], x_reg=None if x_reg is None else x_reg[i])
                                          for i in range(n)]
             elif self.base_forecasters == 'ets':
-                self.base_forecasters = [EtsForecaster(m=self.period, **self.model_params).fit(ts[i, :]) for i in range(n)]
+                self.base_forecasters = [EtsForecaster(m=self.period).fit(ts[i, :], x_reg=None if x_reg is None else x_reg[i])
+                                         for i in range(n)]
             else:
                 raise ValueError("not supported base method")
+        elif isinstance(self.base_forecasters, List):
+            if len(self.base_forecasters) == 1:
+                self.base_forecasters = [self.base_forecasters[0]().fit(ts[i, :], x_reg=None if x_reg is None else x_reg[i])
+                                         for i in range(n)]
+            if len(self.base_forecasters) == self.hierarchy.level_n:
+                self.base_forecasters = [self.base_forecasters[self.hierarchy.node_level[i]]().fit(ts[i, :], x_reg=None if x_reg is None else x_reg[i])
+                                         for i in range(n)]
+            if len(self.base_forecasters) == n:
+                self.base_forecasters = [self.base_forecasters[i]().fit(ts[i, :], x_reg=None if x_reg is None else x_reg[i])
+                                         for i in range(n)]
+        else:
+            raise ValueError("not supported base method")
 
         if self.hf_method == "comb":
             if self.comb_method == "ols":
@@ -72,12 +96,18 @@ class HFModel:
             raise NotImplementedError("this method is not implemented")
         return self
 
-    def generate_base_forecast(self, horizon: int = 1, **kwargs):
-        forecasts = np.stack([model.forecast(h=horizon, **kwargs) for model in self.base_forecasters])
+    def generate_base_forecast(self, horizon: int = 1, x_reg=None, **kwargs):
+        forecasts = np.stack([self.base_forecasters[i].forecast(h=horizon, x_reg=None if x_reg is None else x_reg[i],
+                                                                **kwargs) for i in range(len(self.base_forecasters))])
         return forecasts.T
 
-    def predict(self, horizon: int = 1, **kwargs):
-        forecasts = self.generate_base_forecast(horizon=horizon, **kwargs)
+    def predict(self, horizon: int = 1, x_reg=None, **kwargs) -> np.array:
+        """generate horizon-step-ahead reconciled base forecasts of bottom level.
+
+        :param horizon: forecast horizon
+        :param x_reg: explantory variables with shape (n, h, k), where n is number of time series, h is forecast horizon, k is dimension of explantory variables.
+        :param kwargs: other parameters passed to base forecasters
+        :return: coherent forecasts of bottom level.
+        """
+        forecasts = self.generate_base_forecast(horizon=horizon, x_reg=x_reg, **kwargs)
         return self.G.dot(forecasts.T).T
-
-

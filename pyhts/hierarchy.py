@@ -1,29 +1,66 @@
-from typing import List
 import numpy as np
 import pandas as pd
 from copy import copy
-from typing import Union
+from typing import Union, List
 from . import accuracy
 
 
 class Hierarchy:
-    """Class for hierarchy tree.
+    """Class for hierarchy structure.
 
+    **Attributes**
+
+        .. py:attribute:: s_mat
+
+            summing matrix.
+        .. py:attribute:: period
+
+            frequency of time series.
+        .. py:attribute:: node_name
+
+            name of each node.
+        .. py:attribute:: level_n
+
+            number of levels.
+        .. py:attribute:: node_level
+
+            level of each node.
     """
 
     def __init__(self, s_mat, node_level, names, period):
-        self.s_mat = s_mat
+        self.s_mat = s_mat.astype('int8')
+        """ summing matrix. """
         self.node_level = np.array(node_level)
         self.level_n = max(node_level) + 1
         self.node_name = np.array(names)
         self.period = period
 
     @classmethod
-    def from_node_list(cls, nodes: List[List[int]], period=1):
-        """Construct Hierarchy from node list.
+    def from_node_list(cls, nodes, period: int = 1) -> "Hierarchy":
+        """Constructs hierarchy from a list of lists, each sublist contains number of children nodes of all nodes in a
+        hierarchical level. More specifically, the first sublist contains the number of children nodes of all nodes in
+        Level0, e.g. the root node.(sum of all bottom level time series), and so on.
 
-        :param nodes: e.g. [[2], [2, 2]]
-        :param period: seasonality
+        **Examples**
+
+            >>> from pyhts.hierarchy import Hierarchy
+            >>> nodes = [[2], [2, 2]]
+            >>> hierarchy = Hierarchy.from_node_list(nodes, 12)
+            >>> hierarchy.s_mat
+            array([[1, 1, 1, 1],
+                   [1, 1, 0, 0],
+                   [0, 0, 1, 1],
+                   [1, 0, 0, 0],
+                   [0, 1, 0, 0],
+                   [0, 0, 1, 0],
+                   [0, 0, 0, 1]], dtype=int8)
+
+        :code:`[[2], [2, 2]]` defines a hierarchy that in which the root node have two sub-nodes, the fist
+        sub-node contains two sub-nodes and the second sub-node also contains two sub-nodes. There are 4 bottom time
+        series in total.
+
+        :param nodes: list of children nodes number lists.
+        :param period: frequency of the time series, 1 means non-seasonality data, 12 means monthly data.
         :return:
         """
         nodes = copy(nodes)
@@ -55,12 +92,35 @@ class Hierarchy:
         return cls(s, np.array(node_level), node_level, period)
 
     @classmethod
-    def from_names(cls, names: List[str], chars: List[int], period: int = 1):
-        """Construct Hierarchy from column names
+    def from_names(cls, names: List[str], chars: List[int], period: int = 1) -> "Hierarchy":
+        """Construct Hierarchy from column names of bottom time series. The name of bottom series should be consist of
+        several parts. Each part points to a specific level of the hierarchy and it should have fixed length that used to
+        split and recognize hierarchy.
 
-        :param names:
-        :param chars:
-        :param period:
+        For example :code:`AA`. The first :code:`A` represents :code:`A` series in level1,
+        the second :code:`A` represents the :code:`A` series in level 2 and its parent node is :code:`A` series in level 1. This method
+        will add a :code:`Total` level.
+
+        **Examples**
+
+            >>> from pyhts.hierarchy import Hierarchy
+            >>> names = ['AA', 'AB', 'BA', 'BB']
+            >>> hierarchy = Hierarchy.from_names(names, chars=[1, 1], period=12)
+            >>> hierarchy.s_mat
+            array([[1, 1, 1, 1],
+                   [1, 1, 0, 0],
+                   [0, 0, 1, 1],
+                   [1, 0, 0, 0],
+                   [0, 1, 0, 0],
+                   [0, 0, 1, 0],
+                   [0, 0, 0, 1]], dtype=int8)
+
+        The example above define a hierarchy same as the hierarchy in example of
+        :meth:`~pyhts.hierarchy.Hierarchy.from_node_list()`.
+
+        :param names: columns of all **bottom** level time series.
+        :param chars: character length of each part.
+        :param period: frequency of the time series, 1 means non-seasonality data, 12 means monthly data.
         :return:
         """
         df = pd.DataFrame()
@@ -83,11 +143,31 @@ class Hierarchy:
         return cls(s_mat, np.array(node_level), names, period)
 
     @classmethod
-    def from_balance_group(cls, group_list: List[List[str]], period=1):
-        """Constructor for balanced group.
+    def from_balance_group(cls, group_list: List[List[str]], period=1) -> "Hierarchy":
+        """Construct group hierarchical structure.
 
-        :param group_list: e.g. [['A', 'B', 'C'], [1, 2, 3, 4]]
-        :param period:
+        **Examples**
+
+            >>> from pyhts.hierarchy import Hierarchy
+            >>> groups = [['A', 'B'], ['Item1', 'Item2']]
+            >>> hierarchy = Hierarchy.from_balance_group(groups)
+            >>> hierarchy.node_name
+            array(['Total', 'A', 'B', 'Item1', 'Item2', 'A_Item1', 'A_Item2',
+                   'B_Item1', 'B_Item2'], dtype='<U7')
+            >>> hierarchy.s_mat
+            array([[1, 1, 1, 1],
+                   [1, 1, 0, 0],
+                   [0, 0, 1, 1],
+                   [1, 0, 1, 0],
+                   [0, 1, 0, 1],
+                   [1, 0, 0, 0],
+                   [0, 1, 0, 0],
+                   [0, 0, 1, 0],
+                   [0, 0, 0, 1]], dtype=int8)
+
+
+        :param group_list: Two group types are supported for now.
+        :param period: frequency of the time series, 1 means non-seasonality data, 12 means monthly data.
         :return:
         """
         from itertools import product
@@ -109,23 +189,60 @@ class Hierarchy:
         return cls(s_mat, np.array(node_level), names, period)
 
     @classmethod
-    def from_long(cls, df: pd.DataFrame, keys: List[str], period=1):
-        """Constructor for data that contains complex hierarchies
+    def from_long(cls, df: pd.DataFrame, keys: List[str], period=1) -> "Hierarchy":
+        """Construct hierarchy from long data table that each row represents a bottom level time series. This method is
+        suitable for complex hierarchical structure.
+
+        **Examples**
+
+            >>> from pyhts.hierarchy import Hierarchy
+            >>> df = pd.DataFrame({"City": ["A", "A", "B", "B"], "Store": ["Store1", "Store2", "Store3", "Store4"]})
+            >>> hierarchy = Hierarchy.from_long(df, ["City", "Store"])
+            >>> hierarchy.node_name
+            array(['Total', 'A', 'B', 'Store1', 'Store2', 'Store3', 'Store4'],
+                  dtype='<U8')
+            >>> hierarchy.s_mat
+            array([[1, 1, 1, 1],
+                   [1, 1, 0, 0],
+                   [0, 0, 1, 1],
+                   [1, 0, 0, 0],
+                   [0, 1, 0, 0],
+                   [0, 0, 1, 0],
+                   [0, 0, 0, 1]], dtype=int8)
+            >>> df = pd.DataFrame({"City": ["A", "A", "B", "B"], "Category": ["C1", "C2", "C1", "C2"]})
+            >>> hierarchy = Hierarchy.from_long(df, ["City", "Category"])
+            >>> hierarchy.s_mat
+            array([[1, 1, 1, 1],
+                   [1, 1, 0, 0],
+                   [0, 0, 1, 1],
+                   [1, 0, 1, 0],
+                   [0, 1, 0, 1],
+                   [1, 0, 0, 0],
+                   [0, 1, 0, 0],
+                   [0, 0, 1, 0],
+                   [0, 0, 0, 1]], dtype=int8)
 
         :param df: DataFrame contains keys for determining hierarchical structural.
-        :param keys: column names
-        :param period:
+        :param keys: column names that each column represents a level.
+        :param period: frequency of the time series, 1 means non-seasonality data, 12 means monthly data.
         :return:
         """
         new_df = copy(df[keys]).astype('string')
         new_df['Total'] = 'Total'
         node_level = [0] + [1] * len(new_df[keys[0]].unique())
         names = ['Total'] + list(new_df[keys[0]].unique())
+        n = new_df.shape[0]
         for index in range(1, len(keys)):
-            new_df[keys[index]] = new_df[keys[index-1]] + '-' + new_df[keys[index]]
             names += list(new_df[keys[index]].unique())
             node_level += [index+1] * len(new_df[keys[index]].unique())
-        s_mat = pd.get_dummies(new_df[['Total'] + keys], columns=['Total'] + keys).values.T
+
+        if len(new_df[keys[-1]].unique()) != new_df.shape[0]:
+            new_df['bottom'] = new_df[keys].apply(lambda x: '-'.join(x), axis=1)
+            names += list(new_df['bottom'])
+            node_level += [len(keys)+1] * n
+            s_mat = pd.get_dummies(new_df[['Total'] + keys + ['bottom']], columns=['Total'] + keys + ['bottom']).values.T
+        else:
+            s_mat = pd.get_dummies(new_df[['Total'] + keys], columns=["Total"] + keys).values.T
         return cls(s_mat, np.array(node_level), names, period=period)
 
     def aggregate_ts(self, bts: np.ndarray, levels: Union[int, List[int]] = None) -> np.ndarray:
@@ -221,24 +338,3 @@ class Hierarchy:
                 print('this forecasting measure is not supported!')
         accs.index = self.node_name[np.isin(self.node_level, levels)]
         return accs
-
-
-if __name__ == '__main__':
-    # test for characters
-    # groups = ['AA', 'AB', 'AC', 'AE', 'BA', 'BB', 'BC', 'BD']
-    # hierarchy = Hierarchy.from_names(groups, [1, 1])
-
-    # test for balance group
-    # groups = [['A', 'B', 'C'], ['1', '2', '3', '4']]
-    # hierarchy = Hierarchy.from_balance_group(groups)
-
-    # test for long data
-    df = pd.DataFrame({'Country': ['A', 'A', 'A', 'A', 'B', 'B', 'B', 'B'],
-                       'City': ['City1', 'City1', 'City2', 'City2', 'City3', 'City3', 'City4', 'City4'],
-                       'Station': [str(i) for i in [1, 2, 3, 4, 5, 6, 7, 8]]})
-    hierarchy = Hierarchy.from_long(df, keys=['Country', 'City', 'Station'])
-    print(hierarchy.s_mat.toarray())
-    print(hierarchy.node_name)
-    print(hierarchy.node_level)
-
-    from sklearn.metrics import mean_squared_error
