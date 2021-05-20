@@ -13,13 +13,4 @@ Welcome to pyhts's documentation!
 
    Quick Start <tutorials/Tutorials.rst>
    Define Hierarchy <tutorials/hierarchy.rst>
-   Define HFModel <tutorials/hfmodel.rst>
-
-
-.. toctree::
-   :caption: API References
-
-   API/hfmodel.rst
-   API/forecaster.rst
-   API/reconciliation.rst
-   API/accuracy.rst
+   Define, Fit and Forecast of HFModel <tutorials/hfmodel.rst>

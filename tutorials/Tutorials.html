@@ -13,8 +13,6 @@
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
 
   
   
@@ -31,7 +29,6 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
@@ -100,14 +97,6 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="hierarchy.html">Define Hierarchy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hfmodel.html">Define HFModel</a></li>
-</ul>
-<p class="caption"><span class="caption-text">API References</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../API/hierarchy.html">Hierarchy</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../API/hfmodel.html">HFModel</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../API/forecaster.html">forecaster</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../API/reconciliation.html">reconciliation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../API/accuracy.html">accuracy</a></li>
 </ul>
 
             
@@ -189,15 +178,15 @@ ols <a class="footnote-reference brackets" href="#ols" id="id1">1</a> 、wls <a 
 <p>The steps of using this package are as follows:</p>
 <ol class="arabic simple">
 <li><p>Define a hierarchy structure according to your data.</p></li>
-<li><p>Define a <code class="xref py py-class docutils literal notranslate"><span class="pre">HFModel</span></code></p></li>
-<li><p>fit the <code class="xref py py-class docutils literal notranslate"><span class="pre">HFModel</span></code> using history time series</p></li>
+<li><p>Define a <a class="reference internal" href="hfmodel.html#pyhts.HFModel.HFModel" title="pyhts.HFModel.HFModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">HFModel</span></code></a></p></li>
+<li><p>fit the <a class="reference internal" href="hfmodel.html#pyhts.HFModel.HFModel" title="pyhts.HFModel.HFModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">HFModel</span></code></a> using history time series</p></li>
 <li><p>generate base forecasts and reconcile the forecasts to obtain coherent point forecasts.</p></li>
 </ol>
 </div>
 <div class="section" id="define-the-hierarchy">
 <h2>Define the Hierarchy<a class="headerlink" href="#define-the-hierarchy" title="Permalink to this headline">¶</a></h2>
-<p>You can use classmethods of <a class="reference internal" href="../API/hierarchy.html#pyhts.hierarchy.Hierarchy" title="pyhts.hierarchy.Hierarchy"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyhts.hierarchy.Hierarchy</span></code></a> to define hierarchy structure. see details in <a class="reference internal" href="hierarchy.html"><span class="doc">Define Hierarchy</span></a></p>
-<p>As an example of the hierarchy shown in the figure below, let’s construct the hierarchy using <a class="reference internal" href="../API/hierarchy.html#pyhts.hierarchy.Hierarchy.from_node_list" title="pyhts.hierarchy.Hierarchy.from_node_list"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyhts.hierarchy.Hierarchy.from_node_list()</span></code></a> and <a class="reference internal" href="../API/hierarchy.html#pyhts.hierarchy.Hierarchy.from_names" title="pyhts.hierarchy.Hierarchy.from_names"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyhts.hierarchy.Hierarchy.from_names()</span></code></a>.</p>
+<p>You can use classmethods of <a class="reference internal" href="hierarchy.html#pyhts.hierarchy.Hierarchy" title="pyhts.hierarchy.Hierarchy"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyhts.hierarchy.Hierarchy</span></code></a> to define hierarchy structure. see details in <a class="reference internal" href="hierarchy.html"><span class="doc">Define Hierarchy</span></a></p>
+<p>As an example of the hierarchy shown in the figure below, let’s construct the hierarchy using <a class="reference internal" href="hierarchy.html#pyhts.hierarchy.Hierarchy.from_node_list" title="pyhts.hierarchy.Hierarchy.from_node_list"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyhts.hierarchy.Hierarchy.from_node_list()</span></code></a> and <a class="reference internal" href="hierarchy.html#pyhts.hierarchy.Hierarchy.from_names" title="pyhts.hierarchy.Hierarchy.from_names"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyhts.hierarchy.Hierarchy.from_names()</span></code></a>.</p>
 <img alt="../_images/01_hierarchy.png" src="../_images/01_hierarchy.png" />
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyhts.hierarchy</span> <span class="kn">import</span> <span class="n">Hierarchy</span>
 <span class="n">node_list</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]]</span>
@@ -246,7 +235,7 @@ ols <a class="footnote-reference brackets" href="#ols" id="id1">1</a> 、wls <a 
 <span class="c1"># (12, 4)</span>
 </pre></div>
 </div>
-<p><code class="code docutils literal notranslate"><span class="pre">reconciled_forecasts</span></code> just contain reconciled forecasts of bottom level, you can use <a class="reference internal" href="../API/hierarchy.html#pyhts.hierarchy.Hierarchy.aggregate_ts" title="pyhts.hierarchy.Hierarchy.aggregate_ts"><code class="xref py py-meth docutils literal notranslate"><span class="pre">aggregate_ts()</span></code></a> to get reconciled forecasts of all levels.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">reconciled_forecasts</span></code> just contain reconciled forecasts of bottom level, you can use <code class="xref py py-meth docutils literal notranslate"><span class="pre">aggregate_ts()</span></code> to get reconciled forecasts of all levels.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">reconciled_forecasts_all_levels</span> <span class="o">=</span> <span class="n">hierarchy</span><span class="o">.</span><span class="n">aggregate_ts</span><span class="p">(</span><span class="n">reconciled_forecasts</span><span class="p">)</span>
 <span class="c1"># (12, 7)</span>
 </pre></div>
@@ -254,7 +243,7 @@ ols <a class="footnote-reference brackets" href="#ols" id="id1">1</a> 、wls <a 
 </div>
 <div class="section" id="measurement">
 <h2>measurement<a class="headerlink" href="#measurement" title="Permalink to this headline">¶</a></h2>
-<p>You can evaluate forecasting accuracy of both base forecasts and reconciled forecasts, using <code class="xref py py-meth docutils literal notranslate"><span class="pre">accuray_base()</span></code> and <a class="reference internal" href="../API/hierarchy.html#pyhts.hierarchy.Hierarchy.accuracy" title="pyhts.hierarchy.Hierarchy.accuracy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">accuracy()</span></code></a> respectively.</p>
+<p>You can evaluate forecasting accuracy of both base forecasts and reconciled forecasts, using <code class="xref py py-meth docutils literal notranslate"><span class="pre">accuray_base()</span></code> and <code class="xref py py-meth docutils literal notranslate"><span class="pre">accuracy()</span></code> respectively.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">base_forecasts</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate_base_forecasts</span><span class="p">(</span><span class="n">horizon</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
 <span class="n">hierarchy</span><span class="o">.</span><span class="n">accuracy_base</span><span class="p">(</span><span class="n">test</span><span class="p">,</span> <span class="n">base_forecasts</span><span class="p">,</span> <span class="n">hist</span><span class="o">=</span><span class="n">train</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">measure</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;mase&#39;</span><span class="p">,</span> <span class="s1">&#39;mape&#39;</span><span class="p">])</span>
 <span class="n">hierarchy</span><span class="o">.</span><span class="n">accuracy</span><span class="p">(</span><span class="n">test</span><span class="p">,</span> <span class="n">reconciled_forecasts</span><span class="p">,</span> <span class="n">hist</span><span class="o">=</span><span class="n">train</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">measure</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;mase&#39;</span><span class="p">,</span> <span class="s1">&#39;mape&#39;</span><span class="p">])</span>
