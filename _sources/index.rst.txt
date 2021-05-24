@@ -8,9 +8,10 @@ Welcome to pyhts's documentation!
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: QuickStart
 
    Quick Start <tutorials/Tutorials.rst>
    Define Hierarchy <tutorials/hierarchy.rst>
    Define, Fit and Forecast of HFModel <tutorials/hfmodel.rst>
+   Model Evaluation <tutorials/evaluation.rst>
