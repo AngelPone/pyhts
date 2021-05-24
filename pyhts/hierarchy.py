@@ -270,16 +270,13 @@ class Hierarchy:
     def accuracy_base(self, real, pred, hist=None,
                       levels: Union[int, None, List] = None,
                       measure: List[str] = None) -> pd.DataFrame:
-        """calculate forecast accuracy of base forecast
+        """calculate forecast accuracy of base forecast.
 
         :param real: real future observations, array-like of shape (forecast_horizon, m)
-        :param pred: forecast values, array-like of shape (h, n)
-        :param levels: which level.
+        :param pred: forecast values, array-like of shape (forecast_horizon, n)
+        :param levels: which level, None means all levels.
         :param hist: history time series.
-        :param s: seasonality of series
-        :param measure:
-            mase, mse is supported for now. e.g. ['mase'], ['mse', 'mase'].
-            if None, mase is calculated.
+        :param measure: list of measures, e.g. ['mase'], ['mse', 'mase'].
         :return: forecast accuracy of base forecasts.
         """
         assert self.check_hierarchy(real), f"true observations should be of shape (h, m)"
@@ -306,17 +303,14 @@ class Hierarchy:
     def accuracy(self, real, pred, hist=None,
                  levels: Union[int, None, List] = None,
                  measure: List[str] = None):
-        """calculate forecast accuracy, mase is supported only for now.
+        """calculate forecast accuracy.
 
-        :param real: real observations.
-        :param pred: forecasts.
-        :param hist: history observations
-        :param s: seasonality
-        :param levels: which level.
-        :param measure:
-            mase, mse is supported for now. e.g. ['mase'], ['mse', 'mase'].
-            if None, mase is calculated.
-        :return: forecast accuracy.
+        :param real: real future observations, array-like of shape (forecast_horizon, m)
+        :param pred: forecast values, array-like of shape (forecast_horizon, m)
+        :param levels: which level, None means all levels.
+        :param hist: history time series.
+        :param measure: list of measures, e.g. ['mase'], ['mse', 'mase'].
+        :return: forecast accuracy of reconciled forecasts.
         """
         assert self.check_hierarchy(real), f"true observations should be of shape (h, m)"
         assert self.check_hierarchy(pred), f"forecast values should be of shape (h, m)"
