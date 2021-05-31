@@ -15,13 +15,11 @@ A python package for hierarchical forecasting, inspired by [hts](https://cran.r-
 Load tourism data, which is tourism demand measured by the number of "visitor nights" in Australia.
 
 ```python
-import sys
-sys.path.append('path/to/pyhts')
 from pyhts.dataset import load_tourism
 
 tourism_data = load_tourism()
-train = tourism_data[:-12, :]
-test = tourism_data[-12:, :]
+train = tourism_data.iloc[:-12, :]
+test = tourism_data.iloc[-12:, :]
 ```
 
 
@@ -45,7 +43,7 @@ Fit the model and forecast.
 
 ```python
 model.fit(train)
-forecasts = model.forecast(horizon=12)
+forecasts = model.predict(horizon=12)
 ```
 
 * `model.fit()` will fit the `baseforecasters` and compute the weighting matrix used to reconcile the base forecast.

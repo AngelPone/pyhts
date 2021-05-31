@@ -38,7 +38,7 @@ class AutoArimaForecaster(BaseForecaster):
         self.fitted = self.model.rx2["fitted"]
         return self
 
-    def forecast(self, h: int, xreg=None, **kwargs) -> np.ndarray:
+    def forecast(self, h: int, x_reg=None, **kwargs) -> np.ndarray:
         return np.array(forecast.forecast(self.model, h=h, xreg=x_reg if x_reg is not None else robjects.r('NULL'),
                                           **kwargs).rx2["mean"])
 
