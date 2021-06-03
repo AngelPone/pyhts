@@ -181,11 +181,11 @@
 <dl class="py method">
 <dt id="pyhts.HFModel.HFModel.__init__">
 <code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hierarchy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_forecasters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hf_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'comb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comb_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ols'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constrain_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.HFModel.HFModel.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Define a Hierarchical Forecasting Model.</p>
+<dd><p>Define a hierarchical forecasting model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>hierarchy</strong> (<a class="reference internal" href="hierarchy.html#pyhts.hierarchy.Hierarchy" title="pyhts.hierarchy.Hierarchy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hierarchy</span></code></a>) – hierarchical structure of data.</p></li>
+<li><p><strong>hierarchy</strong> (<a class="reference internal" href="hierarchy.html#pyhts.hierarchy.Hierarchy" title="pyhts.hierarchy.Hierarchy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hierarchy</span></code></a>) – hierarchical structure of the data.</p></li>
 <li><p><strong>base_forecasters</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">BaseForecaster</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – base forecasting method, custom forecasters or arima, ets, implemented by <code class="code docutils literal notranslate"><span class="pre">forecast</span></code> in R called by <code class="code docutils literal notranslate"><span class="pre">rpy2</span></code></p></li>
 <li><p><strong>hf_method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – method for hierarchical forecasting, <code class="code docutils literal notranslate"><span class="pre">comb</span></code> is only supported for now, which represents optimal combination method.</p></li>
 <li><p><strong>comb_method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – method for forecast reconciliation, ols, wls or mint.</p></li>
@@ -199,12 +199,12 @@
 <dl class="py method">
 <dt id="pyhts.HFModel.HFModel.fit">
 <code class="sig-name descname"><span class="pre">fit</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_reg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.HFModel.HFModel.fit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fit base forecast model and calculate reconciliation matrix used for reconciliation.</p>
+<dd><p>Fit a base forecast model and calculate the reconciliation matrix used for reconciliation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ts</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – DataFrame that each column contains a bottom time series.</p></li>
-<li><p><strong>x_reg</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>]) – explantory variables with shape (n, T, k), where n is number of time series, T is history length, k is dimension of explantory variables.</p></li>
+<li><p><strong>ts</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – a DataFrame in which each column contains a bottom-level time series.</p></li>
+<li><p><strong>x_reg</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>]) – explantory variables with shape (n, T, k), where n is number of time series, T is history length, and k is dimension of explantory variables.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -219,20 +219,20 @@
 <dl class="py method">
 <dt id="pyhts.HFModel.HFModel.predict">
 <code class="sig-name descname"><span class="pre">predict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">horizon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_reg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.HFModel.HFModel.predict" title="Permalink to this definition">¶</a></dt>
-<dd><p>generate horizon-step-ahead reconciled base forecasts of bottom level.</p>
+<dd><p>Generate horizon-step-ahead reconciled base forecasts of the bottom level.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>horizon</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – forecast horizon</p></li>
-<li><p><strong>x_reg</strong> – explantory variables with shape (n, h, k), where n is number of time series, h is forecast horizon, k is dimension of explantory variables.</p></li>
-<li><p><strong>kwargs</strong> – other parameters passed to base forecasters</p></li>
+<li><p><strong>x_reg</strong> – explantory variables with shape (n, h, k), where n is number of time series, h is forecast horizon, and k is dimension of explantory variables.</p></li>
+<li><p><strong>kwargs</strong> – other parameters passed to base forecasters.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code></p>
 </dd>
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>coherent forecasts of bottom level.</p>
+<dd class="field-odd"><p>coherent forecasts of the bottom level.</p>
 </dd>
 </dl>
 </dd></dl>

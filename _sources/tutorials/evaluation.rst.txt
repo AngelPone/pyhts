@@ -10,7 +10,7 @@ through :meth:`pyhts.hierarchy.Hierarchy.accuracy_base` or :meth:`pyhts.hierarch
 .. automethod:: pyhts.hierarchy.Hierarchy.accuracy
 
 
-Assuming :code:`ht` is a defined hierarchy, :code:`model` is a fitted :class:`~pyhts.HFModel.HFModel`,:code:`test`
+Assuming :code:`ht` is a defined hierarchy, :code:`model` is a fitted :class:`~pyhts.HFModel.HFModel`, :code:`test`
 is real observations in the forecasting horizon. :code:`train` is the history bottom time series.
 
 

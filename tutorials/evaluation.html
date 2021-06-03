@@ -161,15 +161,15 @@ through <a class="reference internal" href="#pyhts.hierarchy.Hierarchy.accuracy_
 <dl class="py method">
 <dt id="pyhts.hierarchy.Hierarchy.accuracy_base">
 <code class="sig-prename descclassname"><span class="pre">Hierarchy.</span></code><code class="sig-name descname"><span class="pre">accuracy_base</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">real</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">measure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.hierarchy.Hierarchy.accuracy_base" title="Permalink to this definition">¶</a></dt>
-<dd><p>calculate forecast accuracy of base forecast.</p>
+<dd><p>Calculate the forecast accuracy of base forecasts.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>real</strong> – real future observations, array-like of shape (forecast_horizon, m)</p></li>
 <li><p><strong>pred</strong> – forecast values, array-like of shape (forecast_horizon, n)</p></li>
-<li><p><strong>levels</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>]) – which level, None means all levels.</p></li>
-<li><p><strong>hist</strong> – history time series.</p></li>
-<li><p><strong>measure</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – list of measures, e.g. [‘mase’], [‘mse’, ‘mase’].</p></li>
+<li><p><strong>levels</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>]) – which levels. None means all levels.</p></li>
+<li><p><strong>hist</strong> – historical time series.</p></li>
+<li><p><strong>measure</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – list of measures, e.g., [‘mase’], [‘mse’, ‘mase’].</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -184,15 +184,15 @@ through <a class="reference internal" href="#pyhts.hierarchy.Hierarchy.accuracy_
 <dl class="py method">
 <dt id="pyhts.hierarchy.Hierarchy.accuracy">
 <code class="sig-prename descclassname"><span class="pre">Hierarchy.</span></code><code class="sig-name descname"><span class="pre">accuracy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">real</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">levels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">measure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.hierarchy.Hierarchy.accuracy" title="Permalink to this definition">¶</a></dt>
-<dd><p>calculate forecast accuracy.</p>
+<dd><p>Calculate the forecast accuracy.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>real</strong> – real future observations, array-like of shape (forecast_horizon, m)</p></li>
 <li><p><strong>pred</strong> – forecast values, array-like of shape (forecast_horizon, m)</p></li>
-<li><p><strong>levels</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>]) – which level, None means all levels.</p></li>
-<li><p><strong>hist</strong> – history time series.</p></li>
-<li><p><strong>measure</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – list of measures, e.g. [‘mase’], [‘mse’, ‘mase’].</p></li>
+<li><p><strong>levels</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>]) – which levels, None means all levels.</p></li>
+<li><p><strong>hist</strong> – historical time series.</p></li>
+<li><p><strong>measure</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – list of measures, e.g., [‘mase’], [‘mse’, ‘mase’].</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -201,7 +201,7 @@ through <a class="reference internal" href="#pyhts.hierarchy.Hierarchy.accuracy_
 </dl>
 </dd></dl>
 
-<p>Assuming <code class="code docutils literal notranslate"><span class="pre">ht</span></code> is a defined hierarchy, <code class="code docutils literal notranslate"><span class="pre">model</span></code> is a fitted <a class="reference internal" href="hfmodel.html#pyhts.HFModel.HFModel" title="pyhts.HFModel.HFModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">HFModel</span></code></a>,:code:<cite>test</cite>
+<p>Assuming <code class="code docutils literal notranslate"><span class="pre">ht</span></code> is a defined hierarchy, <code class="code docutils literal notranslate"><span class="pre">model</span></code> is a fitted <a class="reference internal" href="hfmodel.html#pyhts.HFModel.HFModel" title="pyhts.HFModel.HFModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">HFModel</span></code></a>, <code class="code docutils literal notranslate"><span class="pre">test</span></code>
 is real observations in the forecasting horizon. <code class="code docutils literal notranslate"><span class="pre">train</span></code> is the history bottom time series.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">forecasts</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">h</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">base_forecasts</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate_base_forecasts</span><span class="p">(</span><span class="n">h</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
