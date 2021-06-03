@@ -71,11 +71,5 @@ Because of the incoherence of base forecasts, `base_forecasts` are forecasts of 
 
 
 
-
-
-
-
-
-
 ## Documentation
-see documentation here https://angelpone.github.io/pyhts/.
+See documentation [here](https://angelpone.github.io/pyhts/).
