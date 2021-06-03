@@ -6,7 +6,7 @@ from . import accuracy
 
 
 class Hierarchy:
-    """Class for hierarchy structure.
+    """Class for a hierarchy structure.
 
     **Attributes**
 
@@ -29,7 +29,7 @@ class Hierarchy:
 
     def __init__(self, s_mat, node_level, names, period):
         self.s_mat = s_mat.astype('int8')
-        """ summing matrix. """
+        """ Summing matrix. """
         self.node_level = np.array(node_level)
         self.level_n = max(node_level) + 1
         self.node_name = np.array(names)
@@ -37,9 +37,9 @@ class Hierarchy:
 
     @classmethod
     def from_node_list(cls, nodes, period: int = 1) -> "Hierarchy":
-        """Constructs hierarchy from a list of lists, each sublist contains number of children nodes of all nodes in a
-        hierarchical level. More specifically, the first sublist contains the number of children nodes of all nodes in
-        Level0, e.g. the root node.(sum of all bottom level time series), and so on.
+        """Construct a hierarchy from a list of lists, in which each sublist contains the number of children nodes of all nodes in a
+        hierarchical level. For example, the first sublist contains the number of children nodes of all nodes in
+        level 0, i.e., the root node (sum of all the bottom level time series).
 
         **Examples**
 
@@ -55,12 +55,12 @@ class Hierarchy:
                    [0, 0, 1, 0],
                    [0, 0, 0, 1]], dtype=int8)
 
-        :code:`[[2], [2, 2]]` defines a hierarchy that in which the root node have two sub-nodes, the fist
+        :code:`[[2], [2, 2]]` defines a hierarchy in which the root node has two sub-nodes. The first
         sub-node contains two sub-nodes and the second sub-node also contains two sub-nodes. There are 4 bottom time
         series in total.
 
-        :param nodes: list of children nodes number lists.
-        :param period: frequency of the time series, 1 means non-seasonality data, 12 means monthly data.
+        :param nodes: a list. Each element represents the number(s) of children nodes for each node in the corresponding level.
+        :param period: frequency of the time series. For example, 1 means non-seasonality data, and 12 means monthly data.
         :return:
         """
         nodes = copy(nodes)
@@ -93,12 +93,12 @@ class Hierarchy:
 
     @classmethod
     def from_names(cls, names: List[str], chars: List[int], period: int = 1) -> "Hierarchy":
-        """Construct Hierarchy from column names of bottom time series. The name of bottom series should be consist of
-        several parts. Each part points to a specific level of the hierarchy and it should have fixed length that used to
-        split and recognize hierarchy.
+        """Construct a hierarchy from column names of the bottom-level time series. The names of bottom series consist of
+        several parts. Each part points to a specific level of the hierarchy, with a fixed length used to
+        split and recognize the hierarchy.
 
-        For example :code:`AA`. The first :code:`A` represents :code:`A` series in level1,
-        the second :code:`A` represents the :code:`A` series in level 2 and its parent node is :code:`A` series in level 1. This method
+        For example :code:`AA`. The first :code:`A` represents :code:`A` series in level 1,
+        the second :code:`A` represents the :code:`A` series in level 2, and its parent node is :code:`A` series in level 1. This method
         will add a :code:`Total` level.
 
         **Examples**
@@ -246,10 +246,10 @@ class Hierarchy:
         return cls(s_mat, np.array(node_level), names, period=period)
 
     def aggregate_ts(self, bts: np.ndarray, levels: Union[int, List[int]] = None) -> np.ndarray:
-        """aggregate bottom-levels time series.
+        """Aggregate bottom-level time series.
 
         :param levels: which levels you want.
-        :param bts: bottom time series
+        :param bts: bottom-level time series
         :return: upper-level time series.
         """
         if isinstance(levels, int):
@@ -270,18 +270,18 @@ class Hierarchy:
     def accuracy_base(self, real, pred, hist=None,
                       levels: Union[int, None, List] = None,
                       measure: List[str] = None) -> pd.DataFrame:
-        """calculate forecast accuracy of base forecast.
+        """Calculate the forecast accuracy of base forecasts.
 
         :param real: real future observations, array-like of shape (forecast_horizon, m)
         :param pred: forecast values, array-like of shape (forecast_horizon, n)
-        :param levels: which level, None means all levels.
-        :param hist: history time series.
-        :param measure: list of measures, e.g. ['mase'], ['mse', 'mase'].
+        :param levels: which levels. None means all levels.
+        :param hist: historical time series.
+        :param measure: list of measures, e.g., ['mase'], ['mse', 'mase'].
         :return: forecast accuracy of base forecasts.
         """
-        assert self.check_hierarchy(real), f"true observations should be of shape (h, m)"
+        assert self.check_hierarchy(real), f"True observations should be of shape (h, m)"
         assert real.shape[0] == pred.shape[0], \
-            f" {real.shape} true observations have different length with {real.shape} forecasts"
+            f" {real.shape} True observations have different lengths with {real.shape} forecasts"
         agg_true = self.aggregate_ts(real, levels=levels)
         if measure is None:
             measure = ['mase', 'mape', 'rmse']
@@ -303,19 +303,19 @@ class Hierarchy:
     def accuracy(self, real, pred, hist=None,
                  levels: Union[int, None, List] = None,
                  measure: List[str] = None):
-        """calculate forecast accuracy.
+        """Calculate the forecast accuracy.
 
         :param real: real future observations, array-like of shape (forecast_horizon, m)
         :param pred: forecast values, array-like of shape (forecast_horizon, m)
-        :param levels: which level, None means all levels.
-        :param hist: history time series.
-        :param measure: list of measures, e.g. ['mase'], ['mse', 'mase'].
+        :param levels: which levels, None means all levels.
+        :param hist: historical time series.
+        :param measure: list of measures, e.g., ['mase'], ['mse', 'mase'].
         :return: forecast accuracy of reconciled forecasts.
         """
-        assert self.check_hierarchy(real), f"true observations should be of shape (h, m)"
-        assert self.check_hierarchy(pred), f"forecast values should be of shape (h, m)"
+        assert self.check_hierarchy(real), f"True observations should be of shape (h, m)"
+        assert self.check_hierarchy(pred), f"Forecast values should be of shape (h, m)"
         assert real.shape[0] == pred.shape[0], \
-            f" {real.shape} true observations have different length with {real.shape} forecasts"
+            f" {real.shape} True observations have different length with {real.shape} forecasts"
         if measure is None:
             measure = ['mase', 'mape', 'rmse']
         if 'mase' in measure or 'smape' in measure or 'rmsse' in measure:
@@ -329,6 +329,6 @@ class Hierarchy:
                 accs[me] = np.array(list(map(lambda x: getattr(accuracy, me)(*x),
                                              zip(agg_true.T, agg_pred.T, hist, [self.period] * self.s_mat.shape[0]))))
             except AttributeError:
-                print('this forecasting measure is not supported!')
+                print('This forecasting measure is not supported!')
         accs.index = self.node_name[np.isin(self.node_level, levels)]
         return accs

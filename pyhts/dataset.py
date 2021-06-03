@@ -3,7 +3,7 @@ import pkg_resources
 
 
 def load_tourism() -> pd.DataFrame:
-    """Load tourism Dataset
+    """Load the tourism dataset.
 
     :return:
     """

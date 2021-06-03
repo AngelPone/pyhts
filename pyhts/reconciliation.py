@@ -4,10 +4,10 @@ from .hierarchy import Hierarchy
 
 
 def _lamb_estimate(x: np.ndarray) -> float:
-    """estimate :math`\\lambda` used in :ref:`shrinkage` estimator of mint method
+    """Estimate :math`\\lambda` used in :ref:`shrinkage` estimator of mint method.
 
-    :param x: in-sample 1-step-ahead forecast error
-    :return: :math`\\lambda`
+    :param x: in-sample 1-step-ahead forecast error.
+    :return: :math`\\lambda`.
     """
     T = x.shape[0]
     covm = x.T.dot(x)/T
@@ -27,17 +27,17 @@ def wls(hierarchy: Hierarchy,
         method: str = "ols",
         weighting: Union[str, np.ndarray, None] = None,
         constraint_level: int = -1) -> np.ndarray:
-    """function for forecast reconciliation.
+    """Function for forecast reconciliation.
 
-    :param hierarchy: history time series.
-    :param error: insample error.
-    :param method: method used for forecast reconciliation, e.g. ols, wls, mint.
+    :param hierarchy: historical time series.
+    :param error: in-sample error.
+    :param method: method used for forecast reconciliation, i.e., ols, wls, and mint.
     :param weighting:
-        method for calculating weight matrix used in reconciliation method, e.g. covariance matrix in mint
+        method for the weight matrix used in forecast reconciliation, i.e., covariance matrix in mint
         or wls.
-    :param constraint: If some levels are constrained to be unchangeable when reconciling base forecasts.
+    :param constraint: True if some levels are constrained to be unchangeable when reconciling base forecasts.
     :param constraint_level: Which level is constrained to be unchangeable when reconciling base forecasts.
-    :return: reconciled forecasts
+    :return: reconciled forecasts.
     """
     S = hierarchy.s_mat
     n = S.shape[0]
@@ -50,12 +50,12 @@ def wls(hierarchy: Hierarchy,
         elif weighting == "sample":
             weight_matrix = W
             if not np.all(np.linalg.eigvals(weight_matrix) > 0):
-                raise ValueError("Sample method needs covariance matrix to be positive definite")
+                raise ValueError("Sample method needs covariance matrix to be positive definite.")
         elif weighting == "shrinkage":
             lamb = _lamb_estimate(error)
             weight_matrix = lamb * np.diag(np.diag(W)) + (1 - lamb) * W
         else:
-            raise NotImplementedError("this min_trace method has not been implemented")
+            raise NotImplementedError("This min_trace method has not been implemented.")
 
     elif method == "ols":
         weight_matrix = np.identity(n)
@@ -65,13 +65,13 @@ def wls(hierarchy: Hierarchy,
         elif weighting == "structural":
             weight_matrix = np.diag(S.dot(np.array([1]*m)))
         else:
-            raise ValueError("this wls weights is not supported now.")
+            raise ValueError("This wls weighting method is not supported for now.")
     G = compute_g_mat(hierarchy, weight_matrix, constraint_level)
     return G
 
 
 def _construct_u_mat(hierarchy: Hierarchy, constraint_level=-1):
-    """construct U' mat used in solution
+    """construct U' mat used in solution.
 
     :param s_mat:
     :param constraint_level:
@@ -89,7 +89,7 @@ def _construct_u_mat(hierarchy: Hierarchy, constraint_level=-1):
 
 
 def compute_g_mat(hierarchy: Hierarchy, weight_matrix, constraint_level=-1):
-    """compute G matrix given weight_matrix
+    """Compute G matrix given the weight_matrix.
 
     :param hierarchy:
     :param weight_matrix:

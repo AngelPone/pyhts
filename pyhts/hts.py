@@ -13,10 +13,10 @@ forecast = importr("forecast")
 
 
 def _nodes2constraints(nodes: List[List[int]]) -> [csr_matrix, np.ndarray]:
-    """construct constraints from nodes
+    """Construct constraints from nodes.
 
-    :param nodes: nodes that demonstrate hierarchy
-    :return: constraints
+    :param nodes: nodes that demonstrate the hierarchy.
+    :return: constraints.
     """
     nodes = copy(nodes)
     n = sum(nodes[-1])
@@ -51,9 +51,9 @@ def _nodes2constraints(nodes: List[List[int]]) -> [csr_matrix, np.ndarray]:
 def _constraints_from_chars(names: List, chars: List) -> [csr_matrix, np.ndarray]:
     """construct constraints from columns and characters.
 
-    :param names: names that represents location of series in hierarchy.
+    :param names: names that represent the location of series in the hierarchy.
     :param chars: characters.
-    :return: constraints
+    :return: constraints.
     """
     total_pos = 0
     import pandas as pd
@@ -71,18 +71,18 @@ def _constraints_from_chars(names: List, chars: List) -> [csr_matrix, np.ndarray
 
 class Hts:
     """
-    Class for hierarchical time series, can be constructed from  cross-sectional hierarchical time series
+    Class for hierarchical time series, which can be constructed from  cross-sectional hierarchical time series
     like hierarchical or grouped time series and temporal hierarchies :ref:`[1]<references>`.
 
     """
     def __init__(self, constraints: Union[csr_matrix, np.ndarray], bts: np.ndarray, node_level: np.ndarray, m: int = 1):
-        """initialize a Hts object according to attributes directly. Do not use it unless you are familiar with meanings
-        of parameters.
+        """Initialize a Hts object according to attributes directly. Do not use it unless you are familiar with the
+        parameters.
 
-        :param constraints: constraints, also called "summing matrix" in some context.
-        :param bts: bottom level time series.
-        :param node_level: which level every nodes belong to.
-        :param m: frequency of time series data.
+        :param constraints: constraints, also called "summing matrix" in some contexts.
+        :param bts: bottom-level time series.
+        :param node_level: which level each node belongs to.
+        :param m: frequency of time series.
         """
         if isinstance(constraints, np.ndarray):
             constraints = csr_matrix(constraints)
@@ -94,7 +94,7 @@ class Hts:
         self.keep_fitted = False
 
     def aggregate_ts(self, levels: Union[int, List[int]] = None) -> np.ndarray:
-        """aggregate bottom-levels time series.
+        """Aggregate bottom-level time series.
 
         :param levels: which levels you want.
         :return: upper-level time series.
@@ -119,31 +119,31 @@ class Hts:
                  constrain_level: int = 0,
                  keep_base_forecast: bool = True
                  ) -> Hts:
-        """forecast Hts using specific reconciliation methods and base methods.
+        """Forecast Hts using specific reconciliation methods and base forecasting methods.
 
         :param h: forecasting horizon.
         :param base_method:
-            method for generate base forecast, arima, ets, or custom function.
+            method for generate base forecasts, arima, ets, or custom function.
             arima and ets are implemented using `forecast` package in R.
-            If custom forecast function is specified and using "mint" method, the function
-            should return the in-sample forecasts for estimating the covariance matrix, e.g. the
+            If custom forecast function is specified and you are using "mint" method, the function
+            returns the in-sample forecasts for estimating the covariance matrix, i.e., the
             base forecast returned should be :math:`(T+h) \\times n`.
         :param base_forecaster:
-            list for base forecasters of each level. If you want different base forecast methods
+            list for the base forecaster of each level. If you want different base forecasting methods
             for different levels, just pass a list of base forecasters, see :doc:forecaster.
-        :param hf_method: method for hierarchical forecasting, "comb", "bu", "td", "mo"
+        :param hf_method: method for hierarchical forecasting, "comb", "bu", "td", "mo".
         :param comb_method:
-            "ols", "wls", "mint"(e.g Minimum Trace :ref:`[2]<mint>` ), weights method used for "comb"(e.g. optimal
-            combination) reconciliation method, if you choose "wls", you should specify `weights`, or the result is same
-            as ols. If you choose "mint", you should specify `variance` parameter.
+            "ols", "wls", "mint"(i.e., Minimum Trace :ref:`[2]<mint>` ), weighting method used for "comb"(i.e., optimal
+            combination) reconciliation method. If you choose "wls", you should specify `weights`, or the result is the same
+            as ols. If you choose "mint", you should specify the `variance` parameter.
         :param weights:
-            weighting matrix used for `wls` combination method and variance used for `mint` combination method,
-            if `wls`, can be "structural" or custom_matrix, this custom matrix should be
+            weighting matrix used for `wls` combination method and variance used for `mint` combination method.
+            For `wls`, it can be "structural" or custom_matrix, which is an
             :math:`n\\times n` symmetric matrix.
-            If `mint`, can be "sample", "variance" or "shrinkage", please refer to :doc:`/tutorials/reconciliation`.
-        :param parallel: If parallel, not supported for now.
-        :param constraint: If some levels are constrained to be unchangeable when reconciling base forecasts.
-        :param constrain_level: Which level is constrained to be unchangeable when reconciling base forecasts.
+            For `mint`, it can be "sample", "variance" or "shrinkage". Please refer to :doc:`/tutorials/reconciliation`.
+        :param parallel: not supported for now.
+        :param constraint: Ture if some levels are constrained to be unchangeable when reconciling the base forecasts. False otherwise.
+        :param constrain_level: Which level is constrained to be unchangeable when reconciling the base forecasts.
         :param keep_base_forecast:
             if keep keep_base_forecast, if True, attribute `Hts.base_forecast` is set. if false, it will be None
         :return: Hts: reconciled forecast.
@@ -158,10 +158,10 @@ class Hts:
             elif base_method == "ets":
                 base_forecaster = [EtsForecaster(self.m)]*int(max(self.node_level)+1)
             elif base_method is not None:
-                raise ValueError("this base forecast method is not supported now.")
+                raise ValueError("This base forecasting method is not supported for now.")
             else:
                 if base_forecaster is None:
-                    raise ValueError("You should either give base_method of base_forecaster")
+                    raise ValueError("base_method of base_forecaster is not specified.")
                 elif not isinstance(base_forecaster, List):
                     base_forecaster = [base_forecaster] * int(max(self.node_level)+1)
                 else:
@@ -178,25 +178,25 @@ class Hts:
                     reconciled_y = fr.wls(self, base_forecast, method="wls", weighting=weights,
                                           constraint=constraint, constraint_level=constrain_level)
                 else:
-                    raise ValueError("weights for wls method is not supported")
+                    raise ValueError("This weighting method for wls is not supported.")
             elif comb_method == "mint":
                 reconciled_y = fr.wls(self, base_forecast, method="mint", weighting=weights,
                                       constraint=constraint, constraint_level=constrain_level)
             else:
-                raise ValueError("this comination method is not supported")
+                raise ValueError("This comination method is not supported.")
         else:
-            raise NotImplementedError("this method is not implemented")
+            raise NotImplementedError("This method is not implemented.")
         if keep_base_forecast:
             self.base_forecast = base_forecast
         return reconciled_y
 
     def generate_base_forecast(self, method: List[BaseForecaster], h: int = 1, keep_fitted: bool = False) -> np.ndarray:
-        """generate base forecasts by `forecast` in R with rpy2.
+        """Generate base forecasts by `forecast` in R with rpy2.
 
-        :param method: base forecast method.
-        :param h: forecasting horizons.
-        :param keep_fitted: if keep in-sample fitted value, useful when mint method is specified.
-        :return: base forecast
+        :param method: base forecasting method.
+        :param h: forecasting horizon.
+        :param keep_fitted: True if you want to keep in-sample fitted value. This parameter is useful when mint method is used.
+        :return: base forecasts
         """
         k = int(max(self.node_level)+1)
         length = self.bts.shape[0]
@@ -216,13 +216,13 @@ class Hts:
 
     @classmethod
     def from_temporal_hierarchy(cls, ts: np.ndarray, m: int, aggregate_lens: List[int]):
-        """Construct Hts from temporal hierarchy.
+        """Construct Hts from a temporal hierarchy.
 
         :param ts: a time series.
-        :param m: frequency
+        :param m: frequency of the time series.
         :param aggregate_lens:
             length of bottom level time series used for aggregation. For example, for monthly data,
-            3 means quarterly data, 6 mean half-annual data, 12 means annual time series.  The time
+            3 means quarterly data, 6 means half-annual data, and 12 means annual time series.  The time
             series should include 1 at least.
         :return: Hts object.
         """
@@ -231,19 +231,19 @@ class Hts:
         smatrix = np.zeros([sum([int(m / k) for k in aggregate_lens]), m])
         node_level = []
         if len(ts) % m != 0:
-            Warning("length of history time series is not multiple of m, some observations at very beginning "
-                    "would be cut out.")
+            Warning("The length of the historical time series is not multiple of m. Some observations at very beginning "
+                    "will be cut out.")
             ts = ts[len(ts) % m:]
 
         if aggregate_lens[0] != 1:
-            raise ValueError("You'd better always include 1 in the aggregate_lens")
+            raise ValueError("Please always include 1 in the aggregate_lens.")
 
         aggregate_lens.reverse()
         index = 0
         for i in range(len(aggregate_lens)):
             k = aggregate_lens[i]
             if (m % k) != 0:
-                raise ValueError("aggregate length should be factor of m")
+                raise ValueError("Aggregate length should be a factor of m.")
             mk = m // k
             for j in range(mk):
                 smatrix[index, j * k:(j + 1) * k] = 1
@@ -265,10 +265,10 @@ class Hts:
         :param bts: :math:`T\\times m` bottom level series.
         :param m: frequency of time series
         :param characters:
-            length of characters of each level,
-            for example, "ABC" 'A' represents 'A' series of  first level,  'B' represents 'B' series under node 'A',
-            'C' represents 'C' series under node 'AB'. So the value of parameter is [1,1,1]
-        :param nodes: List of list to demonstrate the hierarchy, see details.
+            length of characters of each level.
+            For example, in "ABC", 'A' represents 'A' series of  first level,  'B' represents 'B' series under node 'A',
+            and 'C' represents 'C' series under node 'AB'. So the value of parameter is [1,1,1].
+        :param nodes: List of lists to demonstrate the hierarchy, see details.
         :return: Hts object.
         """
         if isinstance(bts, DataFrame):
@@ -278,7 +278,7 @@ class Hts:
             bts = bts
             names = None
         else:
-            raise TypeError("bts must be numpy.ndarray or pandas.DataFrame")
+            raise TypeError("bts must be numpy.ndarray or pandas.DataFrame.")
         if nodes is not None:
             constraints, node_level = _nodes2constraints(nodes)
         elif characters is not None:
@@ -289,13 +289,13 @@ class Hts:
         return hts
 
     def accuracy(self, y_true: Hts, y_pred: Hts, levels: Union[int, None, List] = None, measure: List[str] = None) -> Union[float, DataFrame]:
-        """calculate forecast accuracy, mase is supported only for now.
+        """Calculate the forecast accuracy. mase and mse are supported only for now.
 
         :param y_true: real observations.
         :param y_pred: forecasts.
-        :param levels: which level.
+        :param levels: which levels.
         :param measure:
-            mase, mse is supported for now. e.g. ['mase'], ['mse', 'mase'].
+            mase and mse are supported for now. e.g., ['mase'], ['mse', 'mase'].
             if None, mase is calculated.
         :return: forecast accuracy.
         """
@@ -310,16 +310,16 @@ class Hts:
                 accs[me] = np.array(list(map(lambda x: getattr(accuracy, me)(*x),
                                              zip(agg_ts.T, agg_true.T, agg_pred.T, [self.m] * agg_ts.shape[1]))))
             except AttributeError:
-                print('this forecasting measure is not supported!')
+                print('This forecasting measure is not supported!')
         return accs
 
     def accuracy_base(self, y_true: Hts, levels: Union[int, None, List] = None, measure: List[str] = None) -> DataFrame:
-        """calculate forecast accuracy of base forecast
+        """Calculate forecast accuracy of base forecasts.
 
         :param y_true: real observations.
-        :param levels: which level.
+        :param levels: which levels.
         :param measure:
-            mase, mse is supported for now. e.g. ['mase'], ['mse', 'mase'].
+            mase and mse are supported for now. e.g., ['mase'], ['mse', 'mase'].
             if None, mase is calculated.
         :return: forecast accuracy of base forecasts.
         """

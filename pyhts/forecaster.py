@@ -7,7 +7,7 @@ ts = robjects.r["ts"]
 
 
 class BaseForecaster:
-    """Base Class for forecaster
+    """Base class for forecasters.
 
     """
     def __init__(self):
@@ -44,7 +44,7 @@ class AutoArimaForecaster(BaseForecaster):
 
 
 class EtsForecaster(BaseForecaster):
-    """Ets forecaster.
+    """ets forecaster.
 
     """
 
