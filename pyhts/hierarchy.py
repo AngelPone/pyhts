@@ -301,7 +301,7 @@ class Hierarchy:
         accs = pd.DataFrame()
         for me in measure:
             try:
-                accs[me] = np.array([getattr(accuracy, me)(agg_true[i], pred[i].T, hist[i], self.period)
+                accs[me] = np.array([getattr(accuracy, me)(agg_true[i], pred.T[i], hist[i], self.period)
                                      for i in range(self.s_mat.shape[0])])
             except AttributeError:
                 print(f'Forecasting measure {me} is not supported!')
