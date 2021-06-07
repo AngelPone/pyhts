@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from copy import copy
 from typing import Union, List
-from . import accuracy
+from pyhts import accuracy
 
 
 class Hierarchy:
@@ -27,11 +27,12 @@ class Hierarchy:
             level of each node.
     """
 
-    def __init__(self, s_mat, node_level, names, period):
+    def __init__(self, s_mat, node_level, names, period, level_name=None):
         self.s_mat = s_mat.astype('int8')
         """ Summing matrix. """
         self.node_level = np.array(node_level)
         self.level_n = max(node_level) + 1
+        self.level_name = level_name
         self.node_name = np.array(names)
         self.period = period
 
@@ -225,25 +226,30 @@ class Hierarchy:
         :param df: DataFrame contains keys for determining hierarchical structural.
         :param keys: column names that each column represents a level.
         :param period: frequency of the time series, 1 means non-seasonality data, 12 means monthly data.
+        :param excludes: levels excluded from the summing matrix.
         :return:
         """
         new_df = copy(df[keys]).astype('string')
         new_df['Total'] = 'Total'
+        keys = list(keys)
         node_level = [0] + [1] * len(new_df[keys[0]].unique())
-        names = ['Total'] + list(new_df[keys[0]].unique())
         n = new_df.shape[0]
+        level_names = ['Total']
         for index in range(1, len(keys)):
-            names += list(new_df[keys[index]].unique())
             node_level += [index+1] * len(new_df[keys[index]].unique())
+            level_names.append(keys[index-1])
+        level_names.append(keys[-1])
 
+        s_dummy = pd.get_dummies(new_df[['Total'] + keys], columns=['Total'] + keys)
+        s_mat = s_dummy.values.T
+        names = list(s_dummy.columns)
         if len(new_df[keys[-1]].unique()) != new_df.shape[0]:
             new_df['bottom'] = new_df[keys].apply(lambda x: '-'.join(x), axis=1)
-            names += list(new_df['bottom'])
             node_level += [len(keys)+1] * n
-            s_mat = pd.get_dummies(new_df[['Total'] + keys + ['bottom']], columns=['Total'] + keys + ['bottom']).values.T
-        else:
-            s_mat = pd.get_dummies(new_df[['Total'] + keys], columns=["Total"] + keys).values.T
-        return cls(s_mat, np.array(node_level), names, period=period)
+            s_mat = np.concatenate([s_mat, np.identity(new_df.shape[0])], axis=0).astype('int')
+            names = names + list(new_df['bottom'])
+            level_names.append('bottom')
+        return cls(s_mat, np.array(node_level), names, period=period, level_name=level_names)
 
     def aggregate_ts(self, bts: np.ndarray, levels: Union[int, List[int]] = None) -> np.ndarray:
         """Aggregate bottom-level time series.
@@ -332,3 +338,4 @@ class Hierarchy:
                 print('This forecasting measure is not supported!')
         accs.index = self.node_name[np.isin(self.node_level, levels)]
         return accs
+
