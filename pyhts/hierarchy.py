@@ -305,6 +305,8 @@ class Hierarchy:
                                      for i in range(self.s_mat.shape[0])])
             except AttributeError:
                 print(f'Forecasting measure {me} is not supported!')
+        if levels is None:
+            levels = list(range(self.level_n))
         accs.index = self.node_name[np.isin(self.node_level, levels)]
         return accs
 
@@ -333,6 +335,8 @@ class Hierarchy:
             hist = self.aggregate_ts(hist, levels=levels).T
         else:
             hist = [None] * self.s_mat.shape[0]
+        if levels is None:
+            levels = list(range(self.level_n))
         agg_true = self.aggregate_ts(real, levels=levels).T
         agg_pred = self.aggregate_ts(pred, levels=levels).T
         accs = pd.DataFrame()
