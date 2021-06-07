@@ -288,19 +288,21 @@ class Hierarchy:
         assert self.check_hierarchy(real), f"True observations should be of shape (h, m)"
         assert real.shape[0] == pred.shape[0], \
             f" {real.shape} True observations have different lengths with {real.shape} forecasts"
-        agg_true = self.aggregate_ts(real, levels=levels)
+        agg_true = self.aggregate_ts(real, levels=levels).T
         if measure is None:
             measure = ['mase', 'mape', 'rmse']
         if 'mase' in measure or 'smape' in measure or 'rmsse' in measure:
             assert hist is not None
-            hist = self.aggregate_ts(hist, levels=levels)
-        if hist is None:
+        if hist is not None:
+            assert self.check_hierarchy(hist), "History observations should be of shape(T, m)"
+            hist = self.aggregate_ts(hist, levels=levels).T
+        else:
             hist = [None] * self.s_mat.shape[0]
         accs = pd.DataFrame()
         for me in measure:
             try:
-                accs[me] = np.array(list(map(lambda x: getattr(accuracy, me)(*x),
-                                             zip(agg_true.T, pred.T, hist.T, [self.period] * self.s_mat.shape[0]))))
+                accs[me] = np.array([getattr(accuracy, me)(agg_true[i], pred[i].T, hist[i], self.period)
+                                     for i in range(self.s_mat.shape[0])])
             except AttributeError:
                 print(f'Forecasting measure {me} is not supported!')
         accs.index = self.node_name[np.isin(self.node_level, levels)]
@@ -326,14 +328,18 @@ class Hierarchy:
             measure = ['mase', 'mape', 'rmse']
         if 'mase' in measure or 'smape' in measure or 'rmsse' in measure:
             assert hist is not None
+        if hist is not None:
+            assert self.check_hierarchy(hist), "History observations should be of shape(T, m)"
             hist = self.aggregate_ts(hist, levels=levels).T
-        agg_true = self.aggregate_ts(real, levels=levels)
-        agg_pred = self.aggregate_ts(pred, levels=levels)
+        else:
+            hist = [None] * self.s_mat.shape[0]
+        agg_true = self.aggregate_ts(real, levels=levels).T
+        agg_pred = self.aggregate_ts(pred, levels=levels).T
         accs = pd.DataFrame()
         for me in measure:
             try:
-                accs[me] = np.array(list(map(lambda x: getattr(accuracy, me)(*x),
-                                             zip(agg_true.T, agg_pred.T, hist, [self.period] * self.s_mat.shape[0]))))
+                accs[me] = np.array([getattr(accuracy, me)(agg_true[i], agg_pred[i], hist[i], self.period)
+                            for i in range(self.s_mat.shape[0])])
             except AttributeError:
                 print('This forecasting measure is not supported!')
         accs.index = self.node_name[np.isin(self.node_level, levels)]
