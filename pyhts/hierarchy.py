@@ -32,7 +32,7 @@ class Hierarchy:
         """ Summing matrix. """
         self.node_level = np.array(node_level)
         self.level_n = max(node_level) + 1
-        self.level_name = level_name
+        self.level_name = np.array(level_name)
         self.node_name = np.array(names)
         self.period = period
 
@@ -67,6 +67,7 @@ class Hierarchy:
         nodes = copy(nodes)
         n = sum(nodes[-1])
         m = sum(map(sum, nodes)) + 1
+        level_n = len(nodes) + 1
         node_level = n * [len(nodes)]
         nodes.append([1] * n)
         s = np.zeros([m, n])
@@ -90,7 +91,7 @@ class Hierarchy:
                 c_x = n_x
                 node_level.insert(0, level_idx)
             bts_count = new_bts_count
-        return cls(s, np.array(node_level), node_level, period)
+        return cls(s, np.array(node_level), np.array(range(m)), period, level_name=np.array(range(level_n)).astype('string'))
 
     @classmethod
     def from_names(cls, names: List[str], chars: List[int], period: int = 1) -> "Hierarchy":
@@ -141,7 +142,7 @@ class Hierarchy:
         s_mat = pd.get_dummies(df).values.T
         names += list(df['bottom'])
         node_level += [index+2] * len(df['bottom'])
-        return cls(s_mat, np.array(node_level), names, period)
+        return cls(s_mat, np.array(node_level), names, period, level_name=np.array(range(len(chars)+1)).astype('string'))
 
     @classmethod
     def from_balance_group(cls, group_list: List[List[str]], period=1) -> "Hierarchy":
@@ -187,7 +188,8 @@ class Hierarchy:
             names += group_list[i]
         node_level += [i+2] * df.shape[0]
         names += list(df['bottom'])
-        return cls(s_mat, np.array(node_level), names, period)
+        return cls(s_mat, np.array(node_level), names, period,
+                   level_name=np.array(range(len(group_list)+2)).astype('string'))
 
     @classmethod
     def from_long(cls, df: pd.DataFrame, keys: List[str], period=1) -> "Hierarchy":
