@@ -30,7 +30,7 @@ def wls(hierarchy: Hierarchy,
     """Function for forecast reconciliation.
 
     :param hierarchy: historical time series.
-    :param error: in-sample error.
+    :param error: in-sample error with shape (n, T)
     :param method: method used for forecast reconciliation, i.e., ols, wls, and mint.
     :param weighting:
         method for the weight matrix used in forecast reconciliation, i.e., covariance matrix in mint
@@ -52,7 +52,7 @@ def wls(hierarchy: Hierarchy,
             if not np.all(np.linalg.eigvals(weight_matrix) > 0):
                 raise ValueError("Sample method needs covariance matrix to be positive definite.")
         elif weighting == "shrinkage":
-            lamb = _lamb_estimate(error)
+            lamb = _lamb_estimate(error.T)
             weight_matrix = lamb * np.diag(np.diag(W)) + (1 - lamb) * W
         else:
             raise NotImplementedError("This min_trace method has not been implemented.")
