@@ -1,5 +1,7 @@
 import numpy as np
 from typing import Union
+import scipy.linalg as lg
+from scipy.sparse import csr_matrix
 from .hierarchy import Hierarchy
 
 
@@ -98,11 +100,18 @@ def compute_g_mat(hierarchy: Hierarchy, weight_matrix, constraint_level=-1):
     """
     n, m = hierarchy.s_mat.shape
     u = _construct_u_mat(hierarchy, constraint_level=constraint_level)
+    u = csr_matrix(u)
     c = np.concatenate([np.zeros([m, n-m]), np.identity(m)], axis=1)
+    c = csr_matrix(c)
     a = np.zeros([n - m, n])
     if constraint_level >= 0:
         a = np.concatenate([np.identity(n)[hierarchy.node_level == constraint_level], a])
-    return c - c.dot(weight_matrix).dot(u).dot(np.linalg.inv((u.T.dot(weight_matrix).dot(u)))).dot(u.T-a)
+    a = csr_matrix(a)
+    weight_matrix = csr_matrix(weight_matrix)
+    target = u.T.dot(weight_matrix).dot(u)
+    x, lower = lg.cho_factor(target.toarray())
+    inv_dot = lg.cho_solve((x, lower), (u.T-a).toarray())
+    return c.toarray() - c.dot(weight_matrix).dot(u).dot(inv_dot)
 
 
 __all__ = [
