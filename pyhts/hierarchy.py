@@ -192,7 +192,7 @@ class Hierarchy:
                    level_name=np.array(range(len(group_list)+2)).astype('string'))
 
     @classmethod
-    def from_long(cls, df: pd.DataFrame, keys: List[str], period=1) -> "Hierarchy":
+    def from_long(cls, df: pd.DataFrame, keys: List[str], id_col: str = None, period=1) -> "Hierarchy":
         """Construct hierarchy from long data table that each row represents a bottom level time series. This method is
         suitable for complex hierarchical structure.
 
@@ -228,6 +228,7 @@ class Hierarchy:
         :param df: DataFrame contains keys for determining hierarchical structural.
         :param keys: column names that each column represents a level.
         :param period: frequency of the time series, 1 means non-seasonality data, 12 means monthly data.
+        :param id_col: id of bottom-level time series.
         :param excludes: levels excluded from the summing matrix.
         :return:
         """
@@ -246,7 +247,10 @@ class Hierarchy:
         s_mat = s_dummy.values.T
         names = list(s_dummy.columns)
         if len(new_df[keys[-1]].unique()) != new_df.shape[0]:
-            new_df['bottom'] = new_df[keys].apply(lambda x: '-'.join(x), axis=1)
+            if id_col is None:
+                new_df['bottom'] = new_df[keys].apply(lambda x: '-'.join(x), axis=1)
+            else:
+                new_df['bottom'] = df[id_col]
             node_level += [len(keys)+1] * n
             s_mat = np.concatenate([s_mat, np.identity(new_df.shape[0])], axis=0).astype('int')
             names = names + list(new_df['bottom'])
