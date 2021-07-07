@@ -1,6 +1,5 @@
-# py-hts
-
-A python package for hierarchical forecasting, inspired by [hts](https://cran.r-project.org/web/packages/hts/index.html) package in R.
+# `pyhts`
+A python package for hierarchical forecasting, inspired by the [hts](https://cran.r-project.org/web/packages/hts/index.html) package in R.
 
 ## Features
 
@@ -12,7 +11,7 @@ A python package for hierarchical forecasting, inspired by [hts](https://cran.r-
 
 ## Quick Demo
 
-Load the Australia tourism flows data.
+- Load the Australia tourism flows data.
 
 ```python
 from pyhts.dataset import load_tourism
@@ -23,7 +22,7 @@ test = tourism_data.iloc[-12:, :]
 ```
 
 
-Define the hierarchy.
+- Define the hierarchy.
 
 ```python
 from pyhts.hierarchy import Hierarchy
@@ -31,7 +30,7 @@ hierarchy = Hierarchy.from_names(tourism_data.columns, chars=[1, 1, 1])
 print(hierarchy.node_name)
 ```
 
-Create an ols forecasting reconciliation model with sklearn-like API.
+- Create an ols forecasting reconciliation model with sklearn-like API.
 
 ```python
 from pyhts.HFModel import HFModel
@@ -39,7 +38,7 @@ model = HFModel(hierarchy=hierarchy, base_forecasters="arima",
                 hf_method="comb", comb_method="ols")
 ```
 
-Fit the model and produce forecasts.
+- Fit the model and produce forecasts.
 
 ```python
 model.fit(train)
@@ -50,13 +49,13 @@ forecasts = model.predict(horizon=12)
 
 * `model.forecast()` calculates the base forecasts for all levels and reconciles the base forecasts.
 
-Obtain coherent forecasts of all the hierarchical levels.
+- Obtain coherent forecasts of all the hierarchical levels.
 
 ```python
 all_level_forecasts = hierarchy.aggregate_ts(forecasts)
 ```
 
-Evaluate the forecasting accuracy.
+- Evaluate the forecasting accuracy.
 
 ```python
 # accuracy of reconciled forecasts
