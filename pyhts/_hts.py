@@ -1,16 +1,14 @@
 from __future__ import annotations
 import numpy as np
-from pyhts import accuracy
+from pyhts import _accuracy
 from pandas import DataFrame
 from copy import copy
 
 from typing import List, Union, Optional
-from rpy2.robjects.packages import importr
 from scipy.sparse import csr_matrix
-from pyhts.forecaster import BaseForecaster, AutoArimaForecaster, EtsForecaster
+from pyhts._forecaster import BaseForecaster, AutoArimaForecaster
 
-forecast = importr("forecast")
-
+__all__ = ["Hts"]
 
 def _nodes2constraints(nodes: List[List[int]]) -> [csr_matrix, np.ndarray]:
     """Construct constraints from nodes.
@@ -148,7 +146,7 @@ class Hts:
             if keep keep_base_forecast, if True, attribute `Hts.base_forecast` is set. if false, it will be None
         :return: Hts: reconciled forecast.
         """
-        import pyhts.reconciliation as fr
+        import pyhts._reconciliation as fr
         if hf_method == "comb":
             # generate base forecast
             if comb_method == "mint":

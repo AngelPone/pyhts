@@ -14,7 +14,7 @@ A python package for hierarchical forecasting, inspired by the [hts](https://cra
 - Load the Australia tourism flows data.
 
 ```python
-from pyhts.dataset import load_tourism
+from pyhts._dataset import load_tourism
 
 tourism_data = load_tourism()
 train = tourism_data.iloc[:-12, :]
@@ -25,7 +25,8 @@ test = tourism_data.iloc[-12:, :]
 - Define the hierarchy.
 
 ```python
-from pyhts.hierarchy import Hierarchy
+from pyhts._hierarchy import Hierarchy
+
 hierarchy = Hierarchy.from_names(tourism_data.columns, chars=[1, 1, 1])
 print(hierarchy.node_name)
 ```
@@ -33,8 +34,9 @@ print(hierarchy.node_name)
 - Create an ols forecasting reconciliation model with sklearn-like API.
 
 ```python
-from pyhts.HFModel import HFModel
-model = HFModel(hierarchy=hierarchy, base_forecasters="arima", 
+from pyhts._HFModel import HFModel
+
+model = HFModel(hierarchy=hierarchy, base_forecasters="arima",
                 hf_method="comb", comb_method="ols")
 ```
 

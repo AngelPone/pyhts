@@ -2,7 +2,9 @@ import numpy as np
 from typing import Union
 import scipy.linalg as lg
 from scipy.sparse import csr_matrix
-from .hierarchy import Hierarchy
+from pyhts._hierarchy import Hierarchy
+
+__all__ = ["wls"]
 
 
 def _lamb_estimate(x: np.ndarray) -> float:
@@ -37,7 +39,6 @@ def wls(hierarchy: Hierarchy,
     :param weighting:
         method for the weight matrix used in forecast reconciliation, i.e., covariance matrix in mint
         or wls.
-    :param constraint: True if some levels are constrained to be unchangeable when reconciling base forecasts.
     :param constraint_level: Which level is constrained to be unchangeable when reconciling base forecasts.
     :return: reconciled forecasts.
     """
@@ -75,7 +76,6 @@ def wls(hierarchy: Hierarchy,
 def _construct_u_mat(hierarchy: Hierarchy, constraint_level=-1):
     """construct U' mat used in solution.
 
-    :param s_mat:
     :param constraint_level:
     :return:
     """
@@ -112,10 +112,3 @@ def compute_g_mat(hierarchy: Hierarchy, weight_matrix, constraint_level=-1):
     x, lower = lg.cho_factor(target.toarray())
     inv_dot = lg.cho_solve((x, lower), (u.T-a).toarray())
     return c.toarray() - c.dot(weight_matrix).dot(u).dot(inv_dot)
-
-
-__all__ = [
-    "wls"
-]
-
-

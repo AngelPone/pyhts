@@ -2,8 +2,9 @@ import numpy as np
 import pandas as pd
 from copy import copy
 from typing import Union, List
-from pyhts import accuracy
+from pyhts import _accuracy
 
+__all__ = ["Hierarchy"]
 
 class Hierarchy:
     """Class for a hierarchy structure.
@@ -307,7 +308,7 @@ class Hierarchy:
         accs = pd.DataFrame()
         for me in measure:
             try:
-                accs[me] = np.array([getattr(accuracy, me)(agg_true[i], pred.T[i], hist[i], self.period)
+                accs[me] = np.array([getattr(_accuracy, me)(agg_true[i], pred.T[i], hist[i], self.period)
                                      for i in range(self.s_mat.shape[0])])
             except AttributeError:
                 print(f'Forecasting measure {me} is not supported!')
@@ -348,7 +349,7 @@ class Hierarchy:
         accs = pd.DataFrame()
         for me in measure:
             try:
-                accs[me] = np.array([getattr(accuracy, me)(agg_true[i], agg_pred[i], hist[i], self.period)
+                accs[me] = np.array([getattr(_accuracy, me)(agg_true[i], agg_pred[i], hist[i], self.period)
                             for i in range(self.s_mat.shape[0])])
             except AttributeError:
                 print('This forecasting measure is not supported!')
