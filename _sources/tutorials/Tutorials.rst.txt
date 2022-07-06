@@ -22,16 +22,16 @@ The steps of using this package are as follows:
 
 1. Define a hierarchy structure according to your data.
 
-2. Define a :class:`~pyhts.HFModel.HFModel`
+2. Define a :class:`~pyhts.HFModel`
 
-3. fit the :class:`~pyhts.HFModel.HFModel` using history time series
+3. fit the :class:`~pyhts.HFModel` using history time series
 
 4. generate base forecasts and reconcile the forecasts to obtain coherent point forecasts.
 
 Define the Hierarchy
 --------------------
 
-You can use classmethods of :class:`pyhts.hierarchy.Hierarchy` to define hierarchy structure. see details in :doc:`/tutorials/hierarchy`
+You can use classmethods of :class:`pyhts.Hierarchy` to define hierarchy structure. see details in :doc:`/tutorials/hierarchy`
 
 As an example of the hierarchy shown in the figure below, let’s construct the hierarchy using :class:`pyhts.hierarchy.Hierarchy.from_node_list()` and :class:`pyhts.hierarchy.Hierarchy.from_names()`.
 
@@ -39,7 +39,7 @@ As an example of the hierarchy shown in the figure below, let’s construct the 
 
 .. code-block:: python
 
-    from pyhts.hierarchy import Hierarchy
+    from pyhts import Hierarchy
     node_list = [[2], [2, 2]]
     period = 12
     hierarchy = Hierarchy.from_node_list(node_list, period=period)
@@ -58,7 +58,7 @@ Let’s define a simple ols reconciliation model that use :code:`auto.arima` as 
 
 .. code-block:: python
 
-    from pyhts.HFModel import HFModel
+    from pyhts import HFModel
     ols_model = HFModel(hierarchy=hierarchy, base_forecasters='arima', hf_method='comb', comb_method='ols')
 
 where
@@ -71,7 +71,7 @@ where
 fit model
 ---------
 
-:meth:`pyhts.HFModel.HFModel.fit()` would fit base forecasting models for each time series and compute the reconciliation matrix.
+:meth:`pyhts.HFModel.fit()` would fit base forecasting models for each time series and compute the reconciliation matrix.
 
 .. code-block:: python
 
@@ -84,7 +84,7 @@ fit model
 forecast
 --------
 
-:meth:`pyhts.HFModel.HFModel.forecast()` would generate base forecasts for each time series and reconcile base forecasts to get coherent forecasts.
+:meth:`pyhts.HFModel.forecast()` would generate base forecasts for each time series and reconcile base forecasts to get coherent forecasts.
 
 .. code-block:: python
 
@@ -92,7 +92,7 @@ forecast
     print(reconciled_forecasts.shape)
     # (12, 4)
 
-:code:`reconciled_forecasts` just contain reconciled forecasts of bottom level, you can use :meth:`~pyhts.hierarchy.Hierarchy.aggregate_ts()` to get reconciled forecasts of all levels.
+:code:`reconciled_forecasts` just contain reconciled forecasts of bottom level, you can use :meth:`~pyhts.Hierarchy.aggregate_ts()` to get reconciled forecasts of all levels.
 
 .. code-block:: python
 
@@ -101,7 +101,7 @@ forecast
 
 measurement
 -----------
-You can evaluate forecasting accuracy of both base forecasts and reconciled forecasts, using :meth:`~pyhts.hierarchy.Hierarchy.accuray_base()` and :meth:`~pyhts.hierarchy.Hierarchy.accuracy()` respectively.
+You can evaluate forecasting accuracy of both base forecasts and reconciled forecasts, using :meth:`~pyhts.Hierarchy.accuray_base()` and :meth:`~pyhts.Hierarchy.accuracy()` respectively.
 
 .. code-block:: python
 

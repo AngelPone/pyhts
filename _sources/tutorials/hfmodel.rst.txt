@@ -1,12 +1,12 @@
 Hierarchical Forecasting Model
 ##############################
 
-Hierarchical Forecasting Model (HFModel) is defined by :class:`pyhts.HFModel.HFModel`
+Hierarchical Forecasting Model (HFModel) is defined by :class:`pyhts.HFModel`
 
 HFModel API
 ==============
 
-.. autoclass:: pyhts.HFModel.HFModel
+.. autoclass:: pyhts.HFModel
     :members: __init__, fit, predict
 
 Examples
@@ -16,8 +16,8 @@ load Tourism dataset
 
 .. code-block:: python
 
-    >>> from pyhts.dataset import load_tourism
-    >>> from pyhts.hierarchy import Hierarchy
+    >>> from pyhts import load_tourism
+    >>> from pyhts import Hierarchy
     >>> dataset = load_tourism()
     >>> dataset.columns
     Index(['AAA', 'AAB', 'ABA', 'ABB', 'ACA', 'ADA', 'ADB', 'ADC', 'ADD', 'AEA',
@@ -74,38 +74,51 @@ Then, define the hierarchical forecasting model.
 customize base forecasters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To generate base forecasts, you can either use :code:`arima` or :code:`ets`, which are implemented by
-:code:`forecast` in R called through :code:`rpy2`, or you can define your own base forecasters using whatever
+To generate base forecasts, you can use :code:`arima`, which are implemented by
+:code:`statsforecast`, or you can define your own base forecasters using whatever
 forecasting methods you want, machine learning or deeplearning methods.
 
-- :code:`fit(ts, x_reg, **kwargs)` is needed for the base forecaster, which is used to fit base forecasting model and generate insample forecasts :code:`fitted`, which is necessary when :code:`comb_method` is :code:`mint`.
+- :code:`fit(ts, xreg, **kwargs)` is needed for the base forecaster, which is used to fit base forecasting model and generate insample forecasts :code:`fitted`, which is necessary when :code:`comb_method` is :code:`mint`.
 
 - :code:`forecast(h, xreg, **kwargs)` is needed for the base forecaster, which is used to generate base forecasts.
 
-As an example, here is the implementation of :class:`~pyhts.forecaster.AutoArimaBaseForecaster`
+As an example, here is the implementation of :class:`~pyhts.AutoArimaBaseForecaster`
 
 .. code-block:: python
 
     class AutoArimaForecaster(BaseForecaster):
-        """auto.arima forecaster.
+    """autoarima forecaster, adapted from statsforecast.arima.auto_arima_f
 
+    """
+
+    def __init__(self, period: int = 1):
+        super().__init__()
+        self.period = period
+        self.hist = None
+        self.model = None
+
+    def fit(self, hist: np.ndarray, xreg=None, **kwargs):
+        """fit the AutoArimaForecaster
+
+        :param hist: observations
+        :param xreg: covariates of arima model
+        :param kwargs: other parameters passed to  `statsforecast.arima.auto_arima_f`
+        :return: self
         """
+        self.hist = hist
+        self.model = auto_arima_f(hist, period=self.period, xreg=xreg, **kwargs)
+        self.fitted = True
+        return self
 
-        def __init__(self, m: int = 1):
-            super().__init__()
-            self.m = m
-            self.hist = None
-            self.model = None
+    def forecast(self, h: int, xreg=None, **kwargs) -> np.ndarray:
+        """forecast
 
-        def fit(self, hist: np.ndarray, **kwargs):
-            self.hist = ts(FloatVector(hist), frequency=self.m)
-            arima = forecast.auto_arima
-            self.model = arima(self.hist, **kwargs)
-            self.fitted = self.model.rx2["fitted"]
-            return self
-
-        def forecast(self, h: int, **kwargs) -> np.ndarray:
-            return np.array(forecast.forecast(self.model, h=h, **kwargs).rx2["mean"])
+        :param h: forecast horizons
+        :param xreg: covariates
+        :param kwargs: other parameters passed to `statsforecast.arima.forecast_arima`
+        :return:
+        """
+        return forecast_arima(self.model, h, xreg=xreg, **kwargs)['mean']
 
 Assuming you have trained a global XGBoost model, you can wrap the xgboost model and pass it to
 base_forecasters.
@@ -130,7 +143,7 @@ base_forecasters.
 Fit HFModel
 -----------
 
-:meth:`~pyhts.HFModel.HFModel.fit()` will fit the base forecasters and reconcile the incoherent base forecasts to coherent forecasts.
+:meth:`~pyhts.HFModel.fit()` will fit the base forecasters and reconcile the incoherent base forecasts to coherent forecasts.
 
 Here is an example that fit a mint shrinkage model with :code:`AAA` type :code:`ets` base forecasters.
 
@@ -148,7 +161,7 @@ Also, you can specify the parameter :code:`model` in your customize BaseForecast
 Forecast HFModel
 ----------------
 
-:meth:`~pyhts.HFModel.HFModel.forecast` will generate h-step-ahead base forecasts and reconcile
+:meth:`~pyhts.HFModel.forecast` will generate h-step-ahead base forecasts and reconcile
 the base forecasts to coherent forecasts in bottom level.
 
     >>> forecasts = ols_model.forecast(horizon=12)

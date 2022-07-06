@@ -2,15 +2,15 @@ Model Evaluation
 ================
 
 After obtaining base forecasts or coherent reconciled forecasts, you can use evaluate the forecasting accuracy
-through :meth:`pyhts.hierarchy.Hierarchy.accuracy_base` or :meth:`pyhts.hierarchy.Hierarchy.accuracy` respectively.
+through :meth:`pyhts.accuracy_base` or :meth:`pyhts.accuracy` respectively.
 
 
-.. automethod:: pyhts.hierarchy.Hierarchy.accuracy_base
+.. automethod:: pyhts.Hierarchy.accuracy_base
 
-.. automethod:: pyhts.hierarchy.Hierarchy.accuracy
+.. automethod:: pyhts.Hierarchy.accuracy
 
 
-Assuming :code:`ht` is a defined hierarchy, :code:`model` is a fitted :class:`~pyhts.HFModel.HFModel`, :code:`test`
+Assuming :code:`ht` is a defined hierarchy, :code:`model` is a fitted :class:`~pyhts.HFModel`, :code:`test`
 is real observations in the forecasting horizon. :code:`train` is the history bottom time series.
 
 
@@ -25,14 +25,14 @@ is real observations in the forecasting horizon. :code:`train` is the history bo
 
 Supported forecasting measurements:
 
-.. autofunction:: pyhts.accuracy.mase
+.. autofunction:: pyhts.mase
 
-.. autofunction:: pyhts.accuracy.rmse
+.. autofunction:: pyhts.rmse
 
-.. autofunction:: pyhts.accuracy.mse
+.. autofunction:: pyhts.mse
 
-.. autofunction:: pyhts.accuracy.mape
+.. autofunction:: pyhts.mape
 
-.. autofunction:: pyhts.accuracy.mae
+.. autofunction:: pyhts.mae
 
-.. autofunction:: pyhts.accuracy.smape
+.. autofunction:: pyhts.smape

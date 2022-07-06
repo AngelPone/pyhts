@@ -1,70 +1,35 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>Define Hierarchy &mdash; pyhts  documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Hierarchical Forecasting Model" href="hfmodel.html" />
     <link rel="prev" title="Quick Start" href="Tutorials.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html" class="icon icon-home"> pyhts
-          
-
-          
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -72,19 +37,8 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">QuickStart</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">QuickStart</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="Tutorials.html">Quick Start</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Define Hierarchy</a></li>
@@ -92,117 +46,77 @@
 <li class="toctree-l1"><a class="reference internal" href="evaluation.html">Model Evaluation</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">pyhts</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>Define Hierarchy</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="define-hierarchy">
-<h1>Define Hierarchy<a class="headerlink" href="#define-hierarchy" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="define-hierarchy">
+<h1>Define Hierarchy<a class="headerlink" href="#define-hierarchy" title="Permalink to this heading"></a></h1>
 <ul class="simple">
-<li><p><a class="reference internal" href="#pyhts.hierarchy.Hierarchy.from_node_list" title="pyhts.hierarchy.Hierarchy.from_node_list"><code class="xref py py-class docutils literal notranslate"><span class="pre">from_node_list()</span></code></a> constructs hierarchy from list of children node number lists.</p></li>
-<li><p><a class="reference internal" href="#pyhts.hierarchy.Hierarchy.from_names" title="pyhts.hierarchy.Hierarchy.from_names"><code class="xref py py-class docutils literal notranslate"><span class="pre">from_names()</span></code></a> constructs hierarchy from names of bottom series.</p></li>
-<li><p><a class="reference internal" href="#pyhts.hierarchy.Hierarchy.from_long" title="pyhts.hierarchy.Hierarchy.from_long"><code class="xref py py-class docutils literal notranslate"><span class="pre">from_long()</span></code></a> constructs hierarchy from long data table.</p></li>
-<li><p><a class="reference internal" href="#pyhts.hierarchy.Hierarchy.from_balance_group" title="pyhts.hierarchy.Hierarchy.from_balance_group"><code class="xref py py-class docutils literal notranslate"><span class="pre">from_balance_group()</span></code></a> construct balance group time series that have multiple group types and all groups of each group type contains</p></li>
+<li><p><a class="reference internal" href="#pyhts.Hierarchy.from_node_list" title="pyhts.Hierarchy.from_node_list"><code class="xref py py-class docutils literal notranslate"><span class="pre">from_node_list()</span></code></a> constructs hierarchy from list of children node number lists.</p></li>
+<li><p><a class="reference internal" href="#pyhts.Hierarchy.from_names" title="pyhts.Hierarchy.from_names"><code class="xref py py-class docutils literal notranslate"><span class="pre">from_names()</span></code></a> constructs hierarchy from names of bottom series.</p></li>
+<li><p><a class="reference internal" href="#pyhts.Hierarchy.from_long" title="pyhts.Hierarchy.from_long"><code class="xref py py-class docutils literal notranslate"><span class="pre">from_long()</span></code></a> constructs hierarchy from long data table.</p></li>
+<li><p><a class="reference internal" href="#pyhts.Hierarchy.from_balance_group" title="pyhts.Hierarchy.from_balance_group"><code class="xref py py-class docutils literal notranslate"><span class="pre">from_balance_group()</span></code></a> construct balance group time series that have multiple group types and all groups of each group type contains</p></li>
 </ul>
 <dl class="py class">
-<dt id="pyhts.hierarchy.Hierarchy">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pyhts.hierarchy.</span></code><code class="sig-name descname"><span class="pre">Hierarchy</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s_mat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.hierarchy.Hierarchy" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyhts.Hierarchy">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyhts.</span></span><span class="sig-name descname"><span class="pre">Hierarchy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s_mat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.Hierarchy" title="Permalink to this definition"></a></dt>
 <dd><p>Class for a hierarchy structure.</p>
 <p><strong>Attributes</strong></p>
 <blockquote>
 <div><dl class="py attribute">
-<dt id="pyhts.hierarchy.Hierarchy.s_mat">
-<code class="sig-name descname"><span class="pre">s_mat</span></code><a class="headerlink" href="#pyhts.hierarchy.Hierarchy.s_mat" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyhts.Hierarchy.s_mat">
+<span class="sig-name descname"><span class="pre">s_mat</span></span><a class="headerlink" href="#pyhts.Hierarchy.s_mat" title="Permalink to this definition"></a></dt>
 <dd><p>summing matrix.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="pyhts.hierarchy.Hierarchy.period">
-<code class="sig-name descname"><span class="pre">period</span></code><a class="headerlink" href="#pyhts.hierarchy.Hierarchy.period" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyhts.Hierarchy.period">
+<span class="sig-name descname"><span class="pre">period</span></span><a class="headerlink" href="#pyhts.Hierarchy.period" title="Permalink to this definition"></a></dt>
 <dd><p>frequency of time series.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="pyhts.hierarchy.Hierarchy.node_name">
-<code class="sig-name descname"><span class="pre">node_name</span></code><a class="headerlink" href="#pyhts.hierarchy.Hierarchy.node_name" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyhts.Hierarchy.node_name">
+<span class="sig-name descname"><span class="pre">node_name</span></span><a class="headerlink" href="#pyhts.Hierarchy.node_name" title="Permalink to this definition"></a></dt>
 <dd><p>name of each node.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="pyhts.hierarchy.Hierarchy.level_n">
-<code class="sig-name descname"><span class="pre">level_n</span></code><a class="headerlink" href="#pyhts.hierarchy.Hierarchy.level_n" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyhts.Hierarchy.level_n">
+<span class="sig-name descname"><span class="pre">level_n</span></span><a class="headerlink" href="#pyhts.Hierarchy.level_n" title="Permalink to this definition"></a></dt>
 <dd><p>number of levels.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="pyhts.hierarchy.Hierarchy.node_level">
-<code class="sig-name descname"><span class="pre">node_level</span></code><a class="headerlink" href="#pyhts.hierarchy.Hierarchy.node_level" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyhts.Hierarchy.node_level">
+<span class="sig-name descname"><span class="pre">node_level</span></span><a class="headerlink" href="#pyhts.Hierarchy.node_level" title="Permalink to this definition"></a></dt>
 <dd><p>level of each node.</p>
 </dd></dl>
 
 </div></blockquote>
 <dl class="py method">
-<dt id="pyhts.hierarchy.Hierarchy.from_node_list">
-<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_node_list</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.hierarchy.Hierarchy.from_node_list" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyhts.Hierarchy.from_node_list">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_node_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.Hierarchy.from_node_list" title="Permalink to this definition"></a></dt>
 <dd><p>Construct a hierarchy from a list of lists, in which each sublist contains the number of children nodes of all nodes in a
 hierarchical level. For example, the first sublist contains the number of children nodes of all nodes in
 level 0, i.e., the root node (sum of all the bottom level time series).</p>
@@ -231,7 +145,7 @@ series in total.</p>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="#pyhts.hierarchy.Hierarchy" title="pyhts.hierarchy.Hierarchy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hierarchy</span></code></a></p>
+<dd class="field-even"><p><a class="reference internal" href="#pyhts.Hierarchy" title="pyhts._hierarchy.Hierarchy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hierarchy</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p></p>
@@ -240,8 +154,8 @@ series in total.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pyhts.hierarchy.Hierarchy.from_names">
-<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_names</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.hierarchy.Hierarchy.from_names" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyhts.Hierarchy.from_names">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.Hierarchy.from_names" title="Permalink to this definition"></a></dt>
 <dd><p>Construct a hierarchy from column names of the bottom-level time series. The names of bottom series consist of
 several parts. Each part points to a specific level of the hierarchy, with a fixed length used to
 split and recognize the hierarchy.</p>
@@ -263,7 +177,7 @@ will add a <code class="code docutils literal notranslate"><span class="pre">Tot
 </pre></div>
 </div>
 <p>The example above define a hierarchy same as the hierarchy in example of
-<a class="reference internal" href="#pyhts.hierarchy.Hierarchy.from_node_list" title="pyhts.hierarchy.Hierarchy.from_node_list"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_node_list()</span></code></a>.</p>
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">from_node_list()</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -273,7 +187,7 @@ will add a <code class="code docutils literal notranslate"><span class="pre">Tot
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="#pyhts.hierarchy.Hierarchy" title="pyhts.hierarchy.Hierarchy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hierarchy</span></code></a></p>
+<dd class="field-even"><p><a class="reference internal" href="#pyhts.Hierarchy" title="pyhts._hierarchy.Hierarchy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hierarchy</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p></p>
@@ -282,8 +196,8 @@ will add a <code class="code docutils literal notranslate"><span class="pre">Tot
 </dd></dl>
 
 <dl class="py method">
-<dt id="pyhts.hierarchy.Hierarchy.from_balance_group">
-<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_balance_group</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.hierarchy.Hierarchy.from_balance_group" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyhts.Hierarchy.from_balance_group">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_balance_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.Hierarchy.from_balance_group" title="Permalink to this definition"></a></dt>
 <dd><p>Construct group hierarchical structure.</p>
 <p><strong>Examples</strong></p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyhts.hierarchy</span> <span class="kn">import</span> <span class="n">Hierarchy</span>
@@ -312,7 +226,7 @@ will add a <code class="code docutils literal notranslate"><span class="pre">Tot
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="#pyhts.hierarchy.Hierarchy" title="pyhts.hierarchy.Hierarchy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hierarchy</span></code></a></p>
+<dd class="field-even"><p><a class="reference internal" href="#pyhts.Hierarchy" title="pyhts._hierarchy.Hierarchy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hierarchy</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p></p>
@@ -321,8 +235,8 @@ will add a <code class="code docutils literal notranslate"><span class="pre">Tot
 </dd></dl>
 
 <dl class="py method">
-<dt id="pyhts.hierarchy.Hierarchy.from_long">
-<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_long</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.hierarchy.Hierarchy.from_long" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyhts.Hierarchy.from_long">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_long</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.Hierarchy.from_long" title="Permalink to this definition"></a></dt>
 <dd><p>Construct hierarchy from long data table that each row represents a bottom level time series. This method is
 suitable for complex hierarchical structure.</p>
 <p><strong>Examples</strong></p>
@@ -360,10 +274,12 @@ suitable for complex hierarchical structure.</p>
 <li><p><strong>df</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – DataFrame contains keys for determining hierarchical structural.</p></li>
 <li><p><strong>keys</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – column names that each column represents a level.</p></li>
 <li><p><strong>period</strong> – frequency of the time series, 1 means non-seasonality data, 12 means monthly data.</p></li>
+<li><p><strong>id_col</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – id of bottom-level time series.</p></li>
+<li><p><strong>excludes</strong> – levels excluded from the summing matrix.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="#pyhts.hierarchy.Hierarchy" title="pyhts.hierarchy.Hierarchy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hierarchy</span></code></a></p>
+<dd class="field-even"><p><a class="reference internal" href="#pyhts.Hierarchy" title="pyhts._hierarchy.Hierarchy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hierarchy</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p></p>
@@ -373,54 +289,37 @@ suitable for complex hierarchical structure.</p>
 
 </dd></dl>
 
-</div>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="hfmodel.html" class="btn btn-neutral float-right" title="Hierarchical Forecasting Model" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="Tutorials.html" class="btn btn-neutral float-left" title="Quick Start" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="hfmodel.html" class="btn btn-neutral float-right" title="Hierarchical Forecasting Model" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, Bohan Zhang.
-
-    </p>
+    <p>&#169; Copyright 2021, Bohan Zhang.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

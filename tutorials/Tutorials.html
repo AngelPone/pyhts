@@ -1,70 +1,35 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>Quick Start &mdash; pyhts  documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Define Hierarchy" href="hierarchy.html" />
     <link rel="prev" title="Welcome to pyhts’s documentation!" href="../index.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html" class="icon icon-home"> pyhts
-          
-
-          
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -72,19 +37,8 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">QuickStart</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">QuickStart</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Quick Start</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
@@ -100,73 +54,33 @@
 <li class="toctree-l1"><a class="reference internal" href="evaluation.html">Model Evaluation</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">pyhts</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>Quick Start</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="quick-start">
-<h1>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+             
+  <section id="quick-start">
+<h1>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this heading"></a></h1>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading"></a></h2>
 <p><code class="code docutils literal notranslate"><span class="pre">pyths</span></code> is a python package used for hierarchical forecasting, it implements multiple forecast reconciliation methods which are popular in forecasting literatures such as
 ols <a class="footnote-reference brackets" href="#ols" id="id1">1</a> 、wls <a class="footnote-reference brackets" href="#wls" id="id2">2</a> 、mint <a class="footnote-reference brackets" href="#mint" id="id3">3</a> et al.</p>
 <p><strong>features</strong>:</p>
@@ -179,17 +93,17 @@ ols <a class="footnote-reference brackets" href="#ols" id="id1">1</a> 、wls <a 
 <p>The steps of using this package are as follows:</p>
 <ol class="arabic simple">
 <li><p>Define a hierarchy structure according to your data.</p></li>
-<li><p>Define a <a class="reference internal" href="hfmodel.html#pyhts.HFModel.HFModel" title="pyhts.HFModel.HFModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">HFModel</span></code></a></p></li>
-<li><p>fit the <a class="reference internal" href="hfmodel.html#pyhts.HFModel.HFModel" title="pyhts.HFModel.HFModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">HFModel</span></code></a> using history time series</p></li>
+<li><p>Define a <a class="reference internal" href="hfmodel.html#pyhts.HFModel" title="pyhts.HFModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">HFModel</span></code></a></p></li>
+<li><p>fit the <a class="reference internal" href="hfmodel.html#pyhts.HFModel" title="pyhts.HFModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">HFModel</span></code></a> using history time series</p></li>
 <li><p>generate base forecasts and reconcile the forecasts to obtain coherent point forecasts.</p></li>
 </ol>
-</div>
-<div class="section" id="define-the-hierarchy">
-<h2>Define the Hierarchy<a class="headerlink" href="#define-the-hierarchy" title="Permalink to this headline">¶</a></h2>
-<p>You can use classmethods of <a class="reference internal" href="hierarchy.html#pyhts.hierarchy.Hierarchy" title="pyhts.hierarchy.Hierarchy"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyhts.hierarchy.Hierarchy</span></code></a> to define hierarchy structure. see details in <a class="reference internal" href="hierarchy.html"><span class="doc">Define Hierarchy</span></a></p>
-<p>As an example of the hierarchy shown in the figure below, let’s construct the hierarchy using <a class="reference internal" href="hierarchy.html#pyhts.hierarchy.Hierarchy.from_node_list" title="pyhts.hierarchy.Hierarchy.from_node_list"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyhts.hierarchy.Hierarchy.from_node_list()</span></code></a> and <a class="reference internal" href="hierarchy.html#pyhts.hierarchy.Hierarchy.from_names" title="pyhts.hierarchy.Hierarchy.from_names"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyhts.hierarchy.Hierarchy.from_names()</span></code></a>.</p>
+</section>
+<section id="define-the-hierarchy">
+<h2>Define the Hierarchy<a class="headerlink" href="#define-the-hierarchy" title="Permalink to this heading"></a></h2>
+<p>You can use classmethods of <a class="reference internal" href="hierarchy.html#pyhts.Hierarchy" title="pyhts.Hierarchy"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyhts.Hierarchy</span></code></a> to define hierarchy structure. see details in <a class="reference internal" href="hierarchy.html"><span class="doc">Define Hierarchy</span></a></p>
+<p>As an example of the hierarchy shown in the figure below, let’s construct the hierarchy using <code class="xref py py-class docutils literal notranslate"><span class="pre">pyhts.hierarchy.Hierarchy.from_node_list()</span></code> and <code class="xref py py-class docutils literal notranslate"><span class="pre">pyhts.hierarchy.Hierarchy.from_names()</span></code>.</p>
 <img alt="../_images/01_hierarchy.png" src="../_images/01_hierarchy.png" />
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyhts.hierarchy</span> <span class="kn">import</span> <span class="n">Hierarchy</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyhts</span> <span class="kn">import</span> <span class="n">Hierarchy</span>
 <span class="n">node_list</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]]</span>
 <span class="n">period</span> <span class="o">=</span> <span class="mi">12</span>
 <span class="n">hierarchy</span> <span class="o">=</span> <span class="n">Hierarchy</span><span class="o">.</span><span class="n">from_node_list</span><span class="p">(</span><span class="n">node_list</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="n">period</span><span class="p">)</span>
@@ -201,11 +115,11 @@ ols <a class="footnote-reference brackets" href="#ols" id="id1">1</a> 、wls <a 
 </pre></div>
 </div>
 <p>where period is frequency of time series, m=12 means monthly series.</p>
-</div>
-<div class="section" id="define-hfmodel">
-<h2>Define HFModel<a class="headerlink" href="#define-hfmodel" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="define-hfmodel">
+<h2>Define HFModel<a class="headerlink" href="#define-hfmodel" title="Permalink to this heading"></a></h2>
 <p>Let’s define a simple ols reconciliation model that use <code class="code docutils literal notranslate"><span class="pre">auto.arima</span></code> as the base forecasting model, see details in <a class="reference internal" href="hfmodel.html"><span class="doc">Hierarchical Forecasting Model</span></a> .</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyhts.HFModel</span> <span class="kn">import</span> <span class="n">HFModel</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyhts</span> <span class="kn">import</span> <span class="n">HFModel</span>
 <span class="n">ols_model</span> <span class="o">=</span> <span class="n">HFModel</span><span class="p">(</span><span class="n">hierarchy</span><span class="o">=</span><span class="n">hierarchy</span><span class="p">,</span> <span class="n">base_forecasters</span><span class="o">=</span><span class="s1">&#39;arima&#39;</span><span class="p">,</span> <span class="n">hf_method</span><span class="o">=</span><span class="s1">&#39;comb&#39;</span><span class="p">,</span> <span class="n">comb_method</span><span class="o">=</span><span class="s1">&#39;ols&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -216,10 +130,10 @@ ols <a class="footnote-reference brackets" href="#ols" id="id1">1</a> 、wls <a 
 <li><p><code class="code docutils literal notranslate"><span class="pre">hf_model</span></code> is the method used for hierarchical forecasting, <code class="code docutils literal notranslate"><span class="pre">comb</span></code> that means forecast reconciliation is supported for now. Classical methods such as Top-Down、Bottom-up and middle-out will be supported in the future.</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">comb_method</span></code> is the forecast reconciliation method. mint、wls、ols are supported. see details in <a class="reference internal" href="hfmodel.html"><span class="doc">Hierarchical Forecasting Model</span></a>.</p></li>
 </ul>
-</div>
-<div class="section" id="fit-model">
-<h2>fit model<a class="headerlink" href="#fit-model" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference internal" href="hfmodel.html#pyhts.HFModel.HFModel.fit" title="pyhts.HFModel.HFModel.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyhts.HFModel.HFModel.fit()</span></code></a> would fit base forecasting models for each time series and compute the reconciliation matrix.</p>
+</section>
+<section id="fit-model">
+<h2>fit model<a class="headerlink" href="#fit-model" title="Permalink to this heading"></a></h2>
+<p><a class="reference internal" href="hfmodel.html#pyhts.HFModel.fit" title="pyhts.HFModel.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyhts.HFModel.fit()</span></code></a> would fit base forecasting models for each time series and compute the reconciliation matrix.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">108</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
 <span class="n">train</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:</span><span class="o">-</span><span class="mi">12</span><span class="p">,</span> <span class="p">:]</span>
@@ -227,10 +141,10 @@ ols <a class="footnote-reference brackets" href="#ols" id="id1">1</a> 、wls <a 
 <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="forecast">
-<h2>forecast<a class="headerlink" href="#forecast" title="Permalink to this headline">¶</a></h2>
-<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyhts.HFModel.HFModel.forecast()</span></code> would generate base forecasts for each time series and reconcile base forecasts to get coherent forecasts.</p>
+</section>
+<section id="forecast">
+<h2>forecast<a class="headerlink" href="#forecast" title="Permalink to this heading"></a></h2>
+<p><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyhts.HFModel.forecast()</span></code> would generate base forecasts for each time series and reconcile base forecasts to get coherent forecasts.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">reconciled_forecasts</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">horizon</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">reconciled_forecasts</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 <span class="c1"># (12, 4)</span>
@@ -241,10 +155,10 @@ ols <a class="footnote-reference brackets" href="#ols" id="id1">1</a> 、wls <a 
 <span class="c1"># (12, 7)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="measurement">
-<h2>measurement<a class="headerlink" href="#measurement" title="Permalink to this headline">¶</a></h2>
-<p>You can evaluate forecasting accuracy of both base forecasts and reconciled forecasts, using <code class="xref py py-meth docutils literal notranslate"><span class="pre">accuray_base()</span></code> and <a class="reference internal" href="evaluation.html#pyhts.hierarchy.Hierarchy.accuracy" title="pyhts.hierarchy.Hierarchy.accuracy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">accuracy()</span></code></a> respectively.</p>
+</section>
+<section id="measurement">
+<h2>measurement<a class="headerlink" href="#measurement" title="Permalink to this heading"></a></h2>
+<p>You can evaluate forecasting accuracy of both base forecasts and reconciled forecasts, using <code class="xref py py-meth docutils literal notranslate"><span class="pre">accuray_base()</span></code> and <a class="reference internal" href="evaluation.html#pyhts.Hierarchy.accuracy" title="pyhts.Hierarchy.accuracy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">accuracy()</span></code></a> respectively.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">base_forecasts</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate_base_forecasts</span><span class="p">(</span><span class="n">horizon</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
 <span class="n">hierarchy</span><span class="o">.</span><span class="n">accuracy_base</span><span class="p">(</span><span class="n">test</span><span class="p">,</span> <span class="n">base_forecasts</span><span class="p">,</span> <span class="n">hist</span><span class="o">=</span><span class="n">train</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">measure</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;mase&#39;</span><span class="p">,</span> <span class="s1">&#39;mape&#39;</span><span class="p">])</span>
 <span class="n">hierarchy</span><span class="o">.</span><span class="n">accuracy</span><span class="p">(</span><span class="n">test</span><span class="p">,</span> <span class="n">reconciled_forecasts</span><span class="p">,</span> <span class="n">hist</span><span class="o">=</span><span class="n">train</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">measure</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;mase&#39;</span><span class="p">,</span> <span class="s1">&#39;mape&#39;</span><span class="p">])</span>
@@ -262,55 +176,38 @@ ols <a class="footnote-reference brackets" href="#ols" id="id1">1</a> 、wls <a 
 <dd><p>Wickramasuriya, G. Athanasopoulos, and R. J. Hyndman, “Optimal Forecast Reconciliation for Hierarchical and Grouped Time Series Through Trace Minimization,” Journal of the American Statistical Association, vol. 114, no. 526, pp. 804–819, Apr. 2019, doi: 10.1080/01621459.2018.1448825.</p>
 </dd>
 </dl>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="hierarchy.html" class="btn btn-neutral float-right" title="Define Hierarchy" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../index.html" class="btn btn-neutral float-left" title="Welcome to pyhts’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="hierarchy.html" class="btn btn-neutral float-right" title="Define Hierarchy" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, Bohan Zhang.
-
-    </p>
+    <p>&#169; Copyright 2021, Bohan Zhang.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

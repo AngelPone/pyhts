@@ -1,71 +1,36 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>Hierarchical Forecasting Model &mdash; pyhts  documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Model Evaluation" href="evaluation.html" />
     <link rel="prev" title="Define Hierarchy" href="hierarchy.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html" class="icon icon-home"> pyhts
-          
-
-          
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -73,19 +38,8 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">QuickStart</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">QuickStart</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="Tutorials.html">Quick Start</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hierarchy.html">Define Hierarchy</a></li>
@@ -106,145 +60,107 @@
 <li class="toctree-l1"><a class="reference internal" href="evaluation.html">Model Evaluation</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">pyhts</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>Hierarchical Forecasting Model</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="hierarchical-forecasting-model">
-<h1>Hierarchical Forecasting Model<a class="headerlink" href="#hierarchical-forecasting-model" title="Permalink to this headline">¶</a></h1>
-<p>Hierarchical Forecasting Model (HFModel) is defined by <a class="reference internal" href="#pyhts.HFModel.HFModel" title="pyhts.HFModel.HFModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyhts.HFModel.HFModel</span></code></a></p>
-<div class="section" id="hfmodel-api">
-<h2>HFModel API<a class="headerlink" href="#hfmodel-api" title="Permalink to this headline">¶</a></h2>
+             
+  <section id="hierarchical-forecasting-model">
+<h1>Hierarchical Forecasting Model<a class="headerlink" href="#hierarchical-forecasting-model" title="Permalink to this heading"></a></h1>
+<p>Hierarchical Forecasting Model (HFModel) is defined by <a class="reference internal" href="#pyhts.HFModel" title="pyhts.HFModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyhts.HFModel</span></code></a></p>
+<section id="hfmodel-api">
+<h2>HFModel API<a class="headerlink" href="#hfmodel-api" title="Permalink to this heading"></a></h2>
 <dl class="py class">
-<dt id="pyhts.HFModel.HFModel">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pyhts.HFModel.</span></code><code class="sig-name descname"><span class="pre">HFModel</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hierarchy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_forecasters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hf_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'comb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comb_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ols'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constrain_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.HFModel.HFModel" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyhts.HFModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyhts.</span></span><span class="sig-name descname"><span class="pre">HFModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hierarchy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_forecasters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hf_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'comb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comb_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ols'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constrain_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.HFModel" title="Permalink to this definition"></a></dt>
 <dd><p>Model for hierarchical forecasting.</p>
 <dl class="py method">
-<dt id="pyhts.HFModel.HFModel.__init__">
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hierarchy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_forecasters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hf_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'comb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comb_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ols'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constrain_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.HFModel.HFModel.__init__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyhts.HFModel.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hierarchy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_forecasters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hf_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'comb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comb_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ols'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constrain_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.HFModel.__init__" title="Permalink to this definition"></a></dt>
 <dd><p>Define a hierarchical forecasting model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>hierarchy</strong> (<a class="reference internal" href="hierarchy.html#pyhts.hierarchy.Hierarchy" title="pyhts.hierarchy.Hierarchy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hierarchy</span></code></a>) – hierarchical structure of the data.</p></li>
-<li><p><strong>base_forecasters</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">BaseForecaster</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – base forecasting method, custom forecasters or arima, ets, implemented by <code class="code docutils literal notranslate"><span class="pre">forecast</span></code> in R called by <code class="code docutils literal notranslate"><span class="pre">rpy2</span></code></p></li>
-<li><p><strong>hf_method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – method for hierarchical forecasting, <code class="code docutils literal notranslate"><span class="pre">comb</span></code> is only supported for now, which represents optimal combination method.</p></li>
-<li><p><strong>comb_method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – method for forecast reconciliation, ols, wls or mint.</p></li>
-<li><p><strong>weights</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – weighting matrix used in wls and mint, “structural” or custom symmetric matrix for wls. “shrinkage”, “sample”, “variance” for mint.</p></li>
-<li><p><strong>constrain_level</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – -1 means no constraints.</p></li>
+<li><p><strong>hierarchy</strong> (<a class="reference internal" href="hierarchy.html#pyhts.Hierarchy" title="pyhts._hierarchy.Hierarchy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hierarchy</span></code></a>) – hierarchical structure of the data.</p></li>
+<li><p><strong>base_forecasters</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">BaseForecaster</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – base forecasting method, custom forecasters or arima implemented by</p></li>
 </ul>
 </dd>
 </dl>
+<p><code class="code docutils literal notranslate"><span class="pre">statsforecast</span></code>.
+:type hf_method: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>
+:param hf_method: method for hierarchical forecasting, <code class="code docutils literal notranslate"><span class="pre">comb</span></code> is only supported for now, which represents
+optimal combination method.
+:type comb_method: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>
+:param comb_method: method for forecast reconciliation, ols, wls or mint.
+:type weights: <code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]
+:param weights: weighting matrix used in wls and mint, “structural” or custom symmetric matrix for wls,
+“shrinkage”, “sample”, “variance” for mint.
+:type constrain_level: <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>
+:param constrain_level: -1 means no constraints.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pyhts.HFModel.HFModel.fit">
-<code class="sig-name descname"><span class="pre">fit</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_reg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.HFModel.HFModel.fit" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyhts.HFModel.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_reg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.HFModel.fit" title="Permalink to this definition"></a></dt>
 <dd><p>Fit a base forecast model and calculate the reconciliation matrix used for reconciliation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ts</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – a DataFrame in which each column contains a bottom-level time series.</p></li>
-<li><p><strong>x_reg</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>]) – explantory variables with shape (n, T, k), where n is number of time series, T is history length, and k is dimension of explantory variables.</p></li>
+<li><p><strong>x_reg</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>]) – explanatory variables with shape (n, T, k), where n is number of time series, T is history length,</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="#pyhts.HFModel.HFModel" title="pyhts.HFModel.HFModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">HFModel</span></code></a></p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>fitted HFModel</p>
-</dd>
 </dl>
+<p>and k is dimension of explanatory variables.
+:param kwargs: parameters passed to <code class="code docutils literal notranslate"><span class="pre">base_forecasters</span></code>.
+:rtype: <a class="reference internal" href="#pyhts.HFModel" title="pyhts._HFModel.HFModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">HFModel</span></code></a>
+:return: fitted HFModel</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pyhts.HFModel.HFModel.predict">
-<code class="sig-name descname"><span class="pre">predict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">horizon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_reg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.HFModel.HFModel.predict" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyhts.HFModel.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">horizon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_reg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.HFModel.predict" title="Permalink to this definition"></a></dt>
 <dd><p>Generate horizon-step-ahead reconciled base forecasts of the bottom level.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>horizon</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – forecast horizon</p></li>
-<li><p><strong>x_reg</strong> – explantory variables with shape (n, h, k), where n is number of time series, h is forecast horizon, and k is dimension of explantory variables.</p></li>
-<li><p><strong>kwargs</strong> – other parameters passed to base forecasters.</p></li>
+<li><p><strong>x_reg</strong> – explanatory variables with shape (n, h, k), where n is number of time series, h is forecast</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code></p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>coherent forecasts of the bottom level.</p>
-</dd>
 </dl>
+<p>horizon, and k is dimension of explanatory variables.
+:param kwargs: other parameters passed to base forecasters.
+:rtype: <code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>
+:return: coherent forecasts of the bottom level.</p>
 </dd></dl>
 
 </dd></dl>
 
-</div>
-<div class="section" id="examples">
-<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this heading"></a></h2>
 <p>load Tourism dataset</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyhts.dataset</span> <span class="kn">import</span> <span class="n">load_tourism</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyhts.hierarchy</span> <span class="kn">import</span> <span class="n">Hierarchy</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyhts</span> <span class="kn">import</span> <span class="n">load_tourism</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyhts</span> <span class="kn">import</span> <span class="n">Hierarchy</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span> <span class="o">=</span> <span class="n">load_tourism</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">columns</span>
 <span class="go">Index([&#39;AAA&#39;, &#39;AAB&#39;, &#39;ABA&#39;, &#39;ABB&#39;, &#39;ACA&#39;, &#39;ADA&#39;, &#39;ADB&#39;, &#39;ADC&#39;, &#39;ADD&#39;, &#39;AEA&#39;,</span>
@@ -261,8 +177,8 @@
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ht</span> <span class="o">=</span> <span class="n">Hierarchy</span><span class="o">.</span><span class="n">from_names</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">period</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="section" id="define-hfmodel">
-<h3>Define HFModel<a class="headerlink" href="#define-hfmodel" title="Permalink to this headline">¶</a></h3>
+<section id="define-hfmodel">
+<h3>Define HFModel<a class="headerlink" href="#define-hfmodel" title="Permalink to this heading"></a></h3>
 <p>Then, define the hierarchical forecasting model.</p>
 <p><strong>ols</strong> proposed by Hyndman et al.(2011) <a class="footnote-reference brackets" href="#ols" id="id1">1</a></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">HFModel</span><span class="p">(</span><span class="n">ht</span><span class="p">,</span> <span class="n">base_forecasters</span> <span class="o">=</span> <span class="s2">&quot;arima&quot;</span><span class="p">,</span> <span class="n">hf_method</span><span class="o">=</span><span class="s2">&quot;comb&quot;</span><span class="p">,</span> <span class="n">comb_method</span><span class="o">=</span><span class="s2">&quot;ols&quot;</span><span class="p">)</span>
@@ -284,36 +200,49 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">HFModel</span><span class="p">(</span><span class="n">ht</span><span class="p">,</span> <span class="s2">&quot;arima&quot;</span><span class="p">,</span> <span class="s2">&quot;comb&quot;</span><span class="p">,</span> <span class="s2">&quot;mint&quot;</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="s2">&quot;shrinkage&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="section" id="customize-base-forecasters">
-<span id="base"></span><h4>customize base forecasters<a class="headerlink" href="#customize-base-forecasters" title="Permalink to this headline">¶</a></h4>
-<p>To generate base forecasts, you can either use <code class="code docutils literal notranslate"><span class="pre">arima</span></code> or <code class="code docutils literal notranslate"><span class="pre">ets</span></code>, which are implemented by
-<code class="code docutils literal notranslate"><span class="pre">forecast</span></code> in R called through <code class="code docutils literal notranslate"><span class="pre">rpy2</span></code>, or you can define your own base forecasters using whatever
+<section id="customize-base-forecasters">
+<span id="base"></span><h4>customize base forecasters<a class="headerlink" href="#customize-base-forecasters" title="Permalink to this heading"></a></h4>
+<p>To generate base forecasts, you can use <code class="code docutils literal notranslate"><span class="pre">arima</span></code>, which are implemented by
+<code class="code docutils literal notranslate"><span class="pre">statsforecast</span></code>, or you can define your own base forecasters using whatever
 forecasting methods you want, machine learning or deeplearning methods.</p>
 <ul class="simple">
-<li><p><code class="code docutils literal notranslate"><span class="pre">fit(ts,</span> <span class="pre">x_reg,</span> <span class="pre">**kwargs)</span></code> is needed for the base forecaster, which is used to fit base forecasting model and generate insample forecasts <code class="code docutils literal notranslate"><span class="pre">fitted</span></code>, which is necessary when <code class="code docutils literal notranslate"><span class="pre">comb_method</span></code> is <code class="code docutils literal notranslate"><span class="pre">mint</span></code>.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">fit(ts,</span> <span class="pre">xreg,</span> <span class="pre">**kwargs)</span></code> is needed for the base forecaster, which is used to fit base forecasting model and generate insample forecasts <code class="code docutils literal notranslate"><span class="pre">fitted</span></code>, which is necessary when <code class="code docutils literal notranslate"><span class="pre">comb_method</span></code> is <code class="code docutils literal notranslate"><span class="pre">mint</span></code>.</p></li>
 <li><p><code class="code docutils literal notranslate"><span class="pre">forecast(h,</span> <span class="pre">xreg,</span> <span class="pre">**kwargs)</span></code> is needed for the base forecaster, which is used to generate base forecasts.</p></li>
 </ul>
 <p>As an example, here is the implementation of <code class="xref py py-class docutils literal notranslate"><span class="pre">AutoArimaBaseForecaster</span></code></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">AutoArimaForecaster</span><span class="p">(</span><span class="n">BaseForecaster</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;auto.arima forecaster.</span>
+<span class="sd">&quot;&quot;&quot;autoarima forecaster, adapted from statsforecast.arima.auto_arima_f</span>
 
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">period</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">period</span> <span class="o">=</span> <span class="n">period</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">hist</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hist</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">xreg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;fit the AutoArimaForecaster</span>
+
+<span class="sd">    :param hist: observations</span>
+<span class="sd">    :param xreg: covariates of arima model</span>
+<span class="sd">    :param kwargs: other parameters passed to  `statsforecast.arima.auto_arima_f`</span>
+<span class="sd">    :return: self</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">hist</span> <span class="o">=</span> <span class="n">hist</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">auto_arima_f</span><span class="p">(</span><span class="n">hist</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">period</span><span class="p">,</span> <span class="n">xreg</span><span class="o">=</span><span class="n">xreg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">fitted</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">m</span> <span class="o">=</span> <span class="n">m</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">hist</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="k">def</span> <span class="nf">forecast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">h</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">xreg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;forecast</span>
 
-    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hist</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">hist</span> <span class="o">=</span> <span class="n">ts</span><span class="p">(</span><span class="n">FloatVector</span><span class="p">(</span><span class="n">hist</span><span class="p">),</span> <span class="n">frequency</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="p">)</span>
-        <span class="n">arima</span> <span class="o">=</span> <span class="n">forecast</span><span class="o">.</span><span class="n">auto_arima</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">arima</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hist</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fitted</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">rx2</span><span class="p">[</span><span class="s2">&quot;fitted&quot;</span><span class="p">]</span>
-        <span class="k">return</span> <span class="bp">self</span>
-
-    <span class="k">def</span> <span class="nf">forecast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">h</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">forecast</span><span class="o">.</span><span class="n">forecast</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="n">h</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">rx2</span><span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">])</span>
+<span class="sd">    :param h: forecast horizons</span>
+<span class="sd">    :param xreg: covariates</span>
+<span class="sd">    :param kwargs: other parameters passed to `statsforecast.arima.forecast_arima`</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">forecast_arima</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">xreg</span><span class="o">=</span><span class="n">xreg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>Assuming you have trained a global XGBoost model, you can wrap the xgboost model and pass it to
@@ -333,11 +262,11 @@ base_forecasters.</p>
 <span class="n">xgb_model</span> <span class="o">=</span> <span class="n">HFModel</span><span class="p">(</span><span class="n">ht</span><span class="p">,</span> <span class="n">base_forecasters</span><span class="o">=</span><span class="p">[</span><span class="n">XGBoostWrapper</span><span class="p">],</span> <span class="n">hf_method</span><span class="o">=</span><span class="s1">&#39;comb&#39;</span><span class="p">,</span> <span class="n">comb_method</span><span class="o">=</span><span class="s1">&#39;ols&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="fit-hfmodel">
-<h3>Fit HFModel<a class="headerlink" href="#fit-hfmodel" title="Permalink to this headline">¶</a></h3>
-<p><a class="reference internal" href="#pyhts.HFModel.HFModel.fit" title="pyhts.HFModel.HFModel.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a> will fit the base forecasters and reconcile the incoherent base forecasts to coherent forecasts.</p>
+</section>
+</section>
+<section id="fit-hfmodel">
+<h3>Fit HFModel<a class="headerlink" href="#fit-hfmodel" title="Permalink to this heading"></a></h3>
+<p><a class="reference internal" href="#pyhts.HFModel.fit" title="pyhts.HFModel.fit"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fit()</span></code></a> will fit the base forecasters and reconcile the incoherent base forecasts to coherent forecasts.</p>
 <p>Here is an example that fit a mint shrinkage model with <code class="code docutils literal notranslate"><span class="pre">AAA</span></code> type <code class="code docutils literal notranslate"><span class="pre">ets</span></code> base forecasters.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ols_model</span> <span class="o">=</span> <span class="n">HFModel</span><span class="p">(</span><span class="n">ht</span><span class="p">,</span> <span class="s2">&quot;ets&quot;</span><span class="p">,</span> <span class="s2">&quot;comb&quot;</span><span class="p">,</span> <span class="s2">&quot;mint&quot;</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="s2">&quot;shrinkage&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">ols_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train</span><span class="p">,</span> <span class="n">model</span> <span class="o">=</span><span class="s1">&#39;AAA&#39;</span><span class="p">)</span>
@@ -346,18 +275,18 @@ base_forecasters.</p>
 <p>the parameter <code class="code docutils literal notranslate"><span class="pre">model</span></code> will be passed to <code class="code docutils literal notranslate"><span class="pre">ETSBaseForecaster().fit()</span></code> then be passed to
 <code class="code docutils literal notranslate"><span class="pre">ets()</span></code> function in <code class="code docutils literal notranslate"><span class="pre">forecast</span></code> package.</p>
 <p>Also, you can specify the parameter <code class="code docutils literal notranslate"><span class="pre">model</span></code> in your customize BaseForecasters, as mentioned above.</p>
-</div>
-<div class="section" id="forecast-hfmodel">
-<h3>Forecast HFModel<a class="headerlink" href="#forecast-hfmodel" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="forecast-hfmodel">
+<h3>Forecast HFModel<a class="headerlink" href="#forecast-hfmodel" title="Permalink to this heading"></a></h3>
 <p><code class="xref py py-meth docutils literal notranslate"><span class="pre">forecast()</span></code> will generate h-step-ahead base forecasts and reconcile
 the base forecasts to coherent forecasts in bottom level.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">forecasts</span> <span class="o">=</span> <span class="n">ols_model</span><span class="o">.</span><span class="n">forecast</span><span class="p">(</span><span class="n">horizon</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">all_level_forecasts</span> <span class="o">=</span> <span class="n">ht</span><span class="o">.</span><span class="n">aggregate_ts</span><span class="p">(</span><span class="n">forecasts</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="references">
-<h3>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Permalink to this heading"></a></h3>
 <dl class="footnote brackets">
 <dt class="label" id="ols"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
 <dd><p>Hyndman, R. A. Ahmed, G. Athanasopoulos, and H. L. Shang, “Optimal combination forecasts for hierarchical time series,” Computational Statistics &amp; Data Analysis, vol. 55, no. 9, pp. 2579–2589, Sep. 2011, doi: 10.1016/j.csda.2011.03.006.</p>
@@ -366,56 +295,39 @@ the base forecasts to coherent forecasts in bottom level.</p>
 <dd><p>Wickramasuriya, G. Athanasopoulos, and R. J. Hyndman, “Optimal Forecast Reconciliation for Hierarchical and Grouped Time Series Through Trace Minimization,” Journal of the American Statistical Association, vol. 114, no. 526, pp. 804–819, Apr. 2019, doi: 10.1080/01621459.2018.1448825.</p>
 </dd>
 </dl>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="evaluation.html" class="btn btn-neutral float-right" title="Model Evaluation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="hierarchy.html" class="btn btn-neutral float-left" title="Define Hierarchy" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="evaluation.html" class="btn btn-neutral float-right" title="Model Evaluation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, Bohan Zhang.
-
-    </p>
+    <p>&#169; Copyright 2021, Bohan Zhang.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>
