@@ -13,12 +13,16 @@ class BaseForecaster:
     """
 
     def __init__(self):
-        self.fitted = None
+        self.fitted = False
 
     def fit(self, hist, **kwargs):
         raise NotImplementedError
 
     def forecast(self, h: int, **kwargs) -> np.ndarray:
+        raise NotImplementedError
+
+    @property
+    def residuals(self) -> np.ndarray:
         raise NotImplementedError
 
 
@@ -32,6 +36,7 @@ class AutoArimaForecaster(BaseForecaster):
         self.period = period
         self.hist = None
         self.model = None
+        self.fitted = False
 
     def fit(self, hist: np.ndarray, xreg=None, **kwargs):
         """fit the AutoArimaForecaster
@@ -46,6 +51,12 @@ class AutoArimaForecaster(BaseForecaster):
         self.fitted = True
         return self
 
+    @property
+    def residuals(self) -> np.ndarray:
+        if self.fitted:
+            return self.model['residuals']
+        raise ValueError('Forecaster has not been fitted.')
+
     def forecast(self, h: int, xreg=None, **kwargs) -> np.ndarray:
         """forecast
 
@@ -55,3 +66,5 @@ class AutoArimaForecaster(BaseForecaster):
         :return:
         """
         return forecast_arima(self.model, h, xreg=xreg, **kwargs)['mean']
+
+

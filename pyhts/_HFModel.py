@@ -23,8 +23,8 @@ class HFModel:
         """Define a hierarchical forecasting model.
 
         :param hierarchy: hierarchical structure of the data.
-        :param base_forecasters: base forecasting method, custom forecasters or arima implemented by
-        :code:`statsforecast`.
+        :param base_forecasters: base forecasting method, list of custom forecaster objects or str :code:`arima`
+        implemented by :code:`statsforecast`.
         :param hf_method: method for hierarchical forecasting, :code:`comb` is only supported for now, which represents
         optimal combination method.
         :param comb_method: method for forecast reconciliation, ols, wls or mint.
@@ -66,18 +66,10 @@ class HFModel:
             else:
                 raise ValueError("This base forecasting method is not supported.")
         elif isinstance(self.base_forecasters, List):
-            if len(self.base_forecasters) == 1:
-                self.base_forecasters = [
-                    self.base_forecasters[0]().fit(ts[i, :], xreg=None if xreg is None else xreg[i])
-                    for i in range(n)]
-            if len(self.base_forecasters) == self.hierarchy.level_n:
-                self.base_forecasters = [self.base_forecasters[self.hierarchy.node_level[i]]().fit(
-                    ts[i, :],
-                    xreg=None if xreg is None else xreg[i]) for i in range(n)]
-            if len(self.base_forecasters) == n:
-                self.base_forecasters = [
-                    self.base_forecasters[i]().fit(ts[i, :], xreg=None if xreg is None else xreg[i])
-                    for i in range(n)]
+            self.base_forecasters = [
+                self.base_forecasters[i].fit(ts[i, :], xreg=None if xreg is None else xreg[i])
+                if not self.base_forecasters[i].fitted else self.base_forecasters[i]
+                for i in range(n)]
         else:
             raise ValueError("This base forecasting method is not supported.")
 
@@ -95,9 +87,8 @@ class HFModel:
                 else:
                     raise ValueError("This weighting method for wls is not supported.")
             elif self.comb_method == "mint":
-                sample_forecast = np.stack([model.fitted for model in self.base_forecasters], axis=0)
-                sample_error = ts - sample_forecast
-                self.G = fr.wls(self.hierarchy, sample_error, method="mint", weighting=self.weights,
+                residuals = np.stack([forecaster.residuals for forecaster in self.base_forecasters], axis=0)
+                self.G = fr.wls(self.hierarchy, residuals, method="mint", weighting=self.weights,
                                 constraint_level=self.constrain_level)
             else:
                 raise ValueError("This combination method is not supported.")
