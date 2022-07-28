@@ -41,11 +41,11 @@ class HFModel:
         self.constrain_level = constrain_level
         self.G = None
 
-    def fit(self, ts: pd.DataFrame, x_reg: Optional[np.array] = None, **kwargs) -> "HFModel":
+    def fit(self, ts: pd.DataFrame, xreg: Optional[np.array] = None, **kwargs) -> "HFModel":
         """Fit a base forecast model and calculate the reconciliation matrix used for reconciliation.
 
         :param ts: a DataFrame in which each column contains a bottom-level time series.
-        :param x_reg: explanatory variables with shape (n, T, k), where n is number of time series, T is history length,
+        :param xreg: explanatory variables with shape (n, T, k), where n is number of time series, T is history length,
         and k is dimension of explanatory variables.
         :param kwargs: parameters passed to :code:`base_forecasters`.
         :return: fitted HFModel
@@ -60,7 +60,7 @@ class HFModel:
         if isinstance(self.base_forecasters, str):
             if self.base_forecasters == 'arima':
                 self.base_forecasters = [
-                    AutoArimaForecaster(self.period).fit(ts[i, :], x_reg=None if x_reg is None else x_reg[i],
+                    AutoArimaForecaster(self.period).fit(ts[i, :], xreg=None if xreg is None else xreg[i],
                                                          **kwargs)
                     for i in range(n)]
             else:
@@ -68,15 +68,15 @@ class HFModel:
         elif isinstance(self.base_forecasters, List):
             if len(self.base_forecasters) == 1:
                 self.base_forecasters = [
-                    self.base_forecasters[0]().fit(ts[i, :], x_reg=None if x_reg is None else x_reg[i])
+                    self.base_forecasters[0]().fit(ts[i, :], xreg=None if xreg is None else xreg[i])
                     for i in range(n)]
             if len(self.base_forecasters) == self.hierarchy.level_n:
                 self.base_forecasters = [self.base_forecasters[self.hierarchy.node_level[i]]().fit(
                     ts[i, :],
-                    x_reg=None if x_reg is None else x_reg[i]) for i in range(n)]
+                    xreg=None if xreg is None else xreg[i]) for i in range(n)]
             if len(self.base_forecasters) == n:
                 self.base_forecasters = [
-                    self.base_forecasters[i]().fit(ts[i, :], x_reg=None if x_reg is None else x_reg[i])
+                    self.base_forecasters[i]().fit(ts[i, :], xreg=None if xreg is None else xreg[i])
                     for i in range(n)]
         else:
             raise ValueError("This base forecasting method is not supported.")
@@ -105,19 +105,19 @@ class HFModel:
             raise NotImplementedError("This method is not implemented.")
         return self
 
-    def generate_base_forecast(self, horizon: int = 1, x_reg=None, **kwargs):
-        forecasts = np.stack([self.base_forecasters[i].forecast(h=horizon, x_reg=None if x_reg is None else x_reg[i],
+    def generate_base_forecast(self, horizon: int = 1, xreg=None, **kwargs):
+        forecasts = np.stack([self.base_forecasters[i].forecast(h=horizon, xreg=None if xreg is None else xreg[i],
                                                                 **kwargs) for i in range(len(self.base_forecasters))])
         return forecasts.T
 
-    def predict(self, horizon: int = 1, x_reg=None, **kwargs) -> np.array:
+    def predict(self, horizon: int = 1, xreg=None, **kwargs) -> np.array:
         """Generate horizon-step-ahead reconciled base forecasts of the bottom level.
 
         :param horizon: forecast horizon
-        :param x_reg: explanatory variables with shape (n, h, k), where n is number of time series, h is forecast
+        :param xreg: explanatory variables with shape (n, h, k), where n is number of time series, h is forecast
         horizon, and k is dimension of explanatory variables.
         :param kwargs: other parameters passed to base forecasters.
         :return: coherent forecasts of the bottom level.
         """
-        forecasts = self.generate_base_forecast(horizon=horizon, x_reg=x_reg, **kwargs)
+        forecasts = self.generate_base_forecast(horizon=horizon, xreg=xreg, **kwargs)
         return self.G.dot(forecasts.T).T

@@ -6,6 +6,7 @@ from pyhts import _accuracy
 
 __all__ = ["Hierarchy"]
 
+
 class Hierarchy:
     """Class for a hierarchy structure.
 
@@ -45,7 +46,7 @@ class Hierarchy:
 
         **Examples**
 
-            >>> from pyhts.hierarchy import Hierarchy
+            >>> from pyhts import Hierarchy
             >>> nodes = [[2], [2, 2]]
             >>> hierarchy = Hierarchy.from_node_list(nodes, 12)
             >>> hierarchy.s_mat
@@ -92,7 +93,7 @@ class Hierarchy:
                 c_x = n_x
                 node_level.insert(0, level_idx)
             bts_count = new_bts_count
-        return cls(s, np.array(node_level), np.array(range(m)), period, level_name=np.array(range(level_n)).astype('string'))
+        return cls(s, np.array(node_level), np.array(range(m)), period, level_name=np.array(range(level_n)).astype('str'))
 
     @classmethod
     def from_names(cls, names: List[str], chars: List[int], period: int = 1) -> "Hierarchy":
@@ -101,12 +102,12 @@ class Hierarchy:
         split and recognize the hierarchy.
 
         For example :code:`AA`. The first :code:`A` represents :code:`A` series in level 1,
-        the second :code:`A` represents the :code:`A` series in level 2, and its parent node is :code:`A` series in level 1. This method
-        will add a :code:`Total` level.
+        the second :code:`A` represents the :code:`A` series in level 2, and its parent node is :code:`A` series in
+        level 1. This method will add a :code:`Total` level.
 
         **Examples**
 
-            >>> from pyhts.hierarchy import Hierarchy
+            >>> from pyhts import Hierarchy
             >>> names = ['AA', 'AB', 'BA', 'BB']
             >>> hierarchy = Hierarchy.from_names(names, chars=[1, 1], period=12)
             >>> hierarchy.s_mat
@@ -143,7 +144,7 @@ class Hierarchy:
         s_mat = pd.get_dummies(df).values.T
         names += list(df['bottom'])
         node_level += [index+2] * len(df['bottom'])
-        return cls(s_mat, np.array(node_level), names, period, level_name=np.array(range(len(chars)+1)).astype('string'))
+        return cls(s_mat, np.array(node_level), names, period, level_name=np.array(range(len(chars)+1)).astype('str'))
 
     @classmethod
     def from_balance_group(cls, group_list: List[List[str]], period=1) -> "Hierarchy":
@@ -151,7 +152,7 @@ class Hierarchy:
 
         **Examples**
 
-            >>> from pyhts.hierarchy import Hierarchy
+            >>> from pyhts import Hierarchy
             >>> groups = [['A', 'B'], ['Item1', 'Item2']]
             >>> hierarchy = Hierarchy.from_balance_group(groups)
             >>> hierarchy.node_name
@@ -190,7 +191,7 @@ class Hierarchy:
         node_level += [i+2] * df.shape[0]
         names += list(df['bottom'])
         return cls(s_mat, np.array(node_level), names, period,
-                   level_name=np.array(range(len(group_list)+2)).astype('string'))
+                   level_name=np.array(range(len(group_list)+2)).astype('str'))
 
     @classmethod
     def from_long(cls, df: pd.DataFrame, keys: List[str], id_col: str = None, period=1) -> "Hierarchy":
@@ -199,7 +200,7 @@ class Hierarchy:
 
         **Examples**
 
-            >>> from pyhts.hierarchy import Hierarchy
+            >>> from pyhts import Hierarchy
             >>> df = pd.DataFrame({"City": ["A", "A", "B", "B"], "Store": ["Store1", "Store2", "Store3", "Store4"]})
             >>> hierarchy = Hierarchy.from_long(df, ["City", "Store"])
             >>> hierarchy.node_name
