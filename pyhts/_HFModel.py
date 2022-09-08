@@ -23,12 +23,12 @@ class HFModel:
         """Define a hierarchical forecasting model.
 
         :param hierarchy: hierarchical structure of the data.
-        :param base_forecasters: base forecasting method, list of custom forecaster objects or str :code:`arima`
+        :param base_forecasters: base forecasting method, list of custom forecaster objects or str :code:`arima` \
         implemented by :code:`statsforecast`.
-        :param hf_method: method for hierarchical forecasting, :code:`comb` is only supported for now, which represents
+        :param hf_method: method for hierarchical forecasting, :code:`comb` is only supported for now, which represents\
         optimal combination method.
         :param comb_method: method for forecast reconciliation, ols, wls or mint.
-        :param weights: weighting matrix used in wls and mint, "structural" or custom symmetric matrix for wls,
+        :param weights: weighting matrix used in wls and mint, "structural" or custom symmetric matrix for wls, \
         "shrinkage", "sample", "variance" for mint.
         :param constrain_level: -1 means no constraints.
         """
@@ -45,7 +45,7 @@ class HFModel:
         """Fit a base forecast model and calculate the reconciliation matrix used for reconciliation.
 
         :param ts: a DataFrame in which each column contains a bottom-level time series.
-        :param xreg: explanatory variables with shape (n, T, k), where n is number of time series, T is history length,
+        :param xreg: explanatory variables with shape (n, T, k), where n is number of time series, T is history length,\
         and k is dimension of explanatory variables.
         :param kwargs: parameters passed to :code:`base_forecasters`.
         :return: fitted HFModel
@@ -105,7 +105,7 @@ class HFModel:
         """Generate horizon-step-ahead reconciled base forecasts of the bottom level.
 
         :param horizon: forecast horizon
-        :param xreg: explanatory variables with shape (n, h, k), where n is number of time series, h is forecast
+        :param xreg: explanatory variables with shape (n, h, k), where n is number of time series, h is forecast\
         horizon, and k is dimension of explanatory variables.
         :param kwargs: other parameters passed to base forecasters.
         :return: coherent forecasts of the bottom level.

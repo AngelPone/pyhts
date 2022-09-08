@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from copy import copy
-from typing import Union, List
+from typing import Union, List, Tuple
 from pyhts import _accuracy
 
 __all__ = ["Hierarchy"]
@@ -20,192 +20,37 @@ class Hierarchy:
             frequency of time series.
         .. py:attribute:: node_name
 
-            name of each node.
-        .. py:attribute:: level_n
-
-            number of levels.
+            name of each node in the pattern: level-name_attribute-anme
         .. py:attribute:: node_level
 
-            level of each node.
+            level name of each node.
     """
 
     def __init__(self, s_mat, node_level, names, period, level_name=None):
         self.s_mat = s_mat.astype('int8')
         """ Summing matrix. """
         self.node_level = np.array(node_level)
-        self.level_n = max(node_level) + 1
         self.level_name = np.array(level_name)
         self.node_name = np.array(names)
         self.period = period
 
     @classmethod
-    def from_node_list(cls, nodes, period: int = 1) -> "Hierarchy":
-        """Construct a hierarchy from a list of lists, in which each sublist contains the number of children nodes of all nodes in a
-        hierarchical level. For example, the first sublist contains the number of children nodes of all nodes in
-        level 0, i.e., the root node (sum of all the bottom level time series).
-
-        **Examples**
-
-            >>> from pyhts import Hierarchy
-            >>> nodes = [[2], [2, 2]]
-            >>> hierarchy = Hierarchy.from_node_list(nodes, 12)
-            >>> hierarchy.s_mat
-            array([[1, 1, 1, 1],
-                   [1, 1, 0, 0],
-                   [0, 0, 1, 1],
-                   [1, 0, 0, 0],
-                   [0, 1, 0, 0],
-                   [0, 0, 1, 0],
-                   [0, 0, 0, 1]], dtype=int8)
-
-        :code:`[[2], [2, 2]]` defines a hierarchy in which the root node has two sub-nodes. The first
-        sub-node contains two sub-nodes and the second sub-node also contains two sub-nodes. There are 4 bottom time
-        series in total.
-
-        :param nodes: a list. Each element represents the number(s) of children nodes for each node in the corresponding level.
-        :param period: frequency of the time series. For example, 1 means non-seasonality data, and 12 means monthly data.
-        :return:
-        """
-        nodes = copy(nodes)
-        n = sum(nodes[-1])
-        m = sum(map(sum, nodes)) + 1
-        level_n = len(nodes) + 1
-        node_level = n * [len(nodes)]
-        nodes.append([1] * n)
-        s = np.zeros([m, n])
-        c_row_start = m - n
-        s[c_row_start:, :] = np.identity(n)
-        bts_count = nodes[-1]
-        for level_idx in range(len(nodes) - 2, -1, -1):
-            c_cum = 0
-            c_x = 0
-            level = nodes[level_idx]
-            c_row_start = c_row_start - len(level)
-            new_bts_count = []
-            c_row = c_row_start
-            for node_idx in range(len(nodes[level_idx])):
-                n_x = c_x + level[node_idx]
-                new_bts_count.append(sum(bts_count[c_x:n_x]))
-                n_cum = c_cum + new_bts_count[-1]
-                s[c_row, c_cum:n_cum] = 1
-                c_cum = n_cum
-                c_row += 1
-                c_x = n_x
-                node_level.insert(0, level_idx)
-            bts_count = new_bts_count
-        return cls(s, np.array(node_level), np.array(range(m)), period, level_name=np.array(range(level_n)).astype('str'))
-
-    @classmethod
-    def from_names(cls, names: List[str], chars: List[int], period: int = 1) -> "Hierarchy":
-        """Construct a hierarchy from column names of the bottom-level time series. The names of bottom series consist of
-        several parts. Each part points to a specific level of the hierarchy, with a fixed length used to
-        split and recognize the hierarchy.
-
-        For example :code:`AA`. The first :code:`A` represents :code:`A` series in level 1,
-        the second :code:`A` represents the :code:`A` series in level 2, and its parent node is :code:`A` series in
-        level 1. This method will add a :code:`Total` level.
-
-        **Examples**
-
-            >>> from pyhts import Hierarchy
-            >>> names = ['AA', 'AB', 'BA', 'BB']
-            >>> hierarchy = Hierarchy.from_names(names, chars=[1, 1], period=12)
-            >>> hierarchy.s_mat
-            array([[1, 1, 1, 1],
-                   [1, 1, 0, 0],
-                   [0, 0, 1, 1],
-                   [1, 0, 0, 0],
-                   [0, 1, 0, 0],
-                   [0, 0, 1, 0],
-                   [0, 0, 0, 1]], dtype=int8)
-
-        The example above define a hierarchy same as the hierarchy in example of
-        :meth:`~pyhts.hierarchy.Hierarchy.from_node_list()`.
-
-        :param names: columns of all **bottom** level time series.
-        :param chars: character length of each part.
-        :param period: frequency of the time series, 1 means non-seasonality data, 12 means monthly data.
-        :return:
-        """
-        df = pd.DataFrame()
-        df['bottom'] = names
-        df['top'] = 'Total'
-        total_index = 0
-        names = ['Total']
-        node_level = [0]
-        index = 0
-        for index in range(len(chars)-1):
-            df[index+1] = df['bottom'].apply(lambda x: x[:total_index+chars[index]])
-            total_index += chars[index]
-            names += list(df[index+1].unique())
-            node_level += [index+1] * len(df[index+1].unique())
-        cols = ['top', *[i+1 for i in range(len(chars)-1)], 'bottom']
-        df = df[cols]
-        s_mat = pd.get_dummies(df).values.T
-        names += list(df['bottom'])
-        node_level += [index+2] * len(df['bottom'])
-        return cls(s_mat, np.array(node_level), names, period, level_name=np.array(range(len(chars)+1)).astype('str'))
-
-    @classmethod
-    def from_balance_group(cls, group_list: List[List[str]], period=1) -> "Hierarchy":
-        """Construct group hierarchical structure.
-
-        **Examples**
-
-            >>> from pyhts import Hierarchy
-            >>> groups = [['A', 'B'], ['Item1', 'Item2']]
-            >>> hierarchy = Hierarchy.from_balance_group(groups)
-            >>> hierarchy.node_name
-            array(['Total', 'A', 'B', 'Item1', 'Item2', 'A_Item1', 'A_Item2',
-                   'B_Item1', 'B_Item2'], dtype='<U7')
-            >>> hierarchy.s_mat
-            array([[1, 1, 1, 1],
-                   [1, 1, 0, 0],
-                   [0, 0, 1, 1],
-                   [1, 0, 1, 0],
-                   [0, 1, 0, 1],
-                   [1, 0, 0, 0],
-                   [0, 1, 0, 0],
-                   [0, 0, 1, 0],
-                   [0, 0, 0, 1]], dtype=int8)
-
-
-        :param group_list: Two group types are supported for now.
-        :param period: frequency of the time series, 1 means non-seasonality data, 12 means monthly data.
-        :return:
-        """
-        from itertools import product
-        df = pd.DataFrame(product(*group_list))
-        cols = ['top', *[i for i in range(len(group_list))], 'bottom']
-        df['bottom'] = df.apply(lambda x: '_'.join(x), axis=1)
-        df['top'] = 'total'
-        df = df[cols]
-        dummy_df = pd.get_dummies(df)
-        s_mat = dummy_df.values.T
-        node_level = [0]
-        names = ['Total']
-        i = 0
-        for i in range(len(group_list)):
-            node_level += [i+1]*len(group_list[i])
-            names += group_list[i]
-        node_level += [i+2] * df.shape[0]
-        names += list(df['bottom'])
-        return cls(s_mat, np.array(node_level), names, period,
-                   level_name=np.array(range(len(group_list)+2)).astype('str'))
-
-    @classmethod
-    def from_long(cls, df: pd.DataFrame, keys: List[str], id_col: str = None, period=1) -> "Hierarchy":
-        """Construct hierarchy from long data table that each row represents a bottom level time series. This method is
-        suitable for complex hierarchical structure.
+    def new(cls, df: pd.DataFrame,
+            structures: List[Tuple[str, ...]],
+            excludes: List[Tuple[str, ...]] = None,
+            includes: List[Tuple[str, ...]] = None,
+            period: int = 1) -> "Hierarchy":
+        """Construct hierarchy from data table that each row represents a unique bottom level time series.
+        This method is suitable for complex hierarchical structure.
 
         **Examples**
 
             >>> from pyhts import Hierarchy
             >>> df = pd.DataFrame({"City": ["A", "A", "B", "B"], "Store": ["Store1", "Store2", "Store3", "Store4"]})
-            >>> hierarchy = Hierarchy.from_long(df, ["City", "Store"])
+            >>> hierarchy = Hierarchy.new(df, [("City", "Store")])
             >>> hierarchy.node_name
-            array(['Total', 'A', 'B', 'Store1', 'Store2', 'Store3', 'Store4'],
-                  dtype='<U8')
+            array(['total_total', 'City_A', 'City_B', 'Store_Store1', 'Store_Store2',
+                   'Store_Store3', 'Store_Store4'], dtype=object)
             >>> hierarchy.s_mat
             array([[1, 1, 1, 1],
                    [1, 1, 0, 0],
@@ -215,7 +60,7 @@ class Hierarchy:
                    [0, 0, 1, 0],
                    [0, 0, 0, 1]], dtype=int8)
             >>> df = pd.DataFrame({"City": ["A", "A", "B", "B"], "Category": ["C1", "C2", "C1", "C2"]})
-            >>> hierarchy = Hierarchy.from_long(df, ["City", "Category"])
+            >>> hierarchy = Hierarchy.new(df, [("City",), ("Category",)])
             >>> hierarchy.s_mat
             array([[1, 1, 1, 1],
                    [1, 1, 0, 0],
@@ -228,36 +73,77 @@ class Hierarchy:
                    [0, 0, 0, 1]], dtype=int8)
 
         :param df: DataFrame contains keys for determining hierarchical structural.
-        :param keys: column names that each column represents a level.
+        :param structures: The structure of the hierarchy. It should be a list, where each element represents the \
+        hierarchical structure of one natural hierarchy. \
+        The element should be tuple of string (column in the dataframe). \
+        The order of the columns is top-down. \
+        For example, ("category", "sub-category", "item") can be a natural hierarchy.
+        :param excludes: middle levels excluded from the hierarchy.
+        :param includes: middle levels included in the hierarchy.
         :param period: frequency of the time series, 1 means non-seasonality data, 12 means monthly data.
-        :param id_col: id of bottom-level time series.
-        :param excludes: levels excluded from the summing matrix.
-        :return:
+        :return: Hierarchy object.
         """
-        new_df = copy(df[keys]).astype('string')
-        new_df['Total'] = 'Total'
-        keys = list(keys)
-        node_level = [0] + [1] * len(new_df[keys[0]].unique())
-        n = new_df.shape[0]
-        level_names = ['Total']
-        for index in range(1, len(keys)):
-            node_level += [index+1] * len(new_df[keys[index]].unique())
-            level_names.append(keys[index-1])
-        level_names.append(keys[-1])
 
-        s_dummy = pd.get_dummies(new_df[['Total'] + keys], columns=['Total'] + keys)
+        cols = [c for cs in structures for c in cs]
+        bottoms = [cs[-1] for cs in structures]
+
+        if len(set(cols)) != len(cols):
+            raise ValueError(f"Column should not appear in different tuples (natural hierarchies).")
+
+        levels = []
+        for col in cols:
+            levels.append({*[col]})
+        if len(structures) > 1:
+            levels.append({*bottoms})
+        if includes:
+            for g in includes:
+                if {*g} not in levels:
+                    levels.insert(-2, {{*[g]}} if isinstance(g, str) else {*g})
+        else:
+            from itertools import product, combinations
+            for j in range(2, len(structures) + 1):
+                for comb in combinations(structures, j):
+                    for inter in product(*comb):
+                        if {*inter} not in levels:
+                            levels.insert(-1, {*inter})
+            if excludes:
+                b_set = set(bottoms)
+                for j in excludes:
+                    if b_set == set(j):
+                        raise ValueError(f"The bottom level {'*'.join(b_set)} can not be excluded!")
+                    levels.remove(set(j))
+
+        new_df = copy(df[[list(level)[0] for level in levels if len(level) == 1]])
+        for level in levels:
+            if len(level) > 1:
+                new_df['-'.join(level)] = new_df[list(level)].apply(lambda x: '-'.join(x), axis=1)
+        new_df['total'] = 'total'
+
+        level_names = ['total']
+        level_names.extend([list(level)[0] for level in levels if len(level) == 1])
+        level_names.extend(['-'.join(level) for level in levels if len(level) > 1])
+        new_df = new_df[level_names]
+
+        tmp_df = new_df.copy()
+        for j, structure in enumerate(structures):
+            if len(structure) == 1:
+                continue
+
+            for i in range(1, len(structure)):
+                foo = new_df.loc[:, structure[i-1:i+1]].drop_duplicates()
+                if (foo[structure[i]].value_counts() == 1).all():
+                    continue
+                else:
+                    raise(ValueError(f"Nodes in the level {structure[i]} of {j+1}th hierarchy are not unique."))
+
+        s_dummy = pd.get_dummies(tmp_df)
         s_mat = s_dummy.values.T
+        s_mat[-new_df.shape[0]:, :] = np.identity(new_df.shape[0])
         names = list(s_dummy.columns)
-        if len(new_df[keys[-1]].unique()) != new_df.shape[0]:
-            if id_col is None:
-                new_df['bottom'] = new_df[keys].apply(lambda x: '-'.join(x), axis=1)
-            else:
-                new_df['bottom'] = df[id_col]
-            node_level += [len(keys)+1] * n
-            s_mat = np.concatenate([s_mat, np.identity(new_df.shape[0])], axis=0).astype('int')
-            names = names + list(new_df['bottom'])
-            level_names.append('bottom')
-        return cls(s_mat, np.array(node_level), names, period=period, level_name=level_names)
+        names[-new_df.shape[0]:] = ['-'.join(levels[-1]) + '_' + i for i in list(new_df[level_names[-1]])]
+
+        node_level = [i.split('_')[0] for i in list(s_dummy.columns)]
+        return cls(s_mat, pd.Series(node_level), pd.Series(names), period=period, level_name=pd.Series(level_names))
 
     def aggregate_ts(self, bts: np.ndarray, levels: Union[int, List[int]] = None) -> np.ndarray:
         """Aggregate bottom-level time series.
