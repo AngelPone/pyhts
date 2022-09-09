@@ -14,7 +14,8 @@ __all__ = [
     "rmsse",
     "rmse",
     "mae",
-    "mse"
+    "mse",
+    "load_tourism"
 ]
 
 from pyhts._hierarchy import Hierarchy
@@ -38,3 +39,5 @@ from pyhts._accuracy import (
     smape,
     mse
 )
+
+from pyhts._dataset import load_tourism

@@ -9,6 +9,5 @@ def load_tourism() -> pd.DataFrame:
 
     :return:
     """
-    stream = pkg_resources.resource_stream(__name__, "data/Tourism.csv")
-
-    return pd.read_csv(stream)
+    with pkg_resources.resource_stream(__name__, "data/Tourism.csv") as f:
+        return pd.read_csv(f)

@@ -33,21 +33,20 @@ Define the Hierarchy
 
 You can use classmethods of :class:`pyhts.Hierarchy` to define hierarchy structure. see details in :doc:`/tutorials/hierarchy`
 
-As an example of the hierarchy shown in the figure below, let’s construct the hierarchy using :class:`pyhts.hierarchy.Hierarchy.from_node_list()` and :class:`pyhts.hierarchy.Hierarchy.from_names()`.
+As an example of the hierarchy shown in the figure below, let’s construct the hierarchy using :class:`pyhts.Hierarchy.new()`.
 
 .. image:: ../media/01_hierarchy.png
 
 .. code-block:: python
 
     from pyhts import Hierarchy
-    node_list = [[2], [2, 2]]
+    import pandas as pd
+    node_df = pd.DataFrame({'level1': ['A', 'A', 'B', 'B'], 'level2': ['AA', 'AB', 'BC', 'BB']})
     period = 12
-    hierarchy = Hierarchy.from_node_list(node_list, period=period)
-
-    col_names = ['AA', 'AB', 'BC', 'BD']
-    hierarchy2 = Hierarchy.from_names(col_names, chars=[1,1], period=period)
-    print(hierarchy2.node_name)
-    # array(['Total', 'A', 'B', 'AA', 'AB', 'BC', 'BD'], dtype='<U5')
+    hierarchy = Hierarchy.new(node_df, structures = [('level1', 'level2')],period=period)
+    print(hierarchy.node_name)
+    # array(['total_total', 'level1_A', 'level1_B', 'level2_AA', 'level2_AB',
+    #        'level2_BC', 'level2_BB'], dtype=object)
 
 where period is frequency of time series, m=12 means monthly series.
 
@@ -64,7 +63,7 @@ Let’s define a simple ols reconciliation model that use :code:`auto.arima` as 
 where
 
 - :code:`hierarchy` is the hierarchy define above.
-- :code:`base_forecasters` are base methods that used to generate base forecasts. :code:`arima` and :code:`ets` are supported for now, which are implemented by :code:`forecast` package in R called by :code:`rpy2`.You can also define your custom base forecasters for each level, see details in :ref:`base`.
+- :code:`base_forecasters` are base methods that used to generate base forecasts. :code:`arima` and :code:`ets` are supported for now, which are implemented by :code:`statsforecast` package.You can also define your custom base forecasters for each level, see details in :ref:`base`.
 - :code:`hf_model` is the method used for hierarchical forecasting, :code:`comb` that means forecast reconciliation is supported for now. Classical methods such as Top-Down、Bottom-up and middle-out will be supported in the future.
 - :code:`comb_method` is the forecast reconciliation method. mint、wls、ols are supported. see details in :doc:`/tutorials/hfmodel`.
 
