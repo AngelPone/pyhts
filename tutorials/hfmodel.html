@@ -100,21 +100,14 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>hierarchy</strong> (<a class="reference internal" href="hierarchy.html#pyhts.Hierarchy" title="pyhts._hierarchy.Hierarchy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hierarchy</span></code></a>) – hierarchical structure of the data.</p></li>
-<li><p><strong>base_forecasters</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">BaseForecaster</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – base forecasting method, custom forecasters or arima implemented by</p></li>
+<li><p><strong>base_forecasters</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">BaseForecaster</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – base forecasting method, list of custom forecaster objects or str <code class="code docutils literal notranslate"><span class="pre">arima</span></code>         implemented by <code class="code docutils literal notranslate"><span class="pre">statsforecast</span></code>.</p></li>
+<li><p><strong>hf_method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – method for hierarchical forecasting, <code class="code docutils literal notranslate"><span class="pre">comb</span></code> is only supported for now, which represents        optimal combination method.</p></li>
+<li><p><strong>comb_method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – method for forecast reconciliation, ols, wls or mint.</p></li>
+<li><p><strong>weights</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – weighting matrix used in wls and mint, “structural” or custom symmetric matrix for wls,         “shrinkage”, “sample”, “variance” for mint.</p></li>
+<li><p><strong>constrain_level</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – -1 means no constraints.</p></li>
 </ul>
 </dd>
 </dl>
-<p><code class="code docutils literal notranslate"><span class="pre">statsforecast</span></code>.
-:type hf_method: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>
-:param hf_method: method for hierarchical forecasting, <code class="code docutils literal notranslate"><span class="pre">comb</span></code> is only supported for now, which represents
-optimal combination method.
-:type comb_method: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>
-:param comb_method: method for forecast reconciliation, ols, wls or mint.
-:type weights: <code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]
-:param weights: weighting matrix used in wls and mint, “structural” or custom symmetric matrix for wls,
-“shrinkage”, “sample”, “variance” for mint.
-:type constrain_level: <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>
-:param constrain_level: -1 means no constraints.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -124,15 +117,18 @@ optimal combination method.
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>ts</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – a DataFrame in which each column contains a bottom-level time series.</p></li>
-<li><p><strong>xreg</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>]) – explanatory variables with shape (n, T, k), where n is number of time series, T is history length,</p></li>
+<li><p><strong>ts</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – T * m, each column represents one bottom-level time series. The order of series should be same as         the order when defining hierarchy.</p></li>
+<li><p><strong>xreg</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>]) – explanatory variables with shape (n, T, k), where n is number of time series, T is history length,        and k is dimension of explanatory variables.</p></li>
+<li><p><strong>kwargs</strong> – parameters passed to <code class="code docutils literal notranslate"><span class="pre">base_forecasters</span></code>.</p></li>
 </ul>
 </dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#pyhts.HFModel" title="pyhts._HFModel.HFModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">HFModel</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>fitted HFModel</p>
+</dd>
 </dl>
-<p>and k is dimension of explanatory variables.
-:param kwargs: parameters passed to <code class="code docutils literal notranslate"><span class="pre">base_forecasters</span></code>.
-:rtype: <a class="reference internal" href="#pyhts.HFModel" title="pyhts._HFModel.HFModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">HFModel</span></code></a>
-:return: fitted HFModel</p>
 </dd></dl>
 
 <dl class="py method">
@@ -143,14 +139,17 @@ optimal combination method.
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>horizon</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – forecast horizon</p></li>
-<li><p><strong>xreg</strong> – explanatory variables with shape (n, h, k), where n is number of time series, h is forecast</p></li>
+<li><p><strong>xreg</strong> – explanatory variables with shape (n, h, k), where n is number of time series, h is forecast        horizon, and k is dimension of explanatory variables.</p></li>
+<li><p><strong>kwargs</strong> – other parameters passed to base forecasters.</p></li>
 </ul>
 </dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>coherent forecasts of the bottom level.</p>
+</dd>
 </dl>
-<p>horizon, and k is dimension of explanatory variables.
-:param kwargs: other parameters passed to base forecasters.
-:rtype: <code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>
-:return: coherent forecasts of the bottom level.</p>
 </dd></dl>
 
 </dd></dl>
@@ -202,6 +201,7 @@ optimal combination method.
 </div>
 <section id="customize-base-forecasters">
 <span id="base"></span><h4>customize base forecasters<a class="headerlink" href="#customize-base-forecasters" title="Permalink to this heading"></a></h4>
+<p>TODO: update docs</p>
 <p>To generate base forecasts, you can use <code class="code docutils literal notranslate"><span class="pre">arima</span></code>, which are implemented by
 <code class="code docutils literal notranslate"><span class="pre">statsforecast</span></code>, or you can define your own base forecasters using whatever
 forecasting methods you want, machine learning or deeplearning methods.</p>

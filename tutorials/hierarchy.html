@@ -41,7 +41,11 @@
               <p class="caption" role="heading"><span class="caption-text">QuickStart</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="Tutorials.html">Quick Start</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Define Hierarchy</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Define Hierarchy</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#cross-sectional-hierarchy">Cross-sectional Hierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#reference">Reference</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="hfmodel.html">Define, Fit and Forecast of HFModel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="evaluation.html">Model Evaluation</a></li>
 </ul>
@@ -71,12 +75,45 @@
              
   <section id="define-hierarchy">
 <h1>Define Hierarchy<a class="headerlink" href="#define-hierarchy" title="Permalink to this heading"></a></h1>
+<section id="cross-sectional-hierarchy">
+<h2>Cross-sectional Hierarchy<a class="headerlink" href="#cross-sectional-hierarchy" title="Permalink to this heading"></a></h2>
+<p>There are three kinds of cross-sectional hierarchy: regular, grouped or mix of both (Hyndman &amp; Athanasopoulos, 2021).
+The last type is most of the case in practice. In this tutorial, we will destruct the last type of hierarchy, and show how
+complex hierarchical structures can be constructed using <a class="reference internal" href="#pyhts.Hierarchy.new" title="pyhts.Hierarchy.new"><code class="xref py py-class docutils literal notranslate"><span class="pre">new()</span></code></a>.</p>
+<p>Almost every hierarchy can be seen as a combination of multiple regular hierarchies. Here, regular hierarchy refers to
+hierarchy that can be represented by a tree, where nodes in each level are completely unique. For example, for the product
+category case, it can be “Category” -&gt; “Subcategory” -&gt; “item”. The geographical hierarchy is also a classical example.
+Another example is the file system.</p>
+<p>Mixing two or more regular hierarchies construct a complex but widely used hierarchy. Every “level” in this hierarchy is
+interaction of two or more levels in different regular hierarchies. Here is an example, still the product case.</p>
+<p>For “category”, the regular hierarchy can be <cite>total</cite>, <cite>category</cite>, <cite>subcategory</cite> and <cite>item</cite>.
+Each product can also be sold at multiple locations.
+For “location”, the regular hierarchy can be <cite>total</cite>, <cite>state</cite>, <cite>region</cite>, <cite>store</cite>.</p>
+<p>Mixing these two hierarchies gives following levels, totally 4 * 4 = 16 levels:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#pyhts.Hierarchy.from_node_list" title="pyhts.Hierarchy.from_node_list"><code class="xref py py-class docutils literal notranslate"><span class="pre">from_node_list()</span></code></a> constructs hierarchy from list of children node number lists.</p></li>
-<li><p><a class="reference internal" href="#pyhts.Hierarchy.from_names" title="pyhts.Hierarchy.from_names"><code class="xref py py-class docutils literal notranslate"><span class="pre">from_names()</span></code></a> constructs hierarchy from names of bottom series.</p></li>
-<li><p><a class="reference internal" href="#pyhts.Hierarchy.from_long" title="pyhts.Hierarchy.from_long"><code class="xref py py-class docutils literal notranslate"><span class="pre">from_long()</span></code></a> constructs hierarchy from long data table.</p></li>
-<li><p><a class="reference internal" href="#pyhts.Hierarchy.from_balance_group" title="pyhts.Hierarchy.from_balance_group"><code class="xref py py-class docutils literal notranslate"><span class="pre">from_balance_group()</span></code></a> construct balance group time series that have multiple group types and all groups of each group type contains</p></li>
+<li><p>total = total (category) x total (location)</p></li>
+<li><p>category = category x total (location)</p></li>
+<li><p>subcategory = subcategory x total (location)</p></li>
+<li><p>item = item x total (location)</p></li>
+<li><p>state = total (category) x state</p></li>
+<li><p>region = total (category) x region</p></li>
+<li><p>store = total (category) x store</p></li>
+<li><p>category x state</p></li>
+<li><p>category x region</p></li>
+<li><p>category x store</p></li>
+<li><p>subcategory x state</p></li>
+<li><p>subcategory x region</p></li>
+<li><p>subcategory x store</p></li>
+<li><p>item x state</p></li>
+<li><p>item x region</p></li>
+<li><p>item x store (bottom level)</p></li>
 </ul>
+<p>Another example of this kind of hierarchy is the file system with tags, while usually tags only have one level except the total level.</p>
+<p>To construct the product hierarchy using <a class="reference internal" href="#pyhts.Hierarchy.new" title="pyhts.Hierarchy.new"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyhts.Hierarchy.new()</span></code></a>, use the following statement:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">Hierarchy</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">structures</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;category&#39;</span><span class="p">,</span> <span class="s1">&#39;subcategory&#39;</span><span class="p">,</span> <span class="s1">&#39;item&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;state&#39;</span><span class="p">,</span> <span class="s1">&#39;region&#39;</span><span class="p">,</span> <span class="s1">&#39;store&#39;</span><span class="p">)])</span>
+</pre></div>
+</div>
+<p>You can also specify <code class="code docutils literal notranslate"><span class="pre">excludes</span></code> and <code class="code docutils literal notranslate"><span class="pre">includes</span></code> to exclude some levels or only include some levels use the same rule.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyhts.Hierarchy">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyhts.</span></span><span class="sig-name descname"><span class="pre">Hierarchy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s_mat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.Hierarchy" title="Permalink to this definition"></a></dt>
@@ -98,154 +135,28 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyhts.Hierarchy.node_name">
 <span class="sig-name descname"><span class="pre">node_name</span></span><a class="headerlink" href="#pyhts.Hierarchy.node_name" title="Permalink to this definition"></a></dt>
-<dd><p>name of each node.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pyhts.Hierarchy.level_n">
-<span class="sig-name descname"><span class="pre">level_n</span></span><a class="headerlink" href="#pyhts.Hierarchy.level_n" title="Permalink to this definition"></a></dt>
-<dd><p>number of levels.</p>
+<dd><p>name of each node in the pattern: level-name_attribute-anme</p>
 </dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pyhts.Hierarchy.node_level">
 <span class="sig-name descname"><span class="pre">node_level</span></span><a class="headerlink" href="#pyhts.Hierarchy.node_level" title="Permalink to this definition"></a></dt>
-<dd><p>level of each node.</p>
+<dd><p>level name of each node.</p>
 </dd></dl>
 
 </div></blockquote>
 <dl class="py method">
-<dt class="sig sig-object py" id="pyhts.Hierarchy.from_node_list">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_node_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.Hierarchy.from_node_list" title="Permalink to this definition"></a></dt>
-<dd><p>Construct a hierarchy from a list of lists, in which each sublist contains the number of children nodes of all nodes in a
-hierarchical level. For example, the first sublist contains the number of children nodes of all nodes in
-level 0, i.e., the root node (sum of all the bottom level time series).</p>
-<p><strong>Examples</strong></p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyhts</span> <span class="kn">import</span> <span class="n">Hierarchy</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">nodes</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">hierarchy</span> <span class="o">=</span> <span class="n">Hierarchy</span><span class="o">.</span><span class="n">from_node_list</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">hierarchy</span><span class="o">.</span><span class="n">s_mat</span>
-<span class="go">array([[1, 1, 1, 1],</span>
-<span class="go">       [1, 1, 0, 0],</span>
-<span class="go">       [0, 0, 1, 1],</span>
-<span class="go">       [1, 0, 0, 0],</span>
-<span class="go">       [0, 1, 0, 0],</span>
-<span class="go">       [0, 0, 1, 0],</span>
-<span class="go">       [0, 0, 0, 1]], dtype=int8)</span>
-</pre></div>
-</div>
-<p><code class="code docutils literal notranslate"><span class="pre">[[2],</span> <span class="pre">[2,</span> <span class="pre">2]]</span></code> defines a hierarchy in which the root node has two sub-nodes. The first
-sub-node contains two sub-nodes and the second sub-node also contains two sub-nodes. There are 4 bottom time
-series in total.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>nodes</strong> – a list. Each element represents the number(s) of children nodes for each node in the corresponding level.</p></li>
-<li><p><strong>period</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – frequency of the time series. For example, 1 means non-seasonality data, and 12 means monthly data.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="#pyhts.Hierarchy" title="pyhts._hierarchy.Hierarchy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hierarchy</span></code></a></p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pyhts.Hierarchy.from_names">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.Hierarchy.from_names" title="Permalink to this definition"></a></dt>
-<dd><p>Construct a hierarchy from column names of the bottom-level time series. The names of bottom series consist of
-several parts. Each part points to a specific level of the hierarchy, with a fixed length used to
-split and recognize the hierarchy.</p>
-<p>For example <code class="code docutils literal notranslate"><span class="pre">AA</span></code>. The first <code class="code docutils literal notranslate"><span class="pre">A</span></code> represents <code class="code docutils literal notranslate"><span class="pre">A</span></code> series in level 1,
-the second <code class="code docutils literal notranslate"><span class="pre">A</span></code> represents the <code class="code docutils literal notranslate"><span class="pre">A</span></code> series in level 2, and its parent node is <code class="code docutils literal notranslate"><span class="pre">A</span></code> series in
-level 1. This method will add a <code class="code docutils literal notranslate"><span class="pre">Total</span></code> level.</p>
-<p><strong>Examples</strong></p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyhts</span> <span class="kn">import</span> <span class="n">Hierarchy</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;AA&#39;</span><span class="p">,</span> <span class="s1">&#39;AB&#39;</span><span class="p">,</span> <span class="s1">&#39;BA&#39;</span><span class="p">,</span> <span class="s1">&#39;BB&#39;</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">hierarchy</span> <span class="o">=</span> <span class="n">Hierarchy</span><span class="o">.</span><span class="n">from_names</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">chars</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">period</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">hierarchy</span><span class="o">.</span><span class="n">s_mat</span>
-<span class="go">array([[1, 1, 1, 1],</span>
-<span class="go">       [1, 1, 0, 0],</span>
-<span class="go">       [0, 0, 1, 1],</span>
-<span class="go">       [1, 0, 0, 0],</span>
-<span class="go">       [0, 1, 0, 0],</span>
-<span class="go">       [0, 0, 1, 0],</span>
-<span class="go">       [0, 0, 0, 1]], dtype=int8)</span>
-</pre></div>
-</div>
-<p>The example above define a hierarchy same as the hierarchy in example of
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">from_node_list()</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>names</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – columns of all <strong>bottom</strong> level time series.</p></li>
-<li><p><strong>chars</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]) – character length of each part.</p></li>
-<li><p><strong>period</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – frequency of the time series, 1 means non-seasonality data, 12 means monthly data.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="#pyhts.Hierarchy" title="pyhts._hierarchy.Hierarchy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hierarchy</span></code></a></p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pyhts.Hierarchy.from_balance_group">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_balance_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.Hierarchy.from_balance_group" title="Permalink to this definition"></a></dt>
-<dd><p>Construct group hierarchical structure.</p>
-<p><strong>Examples</strong></p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyhts</span> <span class="kn">import</span> <span class="n">Hierarchy</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">groups</span> <span class="o">=</span> <span class="p">[[</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;Item1&#39;</span><span class="p">,</span> <span class="s1">&#39;Item2&#39;</span><span class="p">]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">hierarchy</span> <span class="o">=</span> <span class="n">Hierarchy</span><span class="o">.</span><span class="n">from_balance_group</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">hierarchy</span><span class="o">.</span><span class="n">node_name</span>
-<span class="go">array([&#39;Total&#39;, &#39;A&#39;, &#39;B&#39;, &#39;Item1&#39;, &#39;Item2&#39;, &#39;A_Item1&#39;, &#39;A_Item2&#39;,</span>
-<span class="go">       &#39;B_Item1&#39;, &#39;B_Item2&#39;], dtype=&#39;&lt;U7&#39;)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">hierarchy</span><span class="o">.</span><span class="n">s_mat</span>
-<span class="go">array([[1, 1, 1, 1],</span>
-<span class="go">       [1, 1, 0, 0],</span>
-<span class="go">       [0, 0, 1, 1],</span>
-<span class="go">       [1, 0, 1, 0],</span>
-<span class="go">       [0, 1, 0, 1],</span>
-<span class="go">       [1, 0, 0, 0],</span>
-<span class="go">       [0, 1, 0, 0],</span>
-<span class="go">       [0, 0, 1, 0],</span>
-<span class="go">       [0, 0, 0, 1]], dtype=int8)</span>
-</pre></div>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>group_list</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]]) – Two group types are supported for now.</p></li>
-<li><p><strong>period</strong> – frequency of the time series, 1 means non-seasonality data, 12 means monthly data.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="#pyhts.Hierarchy" title="pyhts._hierarchy.Hierarchy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hierarchy</span></code></a></p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pyhts.Hierarchy.from_long">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_long</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.Hierarchy.from_long" title="Permalink to this definition"></a></dt>
-<dd><p>Construct hierarchy from long data table that each row represents a bottom level time series. This method is
-suitable for complex hierarchical structure.</p>
+<dt class="sig sig-object py" id="pyhts.Hierarchy.new">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">new</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structures</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">excludes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">includes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.Hierarchy.new" title="Permalink to this definition"></a></dt>
+<dd><p>Construct hierarchy from data table that each row represents a unique bottom level time series.
+This method is suitable for complex hierarchical structure.</p>
 <p><strong>Examples</strong></p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyhts</span> <span class="kn">import</span> <span class="n">Hierarchy</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;City&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">],</span> <span class="s2">&quot;Store&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Store1&quot;</span><span class="p">,</span> <span class="s2">&quot;Store2&quot;</span><span class="p">,</span> <span class="s2">&quot;Store3&quot;</span><span class="p">,</span> <span class="s2">&quot;Store4&quot;</span><span class="p">]})</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">hierarchy</span> <span class="o">=</span> <span class="n">Hierarchy</span><span class="o">.</span><span class="n">from_long</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;City&quot;</span><span class="p">,</span> <span class="s2">&quot;Store&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hierarchy</span> <span class="o">=</span> <span class="n">Hierarchy</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="p">[(</span><span class="s2">&quot;City&quot;</span><span class="p">,</span> <span class="s2">&quot;Store&quot;</span><span class="p">)])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">hierarchy</span><span class="o">.</span><span class="n">node_name</span>
-<span class="go">array([&#39;Total&#39;, &#39;A&#39;, &#39;B&#39;, &#39;Store1&#39;, &#39;Store2&#39;, &#39;Store3&#39;, &#39;Store4&#39;],</span>
-<span class="go">      dtype=&#39;&lt;U8&#39;)</span>
+<span class="go">array([&#39;total_total&#39;, &#39;City_A&#39;, &#39;City_B&#39;, &#39;Store_Store1&#39;, &#39;Store_Store2&#39;,</span>
+<span class="go">       &#39;Store_Store3&#39;, &#39;Store_Store4&#39;], dtype=object)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">hierarchy</span><span class="o">.</span><span class="n">s_mat</span>
 <span class="go">array([[1, 1, 1, 1],</span>
 <span class="go">       [1, 1, 0, 0],</span>
@@ -255,7 +166,7 @@ suitable for complex hierarchical structure.</p>
 <span class="go">       [0, 0, 1, 0],</span>
 <span class="go">       [0, 0, 0, 1]], dtype=int8)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;City&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">],</span> <span class="s2">&quot;Category&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;C1&quot;</span><span class="p">,</span> <span class="s2">&quot;C2&quot;</span><span class="p">,</span> <span class="s2">&quot;C1&quot;</span><span class="p">,</span> <span class="s2">&quot;C2&quot;</span><span class="p">]})</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">hierarchy</span> <span class="o">=</span> <span class="n">Hierarchy</span><span class="o">.</span><span class="n">from_long</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;City&quot;</span><span class="p">,</span> <span class="s2">&quot;Category&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hierarchy</span> <span class="o">=</span> <span class="n">Hierarchy</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="p">[(</span><span class="s2">&quot;City&quot;</span><span class="p">,),</span> <span class="p">(</span><span class="s2">&quot;Category&quot;</span><span class="p">,)])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">hierarchy</span><span class="o">.</span><span class="n">s_mat</span>
 <span class="go">array([[1, 1, 1, 1],</span>
 <span class="go">       [1, 1, 0, 0],</span>
@@ -272,23 +183,28 @@ suitable for complex hierarchical structure.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – DataFrame contains keys for determining hierarchical structural.</p></li>
-<li><p><strong>keys</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – column names that each column represents a level.</p></li>
-<li><p><strong>period</strong> – frequency of the time series, 1 means non-seasonality data, 12 means monthly data.</p></li>
-<li><p><strong>id_col</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – id of bottom-level time series.</p></li>
-<li><p><strong>excludes</strong> – levels excluded from the summing matrix.</p></li>
+<li><p><strong>structures</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code>]]) – The structure of the hierarchy. It should be a list, where each element represents the         hierarchical structure of one natural hierarchy.         The element should be tuple of string (column in the dataframe).         The order of the columns is top-down.         For example, (“category”, “sub-category”, “item”) can be a natural hierarchy.</p></li>
+<li><p><strong>excludes</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code>]]]) – middle levels excluded from the hierarchy.</p></li>
+<li><p><strong>includes</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code>]]]) – middle levels included in the hierarchy.</p></li>
+<li><p><strong>period</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – frequency of the time series, 1 means non-seasonality data, 12 means monthly data.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p><a class="reference internal" href="#pyhts.Hierarchy" title="pyhts._hierarchy.Hierarchy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Hierarchy</span></code></a></p>
 </dd>
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
+<dd class="field-odd"><p>Hierarchy object.</p>
 </dd>
 </dl>
 </dd></dl>
 
 </dd></dl>
 
+</section>
+<section id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this heading"></a></h2>
+<p>[1] Hyndman, R. J., &amp; Athanasopoulos, G. (2021). Forecasting: Principles and Practice (3rd ed.). Otext. <a class="reference external" href="https://otexts.com/fpp3/">https://otexts.com/fpp3/</a></p>
+</section>
 </section>
 
 

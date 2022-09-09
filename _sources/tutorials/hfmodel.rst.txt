@@ -74,6 +74,8 @@ Then, define the hierarchical forecasting model.
 customize base forecasters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+TODO: update docs
+
 To generate base forecasts, you can use :code:`arima`, which are implemented by
 :code:`statsforecast`, or you can define your own base forecasters using whatever
 forecasting methods you want, machine learning or deeplearning methods.
