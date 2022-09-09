@@ -14,11 +14,11 @@ A python package for hierarchical forecasting, inspired by the [hts](https://cra
 - Load the Australia tourism flows data.
 
 ```python
-from pyhts._dataset import load_tourism
+from pyhts import load_tourism
 
 tourism_data = load_tourism()
-train = tourism_data.iloc[:-12, :]
-test = tourism_data.iloc[-12:, :]
+train = tourism_data.iloc[:, 4:-12].T.values
+test = tourism_data.iloc[:, -12:].T.values
 ```
 
 
@@ -27,7 +27,7 @@ test = tourism_data.iloc[-12:, :]
 ```python
 from pyhts import Hierarchy
 
-hierarchy = Hierarchy.from_names(tourism_data.columns, chars=[1, 1, 1])
+hierarchy = Hierarchy.new(tourism_data, [('state', 'region', 'city')])
 print(hierarchy.node_name)
 ```
 
@@ -37,14 +37,14 @@ print(hierarchy.node_name)
 from pyhts import HFModel
 
 model_ols = HFModel(hierarchy=hierarchy, base_forecasters="arima",
-                hf_method="comb", comb_method="ols")
+                    hf_method="comb", comb_method="ols")
 ```
 
 - Fit the model and produce forecasts.
 
 ```python
 model_ols.fit(train)
-ols = model.predict(horizon=12)
+ols = model_ols.predict(horizon=12)
 ```
 
 * `model.fit()` fits the `baseforecasters` and computes the weighting matrix used to reconcile the base forecasts.

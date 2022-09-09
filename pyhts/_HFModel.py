@@ -41,10 +41,11 @@ class HFModel:
         self.constrain_level = constrain_level
         self.G = None
 
-    def fit(self, ts: pd.DataFrame, xreg: Optional[np.array] = None, **kwargs) -> "HFModel":
+    def fit(self, ts: pd.DataFrame or np.ndarray, xreg: Optional[np.array] = None, **kwargs) -> "HFModel":
         """Fit a base forecast model and calculate the reconciliation matrix used for reconciliation.
 
-        :param ts: a DataFrame in which each column contains a bottom-level time series.
+        :param ts: T * m, each column represents one bottom-level time series. The order of series should be same as \
+        the order when defining hierarchy.
         :param xreg: explanatory variables with shape (n, T, k), where n is number of time series, T is history length,\
         and k is dimension of explanatory variables.
         :param kwargs: parameters passed to :code:`base_forecasters`.
@@ -53,10 +54,11 @@ class HFModel:
         assert self.hierarchy.check_hierarchy(ts), "Only bottom series are needed to fit the model."
         s_matrix = self.hierarchy.s_mat
         n, m = self.hierarchy.s_mat.shape
-        try:
-            ts = s_matrix.dot(ts[self.hierarchy.node_name[-m:]].T)
-        except KeyError:
-            ts = s_matrix.dot(ts)
+        if isinstance(ts, np.ndarray):
+            ts = s_matrix.dot(ts.T)
+        else:
+            ts = s_matrix.dot(ts.values.T)
+
         if isinstance(self.base_forecasters, str):
             if self.base_forecasters == 'arima':
                 self.base_forecasters = [

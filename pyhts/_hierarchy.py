@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from copy import copy
-from typing import Union, List, Tuple
+from typing import Union, List, Tuple, Optional, Iterable
 from pyhts import _accuracy
 
 __all__ = ["Hierarchy"]
@@ -145,20 +145,25 @@ class Hierarchy:
         node_level = [i.split('_')[0] for i in list(s_dummy.columns)]
         return cls(s_mat, pd.Series(node_level), pd.Series(names), period=period, level_name=pd.Series(level_names))
 
-    def aggregate_ts(self, bts: np.ndarray, levels: Union[int, List[int]] = None) -> np.ndarray:
+    def aggregate_ts(self, bts: np.ndarray, levels: Optional[Union[str, Iterable[str]]] = None) -> np.ndarray:
         """Aggregate bottom-level time series.
 
-        :param levels: which levels you want.
+        :param levels: which levels you want. :code:`str` for single level. :code:`Tuple[str, ...]` for interaction of \
+        levels.
         :param bts: bottom-level time series
         :return: upper-level time series.
         """
-        if isinstance(levels, int):
+        if isinstance(levels, str):
+            assert levels in self.node_level
             s = self.s_mat[np.where(self.node_level == levels)]
-            return s.dot(bts.T).T
-        if isinstance(levels, list):
+            return bts.dot(s.T)
+        elif levels is None:
+            s = self.s_mat
+        else:
+            levels = list(levels)
+            assert np.isin(levels, self.level_name).all()
             s = self.s_mat[np.isin(self.node_level, levels)]
-            return s.dot(bts.T).T
-        return self.s_mat.dot(bts.T).T
+        return bts.dot(s.T)
 
     def check_hierarchy(self, *hts):
         for ts in hts:
@@ -168,7 +173,7 @@ class Hierarchy:
                 return False
 
     def accuracy_base(self, real, pred, hist=None,
-                      levels: Union[int, None, List] = None,
+                      levels: Optional[Union[str, Iterable[str]]] = None,
                       measure: List[str] = None) -> pd.DataFrame:
         """Calculate the forecast accuracy of base forecasts.
 
@@ -182,30 +187,35 @@ class Hierarchy:
         assert self.check_hierarchy(real), f"True observations should be of shape (h, m)"
         assert real.shape[0] == pred.shape[0], \
             f" {real.shape} True observations have different lengths with {real.shape} forecasts"
-        agg_true = self.aggregate_ts(real, levels=levels).T
+
         if measure is None:
             measure = ['mase', 'mape', 'rmse']
         if 'mase' in measure or 'smape' in measure or 'rmsse' in measure:
             assert hist is not None
-        if hist is not None:
             assert self.check_hierarchy(hist), "History observations should be of shape(T, m)"
             hist = self.aggregate_ts(hist, levels=levels).T
         else:
             hist = [None] * self.s_mat.shape[0]
         accs = pd.DataFrame()
+
+        agg_true = self.aggregate_ts(real, levels=levels).T
+
+        if levels is not None:
+            pred = pred.T[np.isin(self.node_level, levels), ]
+        else:
+            pred = pred.T
+
         for me in measure:
             try:
-                accs[me] = np.array([getattr(_accuracy, me)(agg_true[i], pred.T[i], hist[i], self.period)
-                                     for i in range(self.s_mat.shape[0])])
+                accs[me] = np.array([getattr(_accuracy, me)(agg_true[i], pred[i], hist[i], self.period)
+                                     for i in range(hist.shape[0])])
             except AttributeError:
                 print(f'Forecasting measure {me} is not supported!')
-        if levels is None:
-            levels = list(range(self.level_n))
-        accs.index = self.node_name[np.isin(self.node_level, levels)]
+        accs.index = self.node_name[np.isin(self.node_level, levels)] if levels is not None else self.node_name
         return accs
 
     def accuracy(self, real, pred, hist=None,
-                 levels: Union[int, None, List] = None,
+                 levels: Union[str, None, Iterable[str]] = None,
                  measure: List[str] = None):
         """Calculate the forecast accuracy.
 
@@ -229,17 +239,15 @@ class Hierarchy:
             hist = self.aggregate_ts(hist, levels=levels).T
         else:
             hist = [None] * self.s_mat.shape[0]
-        if levels is None:
-            levels = list(range(self.level_n))
         agg_true = self.aggregate_ts(real, levels=levels).T
         agg_pred = self.aggregate_ts(pred, levels=levels).T
         accs = pd.DataFrame()
         for me in measure:
             try:
                 accs[me] = np.array([getattr(_accuracy, me)(agg_true[i], agg_pred[i], hist[i], self.period)
-                            for i in range(self.s_mat.shape[0])])
+                            for i in range(agg_true.shape[0])])
             except AttributeError:
                 print('This forecasting measure is not supported!')
-        accs.index = self.node_name[np.isin(self.node_level, levels)]
+        accs.index = self.node_name[np.isin(self.node_level, levels)] if levels is not None else self.node_name
         return accs
 
