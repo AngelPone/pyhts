@@ -55,21 +55,21 @@ class HFModel:
         s_matrix = self.hierarchy.s_mat
         n, m = self.hierarchy.s_mat.shape
         if isinstance(ts, np.ndarray):
-            ts = s_matrix.dot(ts.T)
+            ts = ts.dot(s_matrix.T)
         else:
-            ts = s_matrix.dot(ts.values.T)
+            ts = ts.values.T.dot(s_matrix)
 
         if isinstance(self.base_forecasters, str):
             if self.base_forecasters == 'arima':
                 self.base_forecasters = [
-                    AutoArimaForecaster(self.period).fit(ts[i, :], xreg=None if xreg is None else xreg[i],
+                    AutoArimaForecaster(self.period).fit(ts[:, i], xreg=None if xreg is None else xreg[i],
                                                          **kwargs)
                     for i in range(n)]
             else:
                 raise ValueError("This base forecasting method is not supported.")
         elif isinstance(self.base_forecasters, List):
             self.base_forecasters = [
-                self.base_forecasters[i].fit(ts[i, :], xreg=None if xreg is None else xreg[i])
+                self.base_forecasters[i].fit(ts[:, i], xreg=None if xreg is None else xreg[i])
                 if not self.base_forecasters[i].fitted else self.base_forecasters[i]
                 for i in range(n)]
         else:

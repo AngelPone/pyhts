@@ -1,7 +1,6 @@
 import numpy as np
 from typing import *
 import scipy.linalg as lg
-from scipy.sparse import csr_matrix
 from pyhts._hierarchy import Hierarchy
 
 __all__ = ["mint"]
@@ -73,10 +72,10 @@ def mint(hierarchy: Hierarchy,
     return G
 
 
-def _construct_u_mat(hierarchy: Hierarchy, constraint_level=-1):
-    """construct U' mat used in solution.
+def _construct_u_mat(hierarchy: Hierarchy, immutable_set: Optional[List[int]] = None):
+    """construct U matrix used in solution.
 
-    :param constraint_level:
+    :param immutable_set:
     :return:
     """
     s_mat = hierarchy.s_mat
@@ -84,10 +83,11 @@ def _construct_u_mat(hierarchy: Hierarchy, constraint_level=-1):
     u1 = np.identity(n - m)
     u2 = 0-s_mat[:(n-m), :].astype('int32')
     u_mat = np.concatenate([u1, u2], axis=1)
-    if constraint_level < 0:
-        return u_mat.T
-    u_up = np.identity(n)[hierarchy.node_level == constraint_level]
-    return np.concatenate([u_up, u_mat], axis=0).T
+    if immutable_set:
+        u_up = np.identity(n)[immutable_set]
+        return np.concatenate([u_up, u_mat], axis=0).T
+    return u_mat.T
+
 
 
 def compute_g_mat(hierarchy: Hierarchy, weight_matrix,
@@ -100,16 +100,17 @@ def compute_g_mat(hierarchy: Hierarchy, weight_matrix,
     :return:
     """
     n, m = hierarchy.s_mat.shape
-    u = _construct_u_mat(hierarchy, constraint_level=constraint_level)
-    u = csr_matrix(u)
-    c = np.concatenate([np.zeros([m, n-m]), np.identity(m)], axis=1)
-    c = csr_matrix(c)
-    a = np.zeros([n - m, n])
-    if constraint_level >= 0:
-        a = np.concatenate([np.identity(n)[hierarchy.node_level == constraint_level], a])
-    a = csr_matrix(a)
-    weight_matrix = csr_matrix(weight_matrix)
+
+    if immutable_set:
+        immutable_set = list(immutable_set)
+        k = len(immutable_set)
+        assert k <= m, f"The number of immutable series can not be bigger than the number of bottom-level series {m}."
+    u = _construct_u_mat(hierarchy, immutable_set=immutable_set)
+    J = np.concatenate([np.zeros([m, n-m]), np.identity(m)], axis=1)
+    v = np.zeros([n - m, n])
+    if immutable_set:
+        v = np.concatenate([np.identity(n)[immutable_set], v])
     target = u.T.dot(weight_matrix).dot(u)
-    x, lower = lg.cho_factor(target.toarray())
-    inv_dot = lg.cho_solve((x, lower), (u.T-a).toarray())
-    return c.toarray() - c.dot(weight_matrix).dot(u).dot(inv_dot)
+    x, lower = lg.cho_factor(target)
+    inv_dot = lg.cho_solve((x, lower), (u.T-v))
+    return J - J.dot(weight_matrix).dot(u).dot(inv_dot)
