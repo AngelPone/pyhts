@@ -1,10 +1,10 @@
 import numpy as np
-from typing import Union
+from typing import *
 import scipy.linalg as lg
 from scipy.sparse import csr_matrix
 from pyhts._hierarchy import Hierarchy
 
-__all__ = ["wls"]
+__all__ = ["mint"]
 
 
 def _lamb_estimate(x: np.ndarray) -> float:
@@ -26,11 +26,11 @@ def _lamb_estimate(x: np.ndarray) -> float:
     return lamb
 
 
-def wls(hierarchy: Hierarchy,
-        error: np.ndarray = None,
-        method: str = "ols",
-        weighting: Union[str, np.ndarray, None] = None,
-        constraint_level: int = -1) -> np.ndarray:
+def mint(hierarchy: Hierarchy,
+         error: np.ndarray = None,
+         method: str = "ols",
+         weighting: Union[str, np.ndarray, None] = None,
+         immutable_set: Optional[List[int]] = None) -> np.ndarray:
     """Function for forecast reconciliation.
 
     :param hierarchy: historical time series.
@@ -39,7 +39,7 @@ def wls(hierarchy: Hierarchy,
     :param weighting:
         method for the weight matrix used in forecast reconciliation, i.e., covariance matrix in mint
         or wls.
-    :param constraint_level: Which level is constrained to be unchangeable when reconciling base forecasts.
+    :param immutable_set: the subset of time series to be unchanged during reconciliation.
     :return: reconciled forecasts.
     """
     S = hierarchy.s_mat
@@ -69,7 +69,7 @@ def wls(hierarchy: Hierarchy,
             weight_matrix = np.diag(S.dot(np.array([1]*m)))
         else:
             raise ValueError("This wls weighting method is not supported for now.")
-    G = compute_g_mat(hierarchy, weight_matrix, constraint_level)
+    G = compute_g_mat(hierarchy, weight_matrix, immutable_set)
     return G
 
 
@@ -90,12 +90,13 @@ def _construct_u_mat(hierarchy: Hierarchy, constraint_level=-1):
     return np.concatenate([u_up, u_mat], axis=0).T
 
 
-def compute_g_mat(hierarchy: Hierarchy, weight_matrix, constraint_level=-1):
+def compute_g_mat(hierarchy: Hierarchy, weight_matrix,
+                  immutable_set: Optional[Iterable[int]] = None):
     """Compute G matrix given the weight_matrix.
 
     :param hierarchy:
     :param weight_matrix:
-    :param constraint_level:
+    :param immutable_set: the subset of time series to be unchanged during reconciliation
     :return:
     """
     n, m = hierarchy.s_mat.shape

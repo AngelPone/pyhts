@@ -1,5 +1,5 @@
 import numpy as np
-from typing import List, Union, Optional
+from typing import List, Union, Optional, Iterable
 from pyhts._forecaster import BaseForecaster, AutoArimaForecaster
 import pyhts._reconciliation as fr
 from pyhts._hierarchy import Hierarchy
@@ -19,7 +19,7 @@ class HFModel:
                  hf_method: str = 'comb',
                  comb_method: str = 'ols',
                  weights: Optional[Union[str, np.ndarray]] = None,
-                 constrain_level: int = -1):
+                 immutable_set: Optional[Iterable[int]] = None):
         """Define a hierarchical forecasting model.
 
         :param hierarchy: hierarchical structure of the data.
@@ -30,7 +30,7 @@ class HFModel:
         :param comb_method: method for forecast reconciliation, ols, wls or mint.
         :param weights: weighting matrix used in wls and mint, "structural" or custom symmetric matrix for wls, \
         "shrinkage", "sample", "variance" for mint.
-        :param constrain_level: -1 means no constraints.
+        :param immutable_set: the subset of time series to be unchanged during reconciliation
         """
         self.hierarchy = hierarchy
         self.base_forecasters = base_forecasters
@@ -38,10 +38,10 @@ class HFModel:
         self.comb_method = comb_method
         self.period = self.hierarchy.period
         self.weights = weights
-        self.constrain_level = constrain_level
+        self.immutable_set = immutable_set
         self.G = None
 
-    def fit(self, ts: pd.DataFrame or np.ndarray, xreg: Optional[np.array] = None, **kwargs) -> "HFModel":
+    def fit(self, ts: pd.DataFrame or np.ndarray, xreg: Optional[np.array] = None, **kwargs):
         """Fit a base forecast model and calculate the reconciliation matrix used for reconciliation.
 
         :param ts: T * m, each column represents one bottom-level time series. The order of series should be same as \
@@ -77,26 +77,23 @@ class HFModel:
 
         if self.hf_method == "comb":
             if self.comb_method == "ols":
-                self.G = fr.wls(self.hierarchy, error=None, method="ols",
-                                constraint_level=self.constrain_level)
+                error = None
             elif self.comb_method == "wls":
-                if self.weights == "structural":
-                    self.G = fr.wls(self.hierarchy, error=None, method="wls", weighting="structural",
-                                    constraint_level=self.constrain_level)
-                elif isinstance(self.weights, np.ndarray):
-                    self.G = fr.wls(self.hierarchy, error=None, method="wls", weighting=self.weights,
-                                    constraint_level=self.constrain_level)
-                else:
-                    raise ValueError("This weighting method for wls is not supported.")
+                assert self.weights == "structural" or isinstance(self.weights, np.ndarray), "This weighting method for\
+                 wls is not supported."
+                error = None
             elif self.comb_method == "mint":
-                residuals = np.stack([forecaster.residuals for forecaster in self.base_forecasters], axis=0)
-                self.G = fr.wls(self.hierarchy, residuals, method="mint", weighting=self.weights,
-                                constraint_level=self.constrain_level)
+                assert self.weights in ["sample", "shrinkage", "variance"] or isinstance(self.weights, np.ndarray), \
+                "This weighting method for mint is not supported"
+                error = np.stack([forecaster.residuals for forecaster in self.base_forecasters], axis=0)
             else:
                 raise ValueError("This combination method is not supported.")
+
+            self.G = fr.mint(self.hierarchy, error=error, method=self.comb_method, weighting=self.weights,
+                             immutable_set=self.immutable_set)
         else:
             raise NotImplementedError("This method is not implemented.")
-        return self
+
 
     def generate_base_forecast(self, horizon: int = 1, xreg=None, **kwargs):
         forecasts = np.stack([self.base_forecasters[i].forecast(h=horizon, xreg=None if xreg is None else xreg[i],
