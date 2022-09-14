@@ -153,16 +153,16 @@ class Hierarchy:
         :param bts: bottom-level time series
         :return: upper-level time series.
         """
-        if isinstance(levels, str):
-            assert levels in self.node_level
-            s = self.s_mat[np.where(self.node_level == levels)]
-            return bts.dot(s.T)
-        elif levels is None:
-            s = self.s_mat
+        if levels is not None:
+            levels = [levels] if isinstance(levels, str) else list(levels)
+            if np.alltrue(np.isin(levels, self.level_name)):
+                s = self.s_mat[np.isin(self.node_level, levels)]
+            elif np.alltrue(np.isin(levels, self.node_name)):
+                s = self.s_mat[np.isin(self.node_name, levels)]
+            else:
+                raise ValueError("levels should all be level names or node names.")
         else:
-            levels = list(levels)
-            assert np.isin(levels, self.level_name).all()
-            s = self.s_mat[np.isin(self.node_level, levels)]
+            s = self.s_mat
         return bts.dot(s.T)
 
     def check_hierarchy(self, *hts):

@@ -7,7 +7,7 @@ __all__ = [
     "BaseForecaster",
     "AutoArimaForecaster",
     "HFModel",
-    "wls",
+    "mint",
     "mape",
     "mase",
     "smape",
@@ -26,7 +26,7 @@ from pyhts._forecaster import (
 
 from pyhts._HFModel import HFModel
 
-from pyhts._reconciliation import wls
+from pyhts._reconciliation import mint
 
 from pyhts._hts import Hts
 
