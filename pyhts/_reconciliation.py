@@ -1,7 +1,7 @@
 import numpy as np
 from typing import *
 import scipy.linalg as lg
-from pyhts._hierarchy import Hierarchy
+from pyhts._hierarchy import *
 
 __all__ = ["mint"]
 
@@ -25,7 +25,7 @@ def _lamb_estimate(x: np.ndarray) -> float:
     return lamb
 
 
-def mint(hierarchy: Hierarchy,
+def mint(hierarchy: Union[Hierarchy, TemporalHierarchy],
          error: np.ndarray = None,
          method: str = "ols",
          weighting: Union[str, np.ndarray, None] = None,

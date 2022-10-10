@@ -1,10 +1,10 @@
 import numpy as np
 import pandas as pd
 from copy import copy
-from typing import Union, List, Tuple, Optional, Iterable
+from typing import Union, List, Tuple, Optional, Iterable, Dict
 from pyhts import _accuracy
 
-__all__ = ["Hierarchy"]
+__all__ = ["Hierarchy", "TemporalHierarchy"]
 
 
 class Hierarchy:
@@ -251,3 +251,136 @@ class Hierarchy:
         accs.index = self.node_name[np.isin(self.node_level, levels)] if levels is not None else self.node_name
         return accs
 
+
+class TemporalHierarchy:
+    """Class for temporal hierarchy, constructed by multiple temporal aggregations.
+
+    **Attributes**
+
+        .. py:attribute:: s_mat
+
+        summing matrix
+
+        .. py:attribute:: node_level
+
+        array indicating the corresponding level name of each node
+
+        .. py:attribute:: node_name
+
+        array indicating the name of each node. It is corresponded with row of summing matrix.
+
+        .. py:attribute:: level_name
+
+        array indicating the name of each level
+    """
+
+    def __init__(self, s_mat, node_level, names, period, level_name):
+        self.s_mat = s_mat
+        self.period = period
+
+        self.node_level = node_level
+        self.node_name = names
+        self.level_name = level_name
+
+    @classmethod
+    def new(cls,
+            agg_periods: List[int],
+            forecast_frequency: int) -> "TemporalHierarchy":
+        """TemporalHierarchy constructor.
+
+        :param agg_periods: periods of the aggregation levels, referring to how many periods in the bottom-level are \
+        aggregated. To ensure a reasonable hierarchy, each element in :code:`agg_periods` should be a factor of the  \
+        the max agg_period. For example, possible aggregation periods for monthly time series could be 2 (two \
+        months ), 3 (a quarter), 4 (four months), 6(half year), 12 (a year).
+        :param forecast_frequency: frequency of the bottom level series, corresponding to the aggregation level \
+        :code:`1` in agg_periods
+        """
+        agg_periods.sort(reverse=True)
+        period = agg_periods[0]
+
+        for agg_period in agg_periods:
+            assert period % agg_period == 0, f"agg_period should be a factor of period, {period} % {agg_period} != 0"
+
+        if 1 not in agg_periods:
+            agg_periods.append(1)
+        s_matrix = np.concatenate([np.kron(np.eye(period // agg_period, dtype=int), np.tile(1, (1, agg_period)))
+                                   for agg_period in agg_periods])
+        level_names = [f'agg_{agg_period}' for agg_period in agg_periods]
+        names = []
+        for agg_period in agg_periods:
+            names.extend([f'agg_{agg_period}_{i+1}' for i in range(period // agg_period)])
+        node_level = []
+        for agg_period in agg_periods:
+            node_level.extend([f'agg_{agg_period}'] * (period // agg_period))
+
+        return cls(s_matrix, node_level, names, forecast_frequency, level_names)
+
+    def aggregate_ts(self, bts: np.ndarray, levels=None) -> dict:
+        """aggregate time series
+
+        :param bts: should be a univariate time series
+        :param levels: which level to be aggregated, should be one of the level_name
+        :return: a dict whose keys are level_name and value are temporally aggregated time series.
+        """
+
+        assert len(bts.shape) == 1, "the function can only be applied to univariate time series"
+
+        if levels is not None:
+            if not isinstance(levels, str):
+                levels = list(levels)
+            assert np.isin(levels, self.level_name).all(), "the levels should be in level_names"
+
+        n, m = self.s_mat.shape
+        k = len(bts) // m
+        bts = bts[-(k*m):].reshape((k, m))
+        ats = bts.dot(self.s_mat.T)
+        ats_dict = self._temporal_array2dict(ats)
+
+        if levels is not None:
+            return {key: ats_dict[key] for key in levels}
+        return ats_dict
+
+    def accuracy(self, real: np.ndarray, pred: dict, hist: np.ndarray = None, measure=None):
+        """function to compute forecast accuracy
+
+        :param real: univariate time series at forecast periods
+        :param pred: dict containing forecasts, either reconciled or base
+        :param hist: univariate historical time series
+        :param measure: measures
+        :return:
+        """
+
+        if measure is None:
+            measure = ['mase', 'mape', 'rmse']
+        if 'mase' in measure or 'smape' in measure or 'rmsse' in measure:
+            assert hist is not None
+
+        agg_true = self.aggregate_ts(real)
+
+        if hist is not None:
+            hist = self.aggregate_ts(hist)
+
+        accs = dict()
+        for me in measure:
+            try:
+                accs[me] = np.array([getattr(_accuracy, me)(agg_true[key], pred[key], hist[key],
+                                                            self.period // int(key.split('_')[1]) if self.period // int(key.split('_')[1]) > 1 else 1)
+                                     for key in pred])
+            except AttributeError:
+                print('This forecasting measure is not supported!')
+        output = pd.DataFrame(accs)
+        output.index = list(pred.keys())
+        return output
+
+    def _temporal_dict2array(self, dt: Dict):
+        freqs = [self.period // int(i.split('_')[1]) for i in self.level_name]
+        tmp = []
+        for i, series in enumerate(self.level_name):
+            tmp.append(dt[series].reshape((-1, freqs[i])))
+        return np.concatenate(tmp, axis=1)
+
+    def _temporal_array2dict(self, array: np.ndarray):
+        ats_dict = dict()
+        for l in self.level_name:
+            ats_dict[l] = array[:, np.isin(self.node_level, l)].reshape((-1,))
+        return ats_dict
