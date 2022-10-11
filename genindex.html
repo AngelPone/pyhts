@@ -38,8 +38,9 @@
               <p class="caption" role="heading"><span class="caption-text">QuickStart</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/Tutorials.html">Quick Start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/hierarchy.html">Define Hierarchy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/hierarchy.html">Define Hierarchy and TemporalHierarchy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/hfmodel.html">Define, Fit and Forecast of HFModel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/temporalhfmodel.html">Define, Fit and Forecast of TemporalHFModel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials/evaluation.html">Model Evaluation</a></li>
 </ul>
 
@@ -73,19 +74,26 @@
  <a href="#_"><strong>_</strong></a>
  | <a href="#A"><strong>A</strong></a>
  | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
  | <a href="#H"><strong>H</strong></a>
+ | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
  
 </div>
 <h2 id="_">_</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="tutorials/hfmodel.html#pyhts.HFModel.__init__">__init__() (pyhts.HFModel method)</a>
+
+      <ul>
+        <li><a href="tutorials/temporalhfmodel.html#pyhts.TemporalHFModel.__init__">(pyhts.TemporalHFModel method)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -93,10 +101,16 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="tutorials/evaluation.html#pyhts.Hierarchy.accuracy">accuracy() (pyhts.Hierarchy method)</a>
+
+      <ul>
+        <li><a href="tutorials/evaluation.html#pyhts.TemporalHierarchy.accuracy">(pyhts.TemporalHierarchy method)</a>
 </li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="tutorials/evaluation.html#pyhts.Hierarchy.accuracy_base">accuracy_base() (pyhts.Hierarchy method)</a>
+</li>
+      <li><a href="tutorials/hierarchy.html#pyhts.TemporalHierarchy.aggregate_ts">aggregate_ts() (pyhts.TemporalHierarchy method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -105,6 +119,18 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="tutorials/hfmodel.html#pyhts.HFModel.fit">fit() (pyhts.HFModel method)</a>
+
+      <ul>
+        <li><a href="tutorials/temporalhfmodel.html#pyhts.TemporalHFModel.fit">(pyhts.TemporalHFModel method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="tutorials/temporalhfmodel.html#pyhts.TemporalHFModel.generate_base_forecast">generate_base_forecast() (pyhts.TemporalHFModel method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -117,6 +143,14 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="tutorials/hierarchy.html#pyhts.Hierarchy">Hierarchy (class in pyhts)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="tutorials/hierarchy.html#pyhts.TemporalHierarchy.level_name">level_name (pyhts.TemporalHierarchy attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -141,13 +175,25 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="tutorials/hierarchy.html#pyhts.Hierarchy.new">new() (pyhts.Hierarchy class method)</a>
+
+      <ul>
+        <li><a href="tutorials/hierarchy.html#pyhts.TemporalHierarchy.new">(pyhts.TemporalHierarchy class method)</a>
 </li>
+      </ul></li>
+      <li><a href="tutorials/hierarchy.html#pyhts.Hierarchy.node_level">node_level (pyhts.Hierarchy attribute)</a>
+
+      <ul>
+        <li><a href="tutorials/hierarchy.html#pyhts.TemporalHierarchy.node_level">(pyhts.TemporalHierarchy attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="tutorials/hierarchy.html#pyhts.Hierarchy.node_level">node_level (pyhts.Hierarchy attribute)</a>
-</li>
       <li><a href="tutorials/hierarchy.html#pyhts.Hierarchy.node_name">node_name (pyhts.Hierarchy attribute)</a>
+
+      <ul>
+        <li><a href="tutorials/hierarchy.html#pyhts.TemporalHierarchy.node_name">(pyhts.TemporalHierarchy attribute)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -159,7 +205,11 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="tutorials/hfmodel.html#pyhts.HFModel.predict">predict() (pyhts.HFModel method)</a>
+
+      <ul>
+        <li><a href="tutorials/temporalhfmodel.html#pyhts.TemporalHFModel.predict">(pyhts.TemporalHFModel method)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -175,10 +225,26 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="tutorials/hierarchy.html#pyhts.Hierarchy.s_mat">s_mat (pyhts.Hierarchy attribute)</a>
+
+      <ul>
+        <li><a href="tutorials/hierarchy.html#pyhts.TemporalHierarchy.s_mat">(pyhts.TemporalHierarchy attribute)</a>
 </li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="tutorials/evaluation.html#pyhts.smape">smape() (in module pyhts)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="tutorials/temporalhfmodel.html#pyhts.TemporalHFModel">TemporalHFModel (class in pyhts)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="tutorials/hierarchy.html#pyhts.TemporalHierarchy">TemporalHierarchy (class in pyhts)</a>
 </li>
   </ul></td>
 </tr></table>

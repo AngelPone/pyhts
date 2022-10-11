@@ -20,7 +20,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Model Evaluation" href="evaluation.html" />
+    <link rel="next" title="Temporal hierarchical forecasting model" href="temporalhfmodel.html" />
     <link rel="prev" title="Define Hierarchy" href="hierarchy.html" /> 
 </head>
 
@@ -42,7 +42,7 @@
               <p class="caption" role="heading"><span class="caption-text">QuickStart</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="Tutorials.html">Quick Start</a></li>
-<li class="toctree-l1"><a class="reference internal" href="hierarchy.html">Define Hierarchy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hierarchy.html">Define Hierarchy and TemporalHierarchy</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Define, Fit and Forecast of HFModel</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#hfmodel-api">HFModel API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a><ul>
@@ -57,6 +57,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="temporalhfmodel.html">Define, Fit and Forecasts of TemporalHFModel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="evaluation.html">Model Evaluation</a></li>
 </ul>
 
@@ -90,11 +91,11 @@
 <h2>HFModel API<a class="headerlink" href="#hfmodel-api" title="Permalink to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyhts.HFModel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyhts.</span></span><span class="sig-name descname"><span class="pre">HFModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hierarchy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_forecasters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hf_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'comb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comb_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ols'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constrain_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.HFModel" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyhts.</span></span><span class="sig-name descname"><span class="pre">HFModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hierarchy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_forecasters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hf_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'comb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comb_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ols'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">immutable_set</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.HFModel" title="Permalink to this definition"></a></dt>
 <dd><p>Model for hierarchical forecasting.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyhts.HFModel.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hierarchy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_forecasters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hf_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'comb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comb_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ols'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constrain_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.HFModel.__init__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hierarchy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_forecasters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hf_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'comb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comb_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ols'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">immutable_set</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.HFModel.__init__" title="Permalink to this definition"></a></dt>
 <dd><p>Define a hierarchical forecasting model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -104,7 +105,7 @@
 <li><p><strong>hf_method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – method for hierarchical forecasting, <code class="code docutils literal notranslate"><span class="pre">comb</span></code> is only supported for now, which represents        optimal combination method.</p></li>
 <li><p><strong>comb_method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – method for forecast reconciliation, ols, wls or mint.</p></li>
 <li><p><strong>weights</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – weighting matrix used in wls and mint, “structural” or custom symmetric matrix for wls,         “shrinkage”, “sample”, “variance” for mint.</p></li>
-<li><p><strong>constrain_level</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – -1 means no constraints.</p></li>
+<li><p><strong>immutable_set</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]) – the subset of time series to be unchanged during reconciliation</p></li>
 </ul>
 </dd>
 </dl>
@@ -122,11 +123,8 @@
 <li><p><strong>kwargs</strong> – parameters passed to <code class="code docutils literal notranslate"><span class="pre">base_forecasters</span></code>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="#pyhts.HFModel" title="pyhts._HFModel.HFModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">HFModel</span></code></a></p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>fitted HFModel</p>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>fitted HFModel</p>
 </dd>
 </dl>
 </dd></dl>
@@ -304,7 +302,7 @@ the base forecasts to coherent forecasts in bottom level.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="hierarchy.html" class="btn btn-neutral float-left" title="Define Hierarchy" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="evaluation.html" class="btn btn-neutral float-right" title="Model Evaluation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="temporalhfmodel.html" class="btn btn-neutral float-right" title="Temporal hierarchical forecasting model" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

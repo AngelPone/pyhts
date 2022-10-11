@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Temporal hierarchical forecasting model &mdash; pyhts  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Model Evaluation" href="evaluation.html" />
+    <link rel="prev" title="Hierarchical Forecasting Model" href="hfmodel.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> pyhts
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">QuickStart</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Tutorials.html">Quick Start</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hierarchy.html">Define Hierarchy and TemporalHierarchy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hfmodel.html">Define, Fit and Forecast of HFModel</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Define, Fit and Forecast of TemporalHFModel</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#temporalhfmodel-api">TemporalHFModel API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#define-and-fit-temporal-hierarchical-forecasting-model">Define and fit temporal hierarchical forecasting model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#predict-and-evaluate-forecasts">Predict and evaluate forecasts</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="evaluation.html">Model Evaluation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyhts</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Temporal hierarchical forecasting model</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="temporal-hierarchical-forecasting-model">
+<h1>Temporal hierarchical forecasting model<a class="headerlink" href="#temporal-hierarchical-forecasting-model" title="Permalink to this heading"></a></h1>
+<p>Temporal hierarchical forecasting model is defined by <a class="reference internal" href="#pyhts.TemporalHFModel" title="pyhts.TemporalHFModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">TemporalHFModel</span></code></a></p>
+<section id="temporalhfmodel-api">
+<h2>TemporalHFModel API<a class="headerlink" href="#temporalhfmodel-api" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyhts.TemporalHFModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyhts.</span></span><span class="sig-name descname"><span class="pre">TemporalHFModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hierarchy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_forecasters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hf_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'comb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comb_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ols'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">immutable_set</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.TemporalHFModel" title="Permalink to this definition"></a></dt>
+<dd><p>Temporal hierarchical forecasting model</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyhts.TemporalHFModel.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hierarchy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_forecasters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hf_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'comb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comb_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ols'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">immutable_set</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.TemporalHFModel.__init__" title="Permalink to this definition"></a></dt>
+<dd><p>Constructor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hierarchy</strong> (<a class="reference internal" href="hierarchy.html#pyhts.TemporalHierarchy" title="pyhts._hierarchy.TemporalHierarchy"><code class="xref py py-class docutils literal notranslate"><span class="pre">TemporalHierarchy</span></code></a>) – hierarchical structure.</p></li>
+<li><p><strong>base_forecasters</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – base forecasters, It should be string or dictionary.         If string, it could be “arima” implemented by statsforecast.         If dict, its keys should be the level name of the hierarchy, corresponding values represent the fitted         or not fitted Forecaster.</p></li>
+<li><p><strong>hf_method</strong> – <code class="code docutils literal notranslate"><span class="pre">comb</span></code> for optimal combination</p></li>
+<li><p><strong>comb_method</strong> – <code class="code docutils literal notranslate"><span class="pre">ols</span></code>, <code class="code docutils literal notranslate"><span class="pre">wls</span></code>, <code class="code docutils literal notranslate"><span class="pre">mint</span></code></p></li>
+<li><p><strong>weights</strong> – weighting strategies, same as HFModel</p></li>
+<li><p><strong>immutable_set</strong> – immutable nodes, same as HFModel</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyhts.TemporalHFModel.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xreg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.TemporalHFModel.fit" title="Permalink to this definition"></a></dt>
+<dd><p>fit base models and reconciliation matrix</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ts</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – univariate time series</p></li>
+<li><p><strong>xreg</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>]) – dict containing covariates passed to each level</p></li>
+<li><p><strong>kwargs</strong> – other possible arguments passed to forecaster</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyhts.TemporalHFModel.generate_base_forecast">
+<span class="sig-name descname"><span class="pre">generate_base_forecast</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">horizon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xreg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.TemporalHFModel.generate_base_forecast" title="Permalink to this definition"></a></dt>
+<dd><p>generate base forecasts</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>horizon</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – horizon for the top level</p></li>
+<li><p><strong>xreg</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>]) – covariates dict passed to forecaster</p></li>
+<li><p><strong>kwargs</strong> – other arguments passed to forecaster</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>dict containing base forecasts of each level</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyhts.TemporalHFModel.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">horizon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xreg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyhts.TemporalHFModel.predict" title="Permalink to this definition"></a></dt>
+<dd><p>predict base forecasts and reconcile them.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>horizon</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – horizon for the top level</p></li>
+<li><p><strong>xreg</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>]) – covariates dict passed to forecaster</p></li>
+<li><p><strong>kwargs</strong> – other arguments passed to forecaster</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dict containing reconciled forecasts of each level</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this heading"></a></h2>
+<p>Randomly generate some dataset and define the hierarchy. Here, we
+consider a monthly time series and aggregation perios are 2, 3, 6, 12.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyhts</span> <span class="kn">import</span> <span class="n">TemporalHierarchy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">120</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ht</span> <span class="o">=</span> <span class="n">TemporalHierarchy</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">agg_periods</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span> <span class="n">forecast_frequency</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ht</span><span class="o">.</span><span class="n">level_name</span>
+<span class="go">[&#39;agg_12&#39;, &#39;agg_6&#39;, &#39;agg_3&#39;, &#39;agg_2&#39;, &#39;agg_1&#39;]</span>
+</pre></div>
+</div>
+<section id="define-and-fit-temporal-hierarchical-forecasting-model">
+<h3>Define and fit temporal hierarchical forecasting model<a class="headerlink" href="#define-and-fit-temporal-hierarchical-forecasting-model" title="Permalink to this heading"></a></h3>
+<p>Then we can construct a temporal hierarchical forecasting model using
+the ols reconciliation method and arima models as base forecasters.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyhts</span> <span class="kn">import</span> <span class="n">TemporalHFModel</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hfmodel</span> <span class="o">=</span> <span class="n">TemporalHFModel</span><span class="p">(</span><span class="n">ht</span><span class="p">,</span> <span class="s2">&quot;arima&quot;</span><span class="p">,</span> <span class="n">hf_method</span><span class="o">=</span><span class="s1">&#39;comb&#39;</span><span class="p">,</span> <span class="n">comb_method</span><span class="o">=</span><span class="s1">&#39;ols&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hfmodel</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="predict-and-evaluate-forecasts">
+<h3>Predict and evaluate forecasts<a class="headerlink" href="#predict-and-evaluate-forecasts" title="Permalink to this heading"></a></h3>
+<p>The horizon here should be the corresponding forecast horizon for the top level.
+For example, if we want to predict the next 12 months, the horizon
+should be 1 (the top level is year).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">fcasts</span> <span class="o">=</span> <span class="n">hfmodel</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="p">{</span><span class="s1">&#39;agg_12&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="mf">5.89485775</span><span class="p">]),</span>
+<span class="s1">&#39;agg_6&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="mf">2.94742887</span><span class="p">,</span> <span class="mf">2.94742887</span><span class="p">]),</span>
+<span class="s1">&#39;agg_3&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="mf">1.47371444</span><span class="p">,</span> <span class="mf">1.47371444</span><span class="p">,</span> <span class="mf">1.47371444</span><span class="p">,</span> <span class="mf">1.47371444</span><span class="p">]),</span>
+<span class="s1">&#39;agg_2&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="mf">0.98247629</span><span class="p">,</span> <span class="mf">0.98247629</span><span class="p">,</span> <span class="mf">0.98247629</span><span class="p">,</span> <span class="mf">0.98247629</span><span class="p">,</span> <span class="mf">0.98247629</span><span class="p">,</span>
+      <span class="mf">0.98247629</span><span class="p">]),</span>
+<span class="s1">&#39;agg_1&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="mf">0.49123815</span><span class="p">,</span> <span class="mf">0.49123815</span><span class="p">,</span> <span class="mf">0.49123815</span><span class="p">,</span> <span class="mf">0.49123815</span><span class="p">,</span> <span class="mf">0.49123815</span><span class="p">,</span>
+      <span class="mf">0.49123815</span><span class="p">,</span> <span class="mf">0.49123815</span><span class="p">,</span> <span class="mf">0.49123815</span><span class="p">,</span> <span class="mf">0.49123815</span><span class="p">,</span> <span class="mf">0.49123815</span><span class="p">,</span>
+      <span class="mf">0.49123815</span><span class="p">,</span> <span class="mf">0.49123815</span><span class="p">])}</span>
+</pre></div>
+</div>
+<p>The forecasts can be evaluated using <a class="reference internal" href="hierarchy.html#pyhts.TemporalHierarchy.accuracy" title="pyhts.TemporalHierarchy.accuracy"><code class="xref py py-class docutils literal notranslate"><span class="pre">accuracy()</span></code></a>
+method. We pass the future observations, forecasts and historical
+observations (if needed). The measures for each level are returned.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">real</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">ht</span><span class="o">.</span><span class="n">accuracy</span><span class="p">(</span><span class="n">real</span><span class="p">,</span> <span class="n">pred</span><span class="p">,</span> <span class="n">ts</span><span class="p">)</span>
+            <span class="n">mase</span>      <span class="n">mape</span>      <span class="n">rmse</span>
+   <span class="n">agg_12</span>  <span class="mf">3.023196</span>  <span class="mf">0.187241</span>  <span class="mf">1.358036</span>
+   <span class="n">agg_6</span>   <span class="mf">1.248526</span>  <span class="mf">0.186900</span>  <span class="mf">0.683057</span>
+   <span class="n">agg_3</span>   <span class="mf">0.742426</span>  <span class="mf">0.178560</span>  <span class="mf">0.455563</span>
+   <span class="n">agg_2</span>   <span class="mf">1.144290</span>  <span class="mf">0.504512</span>  <span class="mf">0.525026</span>
+   <span class="n">agg_1</span>   <span class="mf">0.810293</span>  <span class="mf">2.290112</span>  <span class="mf">0.317474</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="hfmodel.html" class="btn btn-neutral float-left" title="Hierarchical Forecasting Model" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="evaluation.html" class="btn btn-neutral float-right" title="Model Evaluation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Bohan Zhang.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

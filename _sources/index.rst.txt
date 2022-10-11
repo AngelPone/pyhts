@@ -12,6 +12,7 @@ Welcome to pyhts's documentation!
    :caption: QuickStart
 
    Quick Start <tutorials/Tutorials.rst>
-   Define Hierarchy <tutorials/hierarchy.rst>
+   Define Hierarchy and TemporalHierarchy <tutorials/hierarchy.rst>
    Define, Fit and Forecast of HFModel <tutorials/hfmodel.rst>
+   Define, Fit and Forecast of TemporalHFModel <tutorials/temporalhfmodel.rst>
    Model Evaluation <tutorials/evaluation.rst>

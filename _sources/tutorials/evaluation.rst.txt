@@ -2,12 +2,14 @@ Model Evaluation
 ================
 
 After obtaining base forecasts or coherent reconciled forecasts, you can use evaluate the forecasting accuracy
-through :meth:`pyhts.accuracy_base` or :meth:`pyhts.accuracy` respectively.
+through :meth:`pyhts.Hierarchy.accuracy_base`, :meth:`pyhts.Hierarchy.accuracy`, or :meth:`pyhts.TemporalHierarchy.accuracy` (for temporal hierarchies).
 
 
 .. automethod:: pyhts.Hierarchy.accuracy_base
 
 .. automethod:: pyhts.Hierarchy.accuracy
+
+.. automethod:: pyhts.TemporalHierarchy.accuracy
 
 
 Assuming :code:`ht` is a defined hierarchy, :code:`model` is a fitted :class:`~pyhts.HFModel`, :code:`test`
