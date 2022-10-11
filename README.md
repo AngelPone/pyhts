@@ -1,4 +1,7 @@
-# `pyhts`
+# pyhts
+
+![pypi](https://badgen.net/pypi/v/pyhts) ![license](https://badgen.net/pypi/license/pyhts)
+
 A python package for hierarchical forecasting, inspired by the [hts](https://cran.r-project.org/web/packages/hts/index.html) package in R.
 
 ## Features
