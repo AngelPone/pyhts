@@ -1,9 +1,10 @@
 # Version of the pyhts package
-__version__ = "0.1.5"
+__version__ = "0.2.0"
 
 __all__ = [
     "Hierarchy",
-    "Hts",
+    "TemporalHierarchy",
+    "TemporalHFModel",
     "BaseForecaster",
     "AutoArimaForecaster",
     "HFModel",
@@ -18,17 +19,15 @@ __all__ = [
     "load_tourism"
 ]
 
-from pyhts._hierarchy import Hierarchy
+from pyhts._hierarchy import *
 from pyhts._forecaster import (
     BaseForecaster,
     AutoArimaForecaster
 )
 
-from pyhts._HFModel import HFModel
+from pyhts._HFModel import HFModel, TemporalHFModel
 
 from pyhts._reconciliation import mint
-
-from pyhts._hts import Hts
 
 from pyhts._accuracy import (
     mae,
