@@ -42,7 +42,7 @@ Mixing these two hierarchies gives following levels, totally 4 * 4 = 16 levels:
 
 Another example of this kind of hierarchy is the file system with tags, while usually tags only have one level except the total level.
 
-To construct the product hierarchy using :class:`pyhts.Hierarchy.new()`, use the following statement:
+To construct the product hierarchy using :class:`~pyhts.Hierarchy.new()`, use the following statement:
 
 .. code-block:: Python
 
@@ -56,8 +56,19 @@ You can also specify :code:`excludes` and :code:`includes` to exclude some level
     :members: new
 
 
+Temporal Hierarchy
+------------------
+
+Temporal hierarchy is constructed by multiple levels of temporal aggregation of a time series. :code:`pyhts` provide
+:class:`~pyhts.TemporalHierarchy` to construct temporal hierarchy. The methodology is well-known as THief (Athanasopoulos et al., 2017).
+
+.. autoclass:: pyhts.TemporalHierarchy
+    :members: new, aggregate_ts
 
 Reference
 ---------
 
 [1] Hyndman, R. J., & Athanasopoulos, G. (2021). Forecasting: Principles and Practice (3rd ed.). Otext. https://otexts.com/fpp3/
+
+[2] Athanasopoulos, G., Hyndman, R. J., Kourentzes, N., & Petropoulos, F. (2017). Forecasting with temporal hierarchies. European Journal of Operational Research, 262(1), 60–74. https://doi.org/10.1016/j.ejor.2017.02.046
+
