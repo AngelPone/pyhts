@@ -7,7 +7,6 @@ import pandas as pd
 
 __all__ = ["HFModel", "TemporalHFModel"]
 
-
 class HFModel:
     """Model for hierarchical forecasting.
 

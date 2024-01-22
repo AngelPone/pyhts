@@ -2,9 +2,17 @@ import numpy as np
 import pandas as pd
 from copy import copy
 from typing import Union, List, Tuple, Optional, Iterable, Dict
-from pyhts import _accuracy
+# from pyhts import _accuracy
+from itertools import combinations
+from scipy.sparse import csr_array, identity, vstack, kron
 
 __all__ = ["Hierarchy", "TemporalHierarchy"]
+
+def get_all_combinations(lst):
+    n = len(lst)
+    for r in range(1, n):
+        for comb in combinations(lst, r):
+            yield comb
 
 
 class Hierarchy:
@@ -26,151 +34,166 @@ class Hierarchy:
             level name of each node.
     """
 
-    def __init__(self, s_mat, node_level, names, period, level_name=None):
-        self.s_mat = s_mat.astype('int8')
-        """ Summing matrix. """
-        self.node_level = np.array(node_level)
-        self.level_name = np.array(level_name)
-        self.node_name = np.array(names)
-        self.period = period
+    def __init__(self, s_mat, indices: pd.DataFrame):
+        self.s_mat = s_mat
+        self.indices = indices
+
+        # cross-sectional numbers
+        agg_periods = self.indices['agg_period'].unique().tolist()
+        agg_periods.sort(reverse=True)
+        self.frequencies = [max(agg_periods) // i for i in agg_periods]
+        self.n = s_mat.shape[0] // sum(self.frequencies)
+        self.m = s_mat.shape[1] // indices["agg_period"].max()
+
 
     @classmethod
-    def new(cls, df: pd.DataFrame,
-            structures: List[Tuple[str, ...]],
-            excludes: List[Tuple[str, ...]] = None,
-            includes: List[Tuple[str, ...]] = None,
-            period: int = 1) -> "Hierarchy":
-        """Construct hierarchy from data table that each row represents a unique bottom level time series.
-        This method is suitable for complex hierarchical structure.
+    def new(cls, df: Optional[pd.DataFrame] = None,
+            structures: Optional[List[str]] = None,
+            excludes: Optional[List[Dict]] = None,
+            includes: Optional[List[Dict]] = None,
+            agg_periods: Optional[List[int]] = None) -> "Hierarchy":
+        """Construct cross-sectional/temporal/cross-temporal hierarchy. If only agg_periods is specified, \
+        a temporal hierarchy is constructed. If only structures is specified, a cross-sectional hierarchy is \
+        constructed. If both are specified, a cross-temporal hierarchy is constructed.
 
-        **Examples**
+        **Examples** TODO
+            >>> import pandas as pd
 
-            >>> from pyhts import Hierarchy
-            >>> df = pd.DataFrame({"City": ["A", "A", "B", "B"], "Store": ["Store1", "Store2", "Store3", "Store4"]})
-            >>> hierarchy = Hierarchy.new(df, [("City", "Store")])
-            >>> hierarchy.node_name
-            array(['total_total', 'City_A', 'City_B', 'Store_Store1', 'Store_Store2',
-                   'Store_Store3', 'Store_Store4'], dtype=object)
-            >>> hierarchy.s_mat
-            array([[1, 1, 1, 1],
-                   [1, 1, 0, 0],
-                   [0, 0, 1, 1],
-                   [1, 0, 0, 0],
-                   [0, 1, 0, 0],
-                   [0, 0, 1, 0],
-                   [0, 0, 0, 1]], dtype=int8)
-            >>> df = pd.DataFrame({"City": ["A", "A", "B", "B"], "Category": ["C1", "C2", "C1", "C2"]})
-            >>> hierarchy = Hierarchy.new(df, [("City",), ("Category",)])
-            >>> hierarchy.s_mat
-            array([[1, 1, 1, 1],
-                   [1, 1, 0, 0],
-                   [0, 0, 1, 1],
-                   [1, 0, 1, 0],
-                   [0, 1, 0, 1],
-                   [1, 0, 0, 0],
-                   [0, 1, 0, 0],
-                   [0, 0, 1, 0],
-                   [0, 0, 0, 1]], dtype=int8)
 
-        :param df: DataFrame contains keys for determining hierarchical structural.
-        :param structures: The structure of the hierarchy. It should be a list, where each element represents the \
-        hierarchical structure of one natural hierarchy. \
-        The element should be tuple of string (column in the dataframe). \
-        The order of the columns is top-down. \
-        For example, ("category", "sub-category", "item") can be a natural hierarchy.
-        :param excludes: middle levels excluded from the hierarchy.
-        :param includes: middle levels included in the hierarchy.
-        :param period: frequency of the time series, 1 means non-seasonality data, 12 means monthly data.
+        :param df: DataFrame contains keys for determining cross-section structural. Each row responsents a \
+        cross-sectional time series in the bottom level. Each col represents a attribute of the time series. \
+        The attributes are used to define the cross-sectional structure of the hierarchical time series.
+        :param structures: Columns to use. Use all columns by default.
+        :param excludes: middle levels excluded from the hierarchy, identified by attribute values. \
+        For example, in a (Category, Subcategory, Product) sales Hierarchy, [{"Subcategory": "Fruit"}] means \
+        excluding the "Fruit" time series, which is sum of all products in the "Fruit" subcategory.
+        :param includes: same structure as excludes, but only the specified series are included in the hierarchy.
+        :param agg_periods: list of aggregation periods used to construct temporal hierarchy. \
+        For example, [1, 2, 4] for a quarterly time series means aggregating the quarterly time series to \
+        half-yearly and yearly levels. 
         :return: Hierarchy object.
         """
 
-        cols = [c for cs in structures for c in cs]
-        bottoms = [cs[-1] for cs in structures]
-
-        if len(set(cols)) != len(cols):
-            raise ValueError(f"Column should not appear in different tuples (natural hierarchies).")
-
-        levels = []
-        for col in cols:
-            levels.append({*[col]})
-        if len(structures) > 1:
-            levels.append({*bottoms})
-        if includes:
-            for g in includes:
-                if {*g} not in levels:
-                    levels.insert(-2, {{*[g]}} if isinstance(g, str) else {*g})
-        else:
-            from itertools import product, combinations
-            for j in range(2, len(structures) + 1):
-                for comb in combinations(structures, j):
-                    for inter in product(*comb):
-                        if {*inter} not in levels:
-                            levels.insert(-1, {*inter})
-            if excludes:
-                b_set = set(bottoms)
-                for j in excludes:
-                    if b_set == set(j):
-                        raise ValueError(f"The bottom level {'*'.join(b_set)} can not be excluded!")
-                    levels.remove(set(j))
-
-        new_df = copy(df[[list(level)[0] for level in levels if len(level) == 1]])
-        for level in levels:
-            if len(level) > 1:
-                new_df['-'.join(level)] = new_df[list(level)].apply(lambda x: '-'.join(x), axis=1)
-        new_df['total'] = 'total'
-
-        level_names = ['total']
-        level_names.extend([list(level)[0] for level in levels if len(level) == 1])
-        level_names.extend(['-'.join(level) for level in levels if len(level) > 1])
-        new_df = new_df[level_names]
-
-        tmp_df = new_df.copy()
-        for j, structure in enumerate(structures):
-            if len(structure) == 1:
-                continue
-
-            for i in range(1, len(structure)):
-                foo = new_df.loc[:, structure[i-1:i+1]].drop_duplicates()
-                if (foo[structure[i]].value_counts() == 1).all():
-                    continue
+        if df is not None:
+            if structures is not None:
+                df = df[structures]
+            df = df.drop_duplicates().reset_index(drop=True)
+            columns = df.columns
+            indices = df.copy()
+            indptr = np.array([0])
+            indices_s = np.zeros(0, dtype='int')
+            data = np.zeros(0)
+            current_row = 0
+            existing_idxs = []
+            for comb in get_all_combinations(columns):
+                keys = df.groupby(list(comb))
+                keys_dict = []
+                for (key, idx) in keys.indices.items():
+                    if len(idx) == 1:
+                        continue
+                    if str(idx) in existing_idxs:
+                        continue
+                    existing_idxs.append(str(idx))
+                    indptr = np.append(indptr, indptr[-1] + len(idx))
+                    current_row += 1
+                    indices_s = np.concatenate([indices_s, idx])
+                    keys_dict.append(key)
+                tmp_df = pd.DataFrame(keys_dict, columns=list(comb))
+                indices = pd.concat([tmp_df, indices], axis=0, ignore_index=True)
+            s_mat = csr_array((np.array([1] * len(indices_s), dtype='int'), indices_s, indptr), shape=(current_row, df.shape[0]))
+            s_mat = vstack([s_mat, identity(df.shape[0], dtype='int')])
+            if agg_periods is None:
+                indices["agg_period"] = 1
+        if agg_periods is not None:
+            assert len(agg_periods) > 1, "agg_periods should be a list of length > 1"
+            assert 1 in agg_periods, "agg_periods should contain 1"
+            agg_periods = list(set(agg_periods))
+            agg_periods.sort(reverse=True)
+            s_mat_temporal = None
+            for agg_period in agg_periods:
+                assert agg_periods[0] % agg_period == 0, f"agg_period should be a factor of max agg_periods, \
+                    {agg_periods[0]} % {agg_period} != 0"
+                
+                    
+                s_mat_tmp = np.zeros((agg_periods[0] // agg_period, agg_periods[0]), dtype='int')
+                for i in range(agg_periods[0] // agg_period):
+                    s_mat_tmp[i, i * agg_period:(i + 1) * agg_period] = 1
+                if s_mat_temporal is None:
+                    s_mat_temporal = s_mat_tmp
                 else:
-                    raise(ValueError(f"Nodes in the level {structure[i]} of {j+1}th hierarchy are not unique."))
+                    s_mat_temporal = np.concatenate([s_mat_temporal, s_mat_tmp], axis=0)
+            s_mat_temporal = csr_array(s_mat_temporal)
+            indices_temporal = pd.DataFrame({"agg_period": agg_periods, "key_cartisian": 1})
+            
+            # Cross-temporal hierarchy
+            if df is not None:
+                s_mat = kron(s_mat, s_mat_temporal)
+                indices["key_cartisian"] = 1
+                indices = indices.merge(indices_temporal, on="key_cartisian")
+            # Temporal hierarchy
+            else:
+                s_mat = s_mat_temporal
+                indices = indices_temporal
+            indices.drop("key_cartisian", axis=1, inplace=True)
 
-        s_dummy = pd.get_dummies(tmp_df)
-        s_mat = s_dummy.values.T
-        s_mat[-new_df.shape[0]:, :] = np.identity(new_df.shape[0])
-        names = list(s_dummy.columns)
-        names[-new_df.shape[0]:] = ['-'.join(levels[-1]) + '_' + i for i in list(new_df[level_names[-1]])]
+        return cls(s_mat, indices)
 
-        node_level = [i.split('_')[0] for i in list(s_dummy.columns)]
-        return cls(s_mat, pd.Series(node_level), pd.Series(names), period=period, level_name=pd.Series(level_names))
-
-    def aggregate_ts(self, bts: np.ndarray, levels: Optional[Union[str, Iterable[str]]] = None) -> np.ndarray:
+    @property
+    def type(self):
+        """Type of the hierarchy, either cross-sectional, temporal or cross-temporal."""
+        if self.indices["agg_period"].max() == 1:
+            return "cs"
+        elif self.indices.shape[1] == 1:
+            return "te"
+        else:
+            return "ct"
+    
+    def aggregate_ts(self, bts: np.ndarray, indices = None) -> Union[np.ndarray, List[Dict]]:
         """Aggregate bottom-level time series.
 
-        :param levels: which levels you want. :code:`str` for single level. :code:`Tuple[str, ...]` for interaction of \
-        levels.
-        :param bts: bottom-level time series
-        :return: upper-level time series.
+        :param bts: bottom-level time series, array-like of shape (T, m)
+        :param indices: indices of the series to aggregate
+        :return: y.
         """
-        if levels is not None:
-            levels = [levels] if isinstance(levels, str) else list(levels)
-            if np.alltrue(np.isin(levels, self.level_name)):
-                s = self.s_mat[np.isin(self.node_level, levels)]
-            elif np.alltrue(np.isin(levels, self.node_name)):
-                s = self.s_mat[np.isin(self.node_name, levels)]
-            else:
-                raise ValueError("levels should all be level names or node names.")
-        else:
-            s = self.s_mat
-        return bts.dot(s.T)
+        # cross-sectional hierarchy
+        max_k = self.indices['agg_period'].max()
+        if max_k == 1:
+            return bts.dot(self.s_mat.toarray().T)
+        # temporal hierarchy and cross-temporal hierarchy
+        else: 
+            if self.type == "te": 
+                assert len(bts.shape) == 1, "temporal hierarchy can only be applied to univariate time series"
+                bts = bts.reshape((-1, 1))
+            time_window = bts.shape[0]
+            if time_window % max_k != 0:
+                T_ = time_window // max_k * max_k
+                bts = bts[(bts.shape[0] - T_ + 1):,]
+                Warning(f"the observations at the first {time_window - T_} timestamps are dropped")
+            
+            bts = np.concatenate([bts[:,i].reshape((-1, max_k)) for i in range(self.m)], axis=1)
+            all_ts = bts.dot(self.s_mat.toarray().T)
+            current_idx = 0
+            output = {}
+            for freq in self.frequencies:
+                idx = [list(range(i * sum(self.frequencies) + current_idx, i * sum(self.frequencies) + current_idx + freq)) for i in range(self.n)]
+                tmp = [all_ts[:, i] for i in idx]
+                tmp = [i.reshape((-1,)) for i in tmp]
+                if len(tmp) == 1:
+                    tmp = tmp[0]
+                else:
+                    tmp = np.stack(tmp, axis=1)
+                current_idx += freq
+                # TODO: cross-sectional indices when cross-temporal hierarchy
+                output[freq] = tmp
+            return output
 
     def check_hierarchy(self, *hts):
-        for ts in hts:
-            if ts.shape[1] == self.s_mat.shape[1]:
-                return True
-            else:
-                return False
+        pass
+        # for ts in hts:
+        #     if ts.shape[1] == self.s_mat.shape[1]:
+        #         return True
+        #     else:
+        #         return False
 
     def accuracy_base(self, real, pred, hist=None,
                       levels: Optional[Union[str, Iterable[str]]] = None,
@@ -184,35 +207,36 @@ class Hierarchy:
         :param measure: list of measures, e.g., ['mase'], ['mse', 'mase'].
         :return: forecast accuracy of base forecasts.
         """
-        assert self.check_hierarchy(real), f"True observations should be of shape (h, m)"
-        assert real.shape[0] == pred.shape[0], \
-            f" {real.shape} True observations have different lengths with {real.shape} forecasts"
+        pass
+        # assert self.check_hierarchy(real), f"True observations should be of shape (h, m)"
+        # assert real.shape[0] == pred.shape[0], \
+        #     f" {real.shape} True observations have different lengths with {real.shape} forecasts"
 
-        if measure is None:
-            measure = ['mase', 'mape', 'rmse']
-        if 'mase' in measure or 'smape' in measure or 'rmsse' in measure:
-            assert hist is not None
-            assert self.check_hierarchy(hist), "History observations should be of shape(T, m)"
-            hist = self.aggregate_ts(hist, levels=levels).T
-        else:
-            hist = [None] * self.s_mat.shape[0]
-        accs = pd.DataFrame()
+        # if measure is None:
+        #     measure = ['mase', 'mape', 'rmse']
+        # if 'mase' in measure or 'smape' in measure or 'rmsse' in measure:
+        #     assert hist is not None
+        #     assert self.check_hierarchy(hist), "History observations should be of shape(T, m)"
+        #     hist = self.aggregate_ts(hist, levels=levels).T
+        # else:
+        #     hist = [None] * self.s_mat.shape[0]
+        # accs = pd.DataFrame()
 
-        agg_true = self.aggregate_ts(real, levels=levels).T
+        # agg_true = self.aggregate_ts(real, levels=levels).T
 
-        if levels is not None:
-            pred = pred.T[np.isin(self.node_level, levels), ]
-        else:
-            pred = pred.T
+        # if levels is not None:
+        #     pred = pred.T[np.isin(self.node_level, levels), ]
+        # else:
+        #     pred = pred.T
 
-        for me in measure:
-            try:
-                accs[me] = np.array([getattr(_accuracy, me)(agg_true[i], pred[i], hist[i], self.period)
-                                     for i in range(hist.shape[0])])
-            except AttributeError:
-                print(f'Forecasting measure {me} is not supported!')
-        accs.index = self.node_name[np.isin(self.node_level, levels)] if levels is not None else self.node_name
-        return accs
+        # for me in measure:
+        #     try:
+        #         accs[me] = np.array([getattr(_accuracy, me)(agg_true[i], pred[i], hist[i], self.period)
+        #                              for i in range(hist.shape[0])])
+        #     except AttributeError:
+        #         print(f'Forecasting measure {me} is not supported!')
+        # accs.index = self.node_name[np.isin(self.node_level, levels)] if levels is not None else self.node_name
+        # return accs
 
     def accuracy(self, real, pred, hist=None,
                  levels: Union[str, None, Iterable[str]] = None,
@@ -226,30 +250,31 @@ class Hierarchy:
         :param measure: list of measures, e.g., ['mase'], ['mse', 'mase'].
         :return: forecast accuracy of reconciled forecasts.
         """
-        assert self.check_hierarchy(real), f"True observations should be of shape (h, m)"
-        assert self.check_hierarchy(pred), f"Forecast values should be of shape (h, m)"
-        assert real.shape[0] == pred.shape[0], \
-            f" {real.shape} True observations have different length with {real.shape} forecasts"
-        if measure is None:
-            measure = ['mase', 'mape', 'rmse']
-        if 'mase' in measure or 'smape' in measure or 'rmsse' in measure:
-            assert hist is not None
-        if hist is not None:
-            assert self.check_hierarchy(hist), "History observations should be of shape(T, m)"
-            hist = self.aggregate_ts(hist, levels=levels).T
-        else:
-            hist = [None] * self.s_mat.shape[0]
-        agg_true = self.aggregate_ts(real, levels=levels).T
-        agg_pred = self.aggregate_ts(pred, levels=levels).T
-        accs = pd.DataFrame()
-        for me in measure:
-            try:
-                accs[me] = np.array([getattr(_accuracy, me)(agg_true[i], agg_pred[i], hist[i], self.period)
-                            for i in range(agg_true.shape[0])])
-            except AttributeError:
-                print('This forecasting measure is not supported!')
-        accs.index = self.node_name[np.isin(self.node_level, levels)] if levels is not None else self.node_name
-        return accs
+        pass
+        # assert self.check_hierarchy(real), f"True observations should be of shape (h, m)"
+        # assert self.check_hierarchy(pred), f"Forecast values should be of shape (h, m)"
+        # assert real.shape[0] == pred.shape[0], \
+        #     f" {real.shape} True observations have different length with {real.shape} forecasts"
+        # if measure is None:
+        #     measure = ['mase', 'mape', 'rmse']
+        # if 'mase' in measure or 'smape' in measure or 'rmsse' in measure:
+        #     assert hist is not None
+        # if hist is not None:
+        #     assert self.check_hierarchy(hist), "History observations should be of shape(T, m)"
+        #     hist = self.aggregate_ts(hist, levels=levels).T
+        # else:
+        #     hist = [None] * self.s_mat.shape[0]
+        # agg_true = self.aggregate_ts(real, levels=levels).T
+        # agg_pred = self.aggregate_ts(pred, levels=levels).T
+        # accs = pd.DataFrame()
+        # for me in measure:
+        #     try:
+        #         accs[me] = np.array([getattr(_accuracy, me)(agg_true[i], agg_pred[i], hist[i], self.period)
+        #                     for i in range(agg_true.shape[0])])
+        #     except AttributeError:
+        #         print('This forecasting measure is not supported!')
+        # accs.index = self.node_name[np.isin(self.node_level, levels)] if levels is not None else self.node_name
+        # return accs
 
 
 class TemporalHierarchy:
@@ -384,3 +409,15 @@ class TemporalHierarchy:
         for l in self.level_name:
             ats_dict[l] = array[:, np.isin(self.node_level, l)].reshape((-1,))
         return ats_dict
+
+
+if __name__ == "__main__":
+    df = pd.read_csv("pyhts/data/Tourism.csv", index_col=0)
+    cross_sectional = Hierarchy.new(df, structures=["state", "region", "city"])
+    temporal = Hierarchy.new(agg_periods=[1, 4, 12])
+    cross_temporal = Hierarchy.new(df, structures=["state", "region", "city"], agg_periods=[1, 4, 12])
+
+    bts = df.loc[:, [str(i) for i in range(240)]].values.T
+    a = cross_sectional.aggregate_ts(bts)
+    b = temporal.aggregate_ts(bts[:,0])
+    c = cross_temporal.aggregate_ts(bts)
