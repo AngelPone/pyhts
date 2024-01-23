@@ -2,7 +2,7 @@ import numpy as np
 from typing import List, Union, Optional, Iterable
 from pyhts._forecaster import BaseForecaster, AutoArimaForecaster
 import pyhts._reconciliation as fr
-from pyhts._hierarchy import *
+from pyhts._hierarchy import Hierarchy
 import pandas as pd
 
 __all__ = ["HFModel", "TemporalHFModel"]
@@ -115,7 +115,7 @@ class TemporalHFModel:
     """Temporal hierarchical forecasting model
     """
 
-    def __init__(self, hierarchy: TemporalHierarchy,
+    def __init__(self, hierarchy,
                  base_forecasters: Union[dict, str],
                  hf_method='comb', comb_method='ols', weights=None,
                  immutable_set=None):

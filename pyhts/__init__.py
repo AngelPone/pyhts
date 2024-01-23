@@ -3,7 +3,6 @@ __version__ = "0.2.0"
 
 __all__ = [
     "Hierarchy",
-    "TemporalHierarchy",
     "TemporalHFModel",
     "BaseForecaster",
     "AutoArimaForecaster",
@@ -19,7 +18,7 @@ __all__ = [
     "load_tourism"
 ]
 
-from pyhts._hierarchy import *
+from pyhts._hierarchy import Hierarchy
 from pyhts._forecaster import (
     BaseForecaster,
     AutoArimaForecaster
