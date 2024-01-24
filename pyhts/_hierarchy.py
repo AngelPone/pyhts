@@ -170,11 +170,15 @@ class Hierarchy:
             return "ct"
     
     def _index_cs(self, indices: pd.DataFrame) -> np.ndarray:
-        indices = indices.merge(pd.DataFrame(columns=self.indices_cs.columns), how="left")
-        right = self.indices_cs.copy()
-        right['_idx'] = right.index
-        indices = indices.merge(right, how="left", on=list(self.indices_cs.columns))
-        return indices["_idx"].dropna().values
+        bottom_idx = self.indices_cs.dropna(axis=0).reset_index(drop=True)
+        bottom_idx['_idx'] = bottom_idx.index        
+        row_indices = []
+        for row in range(indices.shape[0]):
+            row = indices.iloc[row:(row+1), ].dropna(axis=1)
+            row_idx = row.merge(bottom_idx, how = "left", on = list(row.columns))['_idx'].values
+            assert not np.isnan(row_idx).any(), f"{ dict(row) } not found"
+            row_indices.append(row_idx.tolist())
+        return row_indices
 
     def _temporal_aggregate(self, bts: np.ndarray, agg_period: int) -> np.ndarray:
         if len(bts.shape) == 1:
@@ -214,7 +218,7 @@ class Hierarchy:
             if self.type == "cs" or ("agg_period" not in indices.columns and self.type == "ct"):
                 indices = self._index_cs(indices)
                 assert len(indices) > 0, "no series found"
-                return bts.dot(self.s_cs.toarray()[indices,].T)
+                return np.stack([bts[:,i].sum(axis=1) for i in indices], axis=1)
             # pure temporal aggregation
             elif self.type == "te":
                 assert "agg_period" in indices.columns, "agg_period should be specified"
@@ -230,8 +234,8 @@ class Hierarchy:
                     cs = indices[indices["agg_period"] == agg_period].drop(columns="agg_period")
                     if cs.shape[1] > 0:
                         idx = self._index_cs(cs)
-                        output[agg_period] = self._temporal_aggregate(bts.dot(self.s_cs.toarray()[idx,].T), 
-                                                                      agg_period)
+                        agg_ts = np.stack([bts[:,i].sum(axis=1) for i in idx], axis=1)
+                        output[agg_period] = self._temporal_aggregate(agg_ts, agg_period)
                     else:
                         bts = bts.sum(axis=1)
                         output[agg_period] = self._temporal_aggregate(bts, agg_period)
