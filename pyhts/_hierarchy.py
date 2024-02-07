@@ -6,7 +6,7 @@ from scipy.sparse import csr_array, identity, vstack, kron, diags, hstack
 from _reconciliation import _lamb_estimate
 import scipy.linalg as lg
 
-__all__ = ["Hierarchy", "TemporalHierarchy"]
+__all__ = ["Hierarchy"]
 
 
 def get_all_combinations(lst):
@@ -55,7 +55,7 @@ class Hierarchy:
 
     @property
     def s_mat(self):
-        """ summing matrix """
+        """summing matrix"""
         if self.indices_tmp is None:
             return self.s_cs
         elif self.indices_cs is None:
@@ -65,11 +65,14 @@ class Hierarchy:
 
     # TODO: support for excludes and includes
     @classmethod
-    def new(cls, df: Optional[pd.DataFrame] = None,
-            structures: Optional[List[str]] = None,
-            # excludes: Optional[List[Dict]] = None,
-            # includes: Optional[List[Dict]] = None,
-            agg_periods: Optional[List[int]] = None) -> "Hierarchy":
+    def new(
+        cls,
+        df: Optional[pd.DataFrame] = None,
+        structures: Optional[List[str]] = None,
+        # excludes: Optional[List[Dict]] = None,
+        # includes: Optional[List[Dict]] = None,
+        agg_periods: Optional[List[int]] = None,
+    ) -> "Hierarchy":
         """Construct cross-sectional/temporal/cross-temporal hierarchy. If only agg_periods is specified, \
         a temporal hierarchy is constructed. If only structures is specified, a cross-sectional hierarchy is \
         constructed. If both are specified, a cross-temporal hierarchy is constructed.
@@ -88,7 +91,7 @@ class Hierarchy:
         :param includes: same structure as excludes, but only the specified series are included in the hierarchy.
         :param agg_periods: list of aggregation periods used to construct temporal hierarchy. \
         For example, [1, 2, 4] for a quarterly time series means aggregating the quarterly time series to \
-        half-yearly and yearly levels. 
+        half-yearly and yearly levels.
         :return: Hierarchy object.
         """
         s_mat_cs = None
@@ -103,13 +106,13 @@ class Hierarchy:
             columns = df.columns
             indices = pd.DataFrame()
             indptr = np.array([0])
-            indices_s = np.zeros(0, dtype='int')
+            indices_s = np.zeros(0, dtype="int")
             current_row = 0
             existing_idxs = []
             for comb in get_all_combinations(columns):
                 keys = df.groupby(list(comb))
                 keys_dict = []
-                for (key, idx) in keys.indices.items():
+                for key, idx in keys.indices.items():
                     if len(idx) == 1:
                         continue
                     if str(idx) in existing_idxs:
@@ -120,30 +123,35 @@ class Hierarchy:
                     indices_s = np.concatenate([indices_s, idx])
                     keys_dict.append(key)
                 tmp_df = pd.DataFrame(keys_dict, columns=list(comb))
-                indices = pd.concat([indices, tmp_df],
-                                    axis=0, ignore_index=True)
-            s_mat = csr_array((np.array([1] * len(indices_s), dtype='int'), indices_s, indptr),
-                              shape=(current_row, df.shape[0]))
-            total_s = csr_array(np.array([1] * df.shape[0], dtype='int'))
-            s_mat_cs = vstack(
-                [total_s, s_mat, identity(df.shape[0], dtype='int')])
-            indices_cs = pd.concat([pd.DataFrame({key: [np.nan] for key in columns}), indices, df.copy()],
-                                   axis=0, ignore_index=True)
+                indices = pd.concat([indices, tmp_df], axis=0, ignore_index=True)
+            s_mat = csr_array(
+                (np.array([1] * len(indices_s), dtype="int"), indices_s, indptr),
+                shape=(current_row, df.shape[0]),
+            )
+            total_s = csr_array(np.array([1] * df.shape[0], dtype="int"))
+            s_mat_cs = vstack([total_s, s_mat, identity(df.shape[0], dtype="int")])
+            indices_cs = pd.concat(
+                [pd.DataFrame({key: [np.nan] for key in columns}), indices, df.copy()],
+                axis=0,
+                ignore_index=True,
+            )
 
         if agg_periods is not None:
-            assert len(
-                agg_periods) > 1, "agg_periods should be a list of length > 1"
+            assert len(agg_periods) > 1, "agg_periods should be a list of length > 1"
             assert 1 in agg_periods, "agg_periods should contain 1"
             agg_periods = list(set(agg_periods))
             agg_periods.sort(reverse=True)
             for agg_period in agg_periods:
-                assert agg_periods[0] % agg_period == 0, f"agg_period should be a factor of max agg_periods, \
+                assert (
+                    agg_periods[0] % agg_period == 0
+                ), f"agg_period should be a factor of max agg_periods, \
                     {agg_periods[0]} % {agg_period} != 0"
 
                 s_mat_tmp = np.zeros(
-                    (agg_periods[0] // agg_period, agg_periods[0]), dtype='int')
+                    (agg_periods[0] // agg_period, agg_periods[0]), dtype="int"
+                )
                 for i in range(agg_periods[0] // agg_period):
-                    s_mat_tmp[i, i * agg_period:(i + 1) * agg_period] = 1
+                    s_mat_tmp[i, i * agg_period : (i + 1) * agg_period] = 1
                 if s_te is None:
                     s_te = s_mat_tmp
                 else:
@@ -151,8 +159,7 @@ class Hierarchy:
             s_te = csr_array(s_te)
             indices_temp = []
             for agg_period in agg_periods:
-                indices_temp.extend(
-                    [agg_period] * (agg_periods[0] // agg_period))
+                indices_temp.extend([agg_period] * (agg_periods[0] // agg_period))
 
         # if excludes is not None:
         #     excludes_cs = pd.DataFrame(excludes)
@@ -179,14 +186,17 @@ class Hierarchy:
 
     def _check_input(self, input, type="forecast", message="forecast"):
         assert input is not None, f"{message} should not be None"
-        if self.type == 'cs':
+        if self.type == "cs":
             assert isinstance(
-                input, np.ndarray), "input should be an array for cross-sectional hierarchy"
+                input, np.ndarray
+            ), "input should be an array for cross-sectional hierarchy"
             assert len(input.shape) == 2, "array should be 2D"
             if type == "forecast":
                 assert input.shape[1] == self.n, f"should have {self.n} forecasts"
             if type == "observation":
-                assert input.shape[1] == self.m, f"should have {self.m} bottom-level series"
+                assert (
+                    input.shape[1] == self.m
+                ), f"should have {self.m} bottom-level series"
             return
         else:
             if type == "observation":
@@ -197,25 +207,28 @@ class Hierarchy:
                     assert len(input.shape) == 2, "array should be 2D"
             if type == "forecast":
                 assert isinstance(
-                    input, dict), "input should be a dict for temporal hierarchy"
-                assert set(input.keys()) == set(self.indices_tmp), \
-                    f"should have forecasts for agg_periods {self.indices_tmp.unique()}"
+                    input, dict
+                ), "input should be a dict for temporal hierarchy"
+                assert set(input.keys()) == set(
+                    self.indices_tmp
+                ), f"should have forecasts for agg_periods {self.indices_tmp.unique()}"
                 length = input[self.k].shape[0]
                 for key, value in input.items():
-                    assert isinstance(
-                        value, np.ndarray), "value should be an vector"
+                    assert isinstance(value, np.ndarray), "value should be an vector"
                     assert len(value.shape) == 1, "array should be 1D"
-                    assert value.shape[0] == length * (self.k // key), \
-                        f"should have {length * (self.k // key)} forecasts for agg_period {key}"
+                    assert value.shape[0] == length * (
+                        self.k // key
+                    ), f"should have {length * (self.k // key)} forecasts for agg_period {key}"
 
     def _index_cs(self, indices: pd.DataFrame) -> np.ndarray:
         bottom_idx = self.indices_cs.dropna(axis=0).reset_index(drop=True)
-        bottom_idx['_idx'] = bottom_idx.index
+        bottom_idx["_idx"] = bottom_idx.index
         row_indices = []
         for row in range(indices.shape[0]):
-            row = indices.iloc[row:(row+1), ].dropna(axis=1)
+            row = indices.iloc[row : (row + 1),].dropna(axis=1)
             row_idx = row.merge(bottom_idx, how="left", on=list(row.columns))[
-                '_idx'].values
+                "_idx"
+            ].values
             assert not np.isnan(row_idx).any(), f"{ dict(row) } not found"
             row_indices.append(row_idx.tolist())
         return row_indices
@@ -225,6 +238,7 @@ class Hierarchy:
             return bts.reshape((-1, agg_period)).sum(axis=1).reshape((-1, 1))
         if len(bts.shape) == 2:
             return bts.reshape((-1, agg_period, bts.shape[1])).sum(axis=1)
+        raise ValueError("bts should be 1D or 2D")
 
     # TODO: test input to matrix with aggregate_ts
     def _input_to_mat(self, input) -> np.ndarray:
@@ -232,24 +246,34 @@ class Hierarchy:
             return input
         if self.type == "te":
             max_k = max(self.indices_tmp)
-            return np.concatenate([
-                input[key].reshape(-1, max_k // key)
-                for key in self.indices_tmp], axis=1)
+            return np.concatenate(
+                [input[key].reshape(-1, max_k // key) for key in self.indices_tmp],
+                axis=1,
+            )
         if self.type == "ct":
             n = self.n
             max_k = max(self.indices_tmp)
-            return np.concatenate([
-                np.concatenate([
-                    input[i][:, j].reshape(-1, max_k // i)
-                    for i in self.indices_tmp], axis=1)
-                for j in range(n)], axis=1)
+            return np.concatenate(
+                [
+                    np.concatenate(
+                        [
+                            input[i][:, j].reshape(-1, max_k // i)
+                            for i in self.indices_tmp
+                        ],
+                        axis=1,
+                    )
+                    for j in range(n)
+                ],
+                axis=1,
+            )
 
-    def aggregate_ts(self, bts: np.ndarray,
-                     indices: [Dict] = None) -> Union[np.ndarray, List[Dict]]:
+    def aggregate_ts(
+        self, bts: np.ndarray, indices: Optional[List[Dict]] = None
+    ) -> Union[np.ndarray, List[Dict[int, np.ndarray]]]:
         """Aggregate bottom-level time series.
 
         :param bts: bottom-level time series, array-like of shape (T, m)
-        :param indices: indices of the series to aggregate. For example: 
+        :param indices: indices of the series to aggregate. For example:
         [{"Category": "Fruit", "SubCategory": "Apple"}, {"Category": "Meat"}] will aggregate the series of \
         "Apple" subcategory and "Meat" category.
         [{"Category": "Fruit", "agg_period": 12}] will aggregate the series of "Fruit" category at yearly level.
@@ -263,51 +287,58 @@ class Hierarchy:
             time_window = bts.shape[0]
             if time_window % max_k != 0:
                 T_ = time_window // max_k * max_k
-                bts = bts[(bts.shape[0] - T_):,]
+                bts = bts[(bts.shape[0] - T_) :,]
                 Warning(
-                    f"the observations at the first {time_window - T_} timestamps are dropped")
+                    f"the observations at the first {time_window - T_} timestamps are dropped"
+                )
         # filter series accorrding to indices
         if indices is not None:
-            assert isinstance(
-                indices, list), "indices should be a list of dict"
-            assert all([isinstance(i, dict) for i in indices]
-                       ), "each element in indices should be a dict"
+            assert isinstance(indices, list), "indices should be a list of dict"
+            assert all(
+                [isinstance(i, dict) for i in indices]
+            ), "each element in indices should be a dict"
 
             indices = pd.DataFrame(indices)
             # pure cross-sectional aggregation
-            if self.type == "cs" or ("agg_period" not in indices.columns and self.type == "ct"):
+            if self.type == "cs" or (
+                "agg_period" not in indices.columns and self.type == "ct"
+            ):
                 indices = self._index_cs(indices)
                 assert len(indices) > 0, "no series found"
                 return np.stack([bts[:, i].sum(axis=1) for i in indices], axis=1)
             # pure temporal aggregation
             elif self.type == "te":
                 assert "agg_period" in indices.columns, "agg_period should be specified"
-                assert indices.shape[1] == 1, "non agg_period parameters are specified to aggregate a temporal hierarchy."
+                assert (
+                    indices.shape[1] == 1
+                ), "non agg_period parameters are specified to aggregate a temporal hierarchy."
                 assert (len(bts.shape) == 1) or (
-                    bts.shape[1] == 1), "temporal hierarchy can only be applied to univariate time series."
-                agg_periods = indices['agg_period'].unique()
+                    bts.shape[1] == 1
+                ), "temporal hierarchy can only be applied to univariate time series."
+                agg_periods = indices["agg_period"].unique()
                 return {i: self._temporal_aggregate(bts, i) for i in agg_periods}
             else:
                 if "agg_period" in indices.columns:
                     indices = indices.fillna({"agg_period": 1})
                 for agg_period in indices["agg_period"].unique():
                     assert agg_period in set(
-                        self.indices_tmp), f"agg_period {agg_period} not found"
-                    cs = indices[indices["agg_period"] ==
-                                 agg_period].drop(columns="agg_period")
+                        self.indices_tmp
+                    ), f"agg_period {agg_period} not found"
+                    cs = indices[indices["agg_period"] == agg_period].drop(
+                        columns="agg_period"
+                    )
                     if cs.shape[1] > 0:
                         idx = self._index_cs(cs)
-                        agg_ts = np.stack([bts[:, i].sum(axis=1)
-                                          for i in idx], axis=1)
+                        agg_ts = np.stack([bts[:, i].sum(axis=1) for i in idx], axis=1)
                         output[agg_period] = self._temporal_aggregate(
-                            agg_ts, agg_period)
+                            agg_ts, agg_period
+                        )
                     else:
                         bts = bts.sum(axis=1)
-                        output[agg_period] = self._temporal_aggregate(
-                            bts, agg_period)
+                        output[agg_period] = self._temporal_aggregate(bts, agg_period)
 
                 return output
-        elif self.type == 'cs':
+        elif self.type == "cs":
             return bts.dot(self.s_cs.toarray().T)
         # temporal hierarchy and cross-temporal hierarchy
         else:
@@ -317,11 +348,13 @@ class Hierarchy:
                 output[period] = self._temporal_aggregate(bts, period)
             return output
 
-    def reconcile(self,
-                  base_forecasts: Union[np.ndarray, Dict[int, np.ndarray]],
-                  method: str,
-                  cov_method: Optional[str] = None,
-                  residuals: Optional[np.ndarray] = None):
+    def reconcile(
+        self,
+        base_forecasts: Union[np.ndarray, Dict[int, np.ndarray]],
+        method: str,
+        cov_method: Optional[str] = None,
+        residuals: Optional[np.ndarray] = None,
+    ):
         """ Point forecast reconciliation
 
         :param base_forecasts: base forecasts, array of shape (h, n) for cross-sectional hierarchy, \
@@ -340,9 +373,11 @@ class Hierarchy:
         """
         # check inputs
         assert method in [
-            "ols", "wls", "mint"], "method should be one of 'ols', 'wls', 'mint'"
-        self._check_input(base_forecasts, type="forecast",
-                          message="base forecasts")
+            "ols",
+            "wls",
+            "mint",
+        ], "method should be one of 'ols', 'wls', 'mint'"
+        self._check_input(base_forecasts, type="forecast", message="base forecasts")
 
         S_mat = self.s_mat
         if method == "ols":
@@ -351,13 +386,13 @@ class Hierarchy:
             if cov_method == "structural":
                 W = S_mat.dot(np.array(1, shape=(S_mat.shape[0], 1)))
             elif cov_method == "variance":
-                self._check_input(residuals, type="forecast",
-                                  message="residuals")
+                self._check_input(residuals, type="forecast", message="residuals")
                 residuals = self._input_to_mat(residuals)
                 W = diags(1 / residuals.var(axis=0))
             else:
                 raise ValueError(
-                    "cov_method for wls should be one of 'structural', 'variance'")
+                    "cov_method for wls should be one of 'structural', 'variance'"
+                )
         else:
             self._check_input(residuals, type="forecast", message="residuals")
             residuals = self._input_to_mat(residuals)
@@ -369,9 +404,10 @@ class Hierarchy:
                 W = W
             else:
                 raise ValueError(
-                    "cov_method for mint should be one of 'shrinkage', 'sample'")
+                    "cov_method for mint should be one of 'shrinkage', 'sample'"
+                )
             W = np.linalg.inv(W)
-        
+
         G = self.compute_g_mat(W)
         return G.dot(base_forecasts.T).T
 
@@ -384,13 +420,12 @@ class Hierarchy:
         s_mat = self.s_mat
         n, m = s_mat.shape
         u1 = identity(n - m)
-        u2 = 0-s_mat[:(n-m), :]
+        u2 = 0 - s_mat[: (n - m), :]
         u_mat = vstack([u1, u2])
         if immutable_set:
             u_up = identity(n)[immutable_set]
             return hstack([u_up, u_mat]).T
         return u_mat.T
-
 
     # TODO: fix immutable_set
     # TODO: fix for sparse matrix
@@ -408,14 +443,15 @@ class Hierarchy:
         if immutable_set:
             immutable_set = list(immutable_set)
             k = len(immutable_set)
-            assert k <= self.m, f"The number of immutable series can not be bigger than the number of bottom-level series {self.m}."
+            assert (
+                k <= self.m
+            ), f"The number of immutable series can not be bigger than the number of bottom-level series {self.m}."
         u = self._construct_u_mat(immutable_set=immutable_set)
-        J = vstack([csr_array((m, n-m)), identity(m)])
+        J = vstack([csr_array((m, n - m)), identity(m)])
         v = csr_array((n - m, n))
         if immutable_set:
             v = hstack([identity(n)[immutable_set], v])
         target = u.T.dot(W).dot(u)
         x, lower = lg.cho_factor(target)
-        inv_dot = lg.cho_solve((x, lower), (u.T-v))
+        inv_dot = lg.cho_solve((x, lower), (u.T - v))
         return J - J.dot(W).dot(u).dot(inv_dot)
-            

@@ -13,23 +13,25 @@ def _lamb_estimate(x: np.ndarray) -> float:
     :return: :math`\\lambda`.
     """
     T = x.shape[0]
-    covm = x.T.dot(x)/T
+    covm = x.T.dot(x) / T
     xs = x / np.sqrt(np.diag(covm))
-    corm = xs.T.dot(xs)/T
+    corm = xs.T.dot(xs) / T
     np.fill_diagonal(corm, 0)
     d = np.sum(np.square(corm))
     xs2 = np.square(xs)
-    v = 1/(T*(T-1))*(xs2.T.dot(xs2) - 1/T*np.square(xs.T.dot(xs)))
+    v = 1 / (T * (T - 1)) * (xs2.T.dot(xs2) - 1 / T * np.square(xs.T.dot(xs)))
     np.fill_diagonal(v, 0)
-    lamb = np.max(np.min([np.sum(v)/d, 1]), 0)
+    lamb = np.max(np.min([np.sum(v) / d, 1]), 0)
     return lamb
 
 
-def mint(hierarchy: Hierarchy,
-         error: np.ndarray = None,
-         method: str = "ols",
-         weighting: Union[str, np.ndarray, None] = None,
-         immutable_set: Optional[List[int]] = None) -> np.ndarray:
+def mint(
+    hierarchy: Hierarchy,
+    error: np.ndarray = None,
+    method: str = "ols",
+    weighting: Union[str, np.ndarray, None] = None,
+    immutable_set: Optional[List[int]] = None,
+) -> np.ndarray:
     """Function for forecast reconciliation.
 
     :param hierarchy: historical time series.
@@ -52,7 +54,9 @@ def mint(hierarchy: Hierarchy,
         elif weighting == "sample":
             weight_matrix = W
             if not np.all(np.linalg.eigvals(weight_matrix) > 0):
-                raise ValueError("Sample method needs covariance matrix to be positive definite.")
+                raise ValueError(
+                    "Sample method needs covariance matrix to be positive definite."
+                )
         elif weighting == "shrinkage":
             lamb = _lamb_estimate(error.T)
             weight_matrix = lamb * np.diag(np.diag(W)) + (1 - lamb) * W
@@ -65,7 +69,7 @@ def mint(hierarchy: Hierarchy,
         if isinstance(weighting, np.ndarray):
             weight_matrix = np.linalg.inv(weighting)
         elif weighting == "structural":
-            weight_matrix = np.diag(S.dot(np.array([1]*m)))
+            weight_matrix = np.diag(S.dot(np.array([1] * m)))
         else:
             raise ValueError("This wls weighting method is not supported for now.")
     G = compute_g_mat(hierarchy, weight_matrix, immutable_set)
@@ -81,7 +85,7 @@ def _construct_u_mat(hierarchy: Hierarchy, immutable_set: Optional[List[int]] = 
     s_mat = hierarchy.s_mat
     n, m = s_mat.shape
     u1 = np.identity(n - m)
-    u2 = 0-s_mat[:(n-m), :].astype('int32')
+    u2 = 0 - s_mat[: (n - m), :].astype("int32")
     u_mat = np.concatenate([u1, u2], axis=1)
     if immutable_set:
         u_up = np.identity(n)[immutable_set]
@@ -89,9 +93,9 @@ def _construct_u_mat(hierarchy: Hierarchy, immutable_set: Optional[List[int]] = 
     return u_mat.T
 
 
-
-def compute_g_mat(hierarchy: Hierarchy, weight_matrix,
-                  immutable_set: Optional[Iterable[int]] = None):
+def compute_g_mat(
+    hierarchy: Hierarchy, weight_matrix, immutable_set: Optional[Iterable[int]] = None
+):
     """Compute G matrix given the weight_matrix.
 
     :param hierarchy:
@@ -104,13 +108,15 @@ def compute_g_mat(hierarchy: Hierarchy, weight_matrix,
     if immutable_set:
         immutable_set = list(immutable_set)
         k = len(immutable_set)
-        assert k <= m, f"The number of immutable series can not be bigger than the number of bottom-level series {m}."
+        assert (
+            k <= m
+        ), f"The number of immutable series can not be bigger than the number of bottom-level series {m}."
     u = _construct_u_mat(hierarchy, immutable_set=immutable_set)
-    J = np.concatenate([np.zeros([m, n-m]), np.identity(m)], axis=1)
+    J = np.concatenate([np.zeros([m, n - m]), np.identity(m)], axis=1)
     v = np.zeros([n - m, n])
     if immutable_set:
         v = np.concatenate([np.identity(n)[immutable_set], v])
     target = u.T.dot(weight_matrix).dot(u)
     x, lower = lg.cho_factor(target)
-    inv_dot = lg.cho_solve((x, lower), (u.T-v))
+    inv_dot = lg.cho_solve((x, lower), (u.T - v))
     return J - J.dot(weight_matrix).dot(u).dot(inv_dot)

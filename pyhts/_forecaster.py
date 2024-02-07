@@ -2,15 +2,11 @@ import numpy as np
 from statsforecast.arima import auto_arima_f, forecast_arima
 
 
-__all__ = [
-    "BaseForecaster", "AutoArimaForecaster"
-]
+__all__ = ["BaseForecaster", "AutoArimaForecaster"]
 
 
 class BaseForecaster:
-    """Base class for forecasters.
-
-    """
+    """Base class for forecasters."""
 
     def __init__(self):
         self.fitted = False
@@ -27,9 +23,7 @@ class BaseForecaster:
 
 
 class AutoArimaForecaster(BaseForecaster):
-    """autoarima forecaster, adapted from statsforecast.arima.auto_arima_f
-
-    """
+    """autoarima forecaster, adapted from statsforecast.arima.auto_arima_f"""
 
     def __init__(self, period: int = 1):
         super().__init__()
@@ -54,8 +48,8 @@ class AutoArimaForecaster(BaseForecaster):
     @property
     def residuals(self) -> np.ndarray:
         if self.fitted:
-            return self.model['residuals']
-        raise ValueError('Forecaster has not been fitted.')
+            return self.model["residuals"]
+        raise ValueError("Forecaster has not been fitted.")
 
     def forecast(self, h: int, xreg=None, **kwargs) -> np.ndarray:
         """forecast
@@ -65,6 +59,4 @@ class AutoArimaForecaster(BaseForecaster):
         :param kwargs: other parameters passed to `statsforecast.arima.forecast_arima`
         :return:
         """
-        return forecast_arima(self.model, h, xreg=xreg, **kwargs)['mean']
-
-
+        return forecast_arima(self.model, h, xreg=xreg, **kwargs)["mean"]
