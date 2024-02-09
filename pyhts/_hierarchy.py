@@ -3,11 +3,29 @@ import pandas as pd
 from typing import Union, List, Optional, Dict, Iterable
 from itertools import combinations
 from scipy.sparse import block_diag, csr_matrix, identity, vstack, kron, diags, hstack
-from _reconciliation import _lamb_estimate
 import scipy.linalg as lg
 from abc import ABC, abstractmethod
 
-__all__ = ["Hierarchy"]
+__all__ = ["CrossSectionalHierarchy", "TemporalHierarchy"]
+
+
+def _lamb_estimate(x: np.ndarray) -> float:
+    """Estimate :math`\\lambda` used in :ref:`shrinkage` estimator of mint method.
+
+    :param x: in-sample 1-step-ahead forecast error.
+    :return: :math`\\lambda`.
+    """
+    T = x.shape[0]
+    covm = x.T.dot(x) / T
+    xs = x / np.sqrt(np.diag(covm))
+    corm = xs.T.dot(xs) / T
+    np.fill_diagonal(corm, 0)
+    d = np.sum(np.square(corm))
+    xs2 = np.square(xs)
+    v = 1 / (T * (T - 1)) * (xs2.T.dot(xs2) - 1 / T * np.square(xs.T.dot(xs)))
+    np.fill_diagonal(v, 0)
+    lamb = np.max(np.min([np.sum(v) / d, 1]), 0)
+    return lamb
 
 
 def get_all_combinations(lst):
@@ -62,6 +80,50 @@ class Hierarchy(ABC):
     def _check_aggregate_ts(self, bts: np.ndarray):
         self._check_input(bts, type="observation", message="bts")
 
+    def _construct_u_mat(self, immutable_set: Optional[List[int]] = None) -> csr_matrix:
+        """construct U matrix used in solution.
+
+        :param immutable_set:
+        :return:
+        """
+        s_mat = self.s_mat
+        n, m = s_mat.shape
+        u1 = identity(n - m, dtype="int8")
+        u2 = 0 - s_mat[: (n - m), :]
+        u_mat = hstack([u1, u2])
+        if immutable_set:
+            u_up = csr_matrix(identity(n, dtype="int8", format="csr"))[immutable_set]
+            return hstack([u_up, u_mat]).T
+        return csr_matrix(u_mat.T)
+
+    # TODO: support for immutable_set
+    def compute_g_mat(self, W) -> np.ndarray:
+        """Compute G matrix given the weight_matrix."""
+
+        m = self.m
+        n = self.n
+        # if immutable_set:
+        #     immutable_set = list(immutable_set)
+        #     k = len(immutable_set)
+        #     assert (
+        #         k <= self.m
+        #     ), f"The number of immutable series can not be bigger than the number of bottom-level series {self.m}."
+        u = self._construct_u_mat(immutable_set=None)
+        J = csr_matrix(hstack([csr_matrix((m, n - m)), identity(m, format="csr")]))
+        v = csr_matrix((n - m, n))
+        # if immutable_set:
+        #     v = hstack([identity(n)[immutable_set], v])
+        if isinstance(W, csr_matrix):
+            target = u.T.dot(W).dot(u).toarray()
+        else:
+            target = u.toarray().T.dot(W).dot(u.toarray())
+        x, lower = lg.cho_factor(target)
+        inv_dot = lg.cho_solve((x, lower), (u.T - v).toarray())
+        if isinstance(W, csr_matrix):
+            return J.toarray() - J.dot(W).dot(u).toarray().dot(inv_dot)
+        else:
+            return J.toarray() - J.toarray().dot(W).dot(u.toarray()).dot(inv_dot)
+
     def compute_W(
         self, residuals: Optional[np.ndarray], method: str, cov_method: Optional[str]
     ) -> Union[np.ndarray, csr_matrix]:
@@ -69,7 +131,12 @@ class Hierarchy(ABC):
             return csr_matrix(identity(self.n))
         elif method == "wls":
             if cov_method == "structural":
-                return self.s_mat.dot(np.array([[1]] * self.n))
+                return csr_matrix(
+                    diags(
+                        self.s_mat.dot(np.array([[1]] * self.m)).reshape(-1),
+                        format="csr",
+                    )
+                )
             else:
                 assert residuals is not None
                 return csr_matrix(diags(residuals.var(axis=0)))
@@ -84,25 +151,42 @@ class Hierarchy(ABC):
 
 
 class TemporalHierarchy(Hierarchy):
+    """Class for temporal hierarchy"""
+
     def __init__(self, s_mat: csr_matrix, indices: List[int]) -> None:
+        """
+        :param s_mat: summing matrix of the hierarchy.
+        :param indices: list of integers representing the aggregation periods.
+        :return: TemporalHierarchy object.
+        """
+
         self._s_mat = s_mat
         self.indices = indices
 
     @property
     def s_mat(self) -> csr_matrix:
+        """summing matrix of the hierarchy"""
         return self._s_mat
 
     @property
     def n(self) -> int:
+        """Number of time series in the temporal hierarchy"""
         max_indice = max(self.indices)
         return sum([max_indice // i for i in self.indices])
 
     @property
     def m(self) -> int:
+        """number of bottom level series in the temporal hierarchy."""
         return max(self.indices)
 
     @classmethod
     def new(cls, agg_periods: Iterable[int]) -> "TemporalHierarchy":
+        """Constructor of TemporalHierarchy based on aggregation periods.
+
+        :param: agg_periods: list of integers representing the aggregation periods.
+        :return: TemporalHierarchy object.
+        """
+
         unique_periods = list(set(agg_periods))
         unique_periods.sort()
         assert 1 in unique_periods, "1 should be in agg_periods"
@@ -116,17 +200,40 @@ class TemporalHierarchy(Hierarchy):
             blocks = [[1] * period] * (max_period // period)
             # call csr_matrix to be compatible with pyright
             rows.insert(0, csr_matrix(block_diag(blocks, format="csr", dtype=np.int8)))
-        return cls(csr_matrix(hstack(rows)), unique_periods)
+        return cls(csr_matrix(vstack(rows)), unique_periods)
 
-    def aggregate_ts(self, bts: np.ndarray) -> Union[np.ndarray, Dict[int, np.ndarray]]:
+    def aggregate_ts(
+        self, bts: np.ndarray, agg_periods: Optional[List[int]] = None
+    ) -> Dict[int, np.ndarray]:
+        """Aggregate the bottom level time series to the higher levels.
+
+        :param bts: univariate time series of shape (T,).
+        :param agg_periods: if not None, only return aggregated time series for the
+            given aggregation periods.
+        :return: aggregated time series. Dict. keys are the aggregation periods.
+            values are the aggregated time series of shape (T//agg_period,).
+        """
         self._check_aggregate_ts(bts)
         output: Dict[int, np.ndarray] = {}
-        for key in self.indices:
+
+        if len(bts) % self.m != 0:
+            truncted_len = len(bts) - len(bts) % self.m
+            bts = bts[-truncted_len:]
+            Warning(
+                f"The length of the time series is not multiple of the maximum period \
+                and the first {len(bts) % self.m} is truncated."
+            )
+        if agg_periods is None:
+            agg_periods = self.indices
+        for key in agg_periods:
+            assert (
+                key in self.indices
+            ), f"{key} is not in the aggregation periods {self.indices}"
             output[key] = self._temporal_aggregate(bts, key)
         return output
 
     def _temporal_aggregate(self, bts: np.ndarray, agg_period: int) -> np.ndarray:
-        return bts.reshape((-1, agg_period)).sum(axis=1).reshape((-1, 1))
+        return bts.reshape((-1, agg_period)).sum(axis=1)
 
     def _check_input(
         self, input: Union[np.ndarray, Dict[int, np.ndarray]], type: str, message: str
@@ -143,11 +250,7 @@ class TemporalHierarchy(Hierarchy):
             for key in self.indices:
                 assert key in input.keys(), f"{key} not in {message}"
 
-    def _input_to_mat(
-        self, input: Optional[Dict[int, np.ndarray]]
-    ) -> Optional[np.ndarray]:
-        if input is None:
-            return None
+    def _input_to_mat(self, input: Dict[int, np.ndarray]) -> np.ndarray:
         series_list: List[np.ndarray] = []
         for key in self.indices:
             series_list.append(input[key].reshape((-1, max(self.indices) // key)))
@@ -157,12 +260,31 @@ class TemporalHierarchy(Hierarchy):
         self,
         fcasts: Dict[int, np.ndarray],
         method: str,
-        cov_method: Optional[str],
-        residuals: Optional[Dict[int, np.ndarray]],
+        cov_method: Optional[str] = None,
+        residuals: Optional[Dict[int, np.ndarray]] = None,
     ) -> np.ndarray:
+        """Reconciliation method.
+
+        :param fcasts: dict of forecasts. keys are the aggregation periods.
+            values are the forecasts of shape (h//agg_period,).
+        :param method: method of reconciliation. "bu", "tdfp", "tdhp", "ols", "wls", "mint".
+        :param cov_method: method of covariance estimation.
+            for "wls", it should be one of "structural" and "variance",
+            for "mint", it should be one of "sample" and "shrinkage".
+        :param residuals: dict of residuals used for covariance estimation.
+            keys are the aggregation periods.
+            values are the residuals of shape (T//agg_period,).
+            Required for "variance", "sample", "shrinkage" cov_method.
+        :return: reconciled forecasts of shape (h,).
+        """
         self._check_reconcile(fcasts, method, cov_method, residuals)
-        residuals_mat = self._input_to_mat(residuals)
+        residuals_mat = None
+        if residuals is not None:
+            residuals_mat = self._input_to_mat(residuals)
         W = self.compute_W(residuals_mat, method, cov_method)
+        G = self.compute_g_mat(W)
+        fcasts_mat = self._input_to_mat(fcasts)
+        return G.dot(fcasts_mat.T).reshape((-1,))
 
 
 class CrossSectionalHierarchy(Hierarchy):
@@ -170,7 +292,11 @@ class CrossSectionalHierarchy(Hierarchy):
 
     **Attributes**
 
-    TODO
+        .. py:attribute:: s_cs
+
+            summing matrix for cross-sectional hierarchy
+
+        .. py:attribute:: s_temp
     """
 
     def __init__(
@@ -581,32 +707,3 @@ class CrossSectionalHierarchy(Hierarchy):
             u_up = identity(n)[immutable_set]
             return hstack([u_up, u_mat]).T
         return u_mat.T
-
-    # TODO: fix immutable_set
-    # TODO: fix for sparse matrix
-    def compute_g_mat(self, W, immutable_set: Optional[List[int]] = None):
-        """Compute G matrix given the weight_matrix.
-
-        :param hierarchy:
-        :param weight_matrix:
-        :param immutable_set: the subset of time series to be unchanged during reconciliation
-        :return:
-        """
-
-        m = self.m * self.k
-        n = self.n * self.K
-        if immutable_set:
-            immutable_set = list(immutable_set)
-            k = len(immutable_set)
-            assert (
-                k <= self.m
-            ), f"The number of immutable series can not be bigger than the number of bottom-level series {self.m}."
-        u = self._construct_u_mat(immutable_set=immutable_set)
-        J = vstack([csr_matrix((m, n - m)), identity(m)])
-        v = csr_matrix((n - m, n))
-        if immutable_set:
-            v = hstack([identity(n)[immutable_set], v])
-        target = u.T.dot(W).dot(u)
-        x, lower = lg.cho_factor(target)
-        inv_dot = lg.cho_solve((x, lower), (u.T - v))
-        return J - J.dot(W).dot(u).dot(inv_dot)

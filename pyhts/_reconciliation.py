@@ -6,25 +6,6 @@ from pyhts._hierarchy import Hierarchy
 __all__ = ["mint"]
 
 
-def _lamb_estimate(x: np.ndarray) -> float:
-    """Estimate :math`\\lambda` used in :ref:`shrinkage` estimator of mint method.
-
-    :param x: in-sample 1-step-ahead forecast error.
-    :return: :math`\\lambda`.
-    """
-    T = x.shape[0]
-    covm = x.T.dot(x) / T
-    xs = x / np.sqrt(np.diag(covm))
-    corm = xs.T.dot(xs) / T
-    np.fill_diagonal(corm, 0)
-    d = np.sum(np.square(corm))
-    xs2 = np.square(xs)
-    v = 1 / (T * (T - 1)) * (xs2.T.dot(xs2) - 1 / T * np.square(xs.T.dot(xs)))
-    np.fill_diagonal(v, 0)
-    lamb = np.max(np.min([np.sum(v) / d, 1]), 0)
-    return lamb
-
-
 def mint(
     hierarchy: Hierarchy,
     error: np.ndarray = None,
