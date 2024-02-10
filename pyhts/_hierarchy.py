@@ -288,6 +288,54 @@ class TemporalHierarchy(Hierarchy):
 
 
 class CrossSectionalHierarchy(Hierarchy):
+    """Class for cross-sectional hierarchy."""
+
+    def __init__(self, s_mat: csr_matrix, indices: pd.DataFrame) -> None:
+        self._s_mat = s_mat
+        self.indices = indices
+
+    @property
+    def s_mat(self) -> csr_matrix:
+        """summing matrix of the hierarchy"""
+        return self._s_mat
+
+    @property
+    def n(self) -> int:
+        """Number of time series in the cross-sectional hierarchy"""
+        return self.s_mat.shape[1]
+
+    @property
+    def m(self) -> int:
+        """number of bottom level series in the cross-sectional hierarchy."""
+        return self.s_mat.shape[0]
+
+    @classmethod
+    def new(cls, structures: pd.DataFrame) -> "CrossSectionalHierarchy":
+        structures = structures.drop_duplicates().reset_index(drop=True)
+        columns = structures.columns
+        indices = pd.DataFrame()
+        indptr = np.array([0], dtype="int")
+        indices_s = np.zeros(0, dtype="int")
+        current_row = 0
+        existing_idxs = []
+        for comb in get_all_combinations(columns):
+            keys = structures.groupby(list(comb))
+            keys_dict = []
+            for key, idx in keys.indices.items():
+                if len(idx) == 1:
+                    continue
+                if str(idx) in existing_idxs:
+                    continue
+                existing_idxs.append(str(idx))
+                indptr = np.append(indptr, indptr[-1] + len(idx))
+                current_row += 1
+                indices_s = np.concatenate([indices_s, idx])
+                keys_dict.append(key)
+            tmp_df = pd.DataFrame(keys_dict, columns=list(comb))
+            indices = pd.concat([indices, tmp_df], axis=0, ignore_index=True)
+
+
+class CrossTemporalHierarchy(Hierarchy):
     """Class for a hierarchy structure.
 
     **Attributes**
