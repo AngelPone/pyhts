@@ -262,7 +262,7 @@ class TemporalHierarchy(Hierarchy):
     def _input_to_mat(self, input: Dict[int, np.ndarray]) -> np.ndarray:
         series_list: List[np.ndarray] = []
         for key in self.indices:
-            series_list.append(input[key].reshape((-1, max(self.indices) // key)))
+            series_list.insert(0, input[key].reshape((-1, max(self.indices) // key)))
         return np.concatenate(series_list, axis=1)
 
     def reconcile(
