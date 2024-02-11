@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
-from typing import Union, List, Optional, Dict, Iterable
-from itertools import combinations
+from typing import Union, List, Optional, Dict, Iterable, Tuple
+from itertools import combinations, product
 from scipy.sparse import block_diag, csr_matrix, identity, vstack, kron, diags, hstack
 import scipy.linalg as lg
 from abc import ABC, abstractmethod
@@ -28,11 +28,20 @@ def _lamb_estimate(x: np.ndarray) -> float:
     return lamb
 
 
-def get_all_combinations(lst):
+def get_all_combinations(lst: List[Tuple[str]]) -> Iterable[List[str]]:
     n = len(lst)
-    for r in range(1, n):
+    for r in range(1, n + 1):
         for comb in combinations(lst, r):
-            yield comb
+            if len(comb) == 1:
+                for i in range(len(comb[0])):
+                    yield list(comb[0][: (i + 1)])
+            else:
+                idxs: List[List[int]] = [list(range(len(i))) for i in comb]
+                for i in product(*idxs):
+                    output = []
+                    for j, k in zip(comb, i):
+                        output.extend(j[: (k + 1)])
+                    yield output
 
 
 class Hierarchy(ABC):
@@ -291,6 +300,18 @@ class CrossSectionalHierarchy(Hierarchy):
     """Class for cross-sectional hierarchy."""
 
     def __init__(self, s_mat: csr_matrix, indices: pd.DataFrame) -> None:
+        """
+
+        :param s_mat: summing matrix of the hierarchy.
+        :param indices: DataFrame contains keys for determining cross-section structural.
+            Each row responsents a cross-sectional time series and corresponds to a row in the summing matrix.
+            Each col represents a attribute which determines the cross-sectional structure.
+            It is automatically constructed by the new method.
+            Unless you are familiar with the structure of indices, you should not
+            construct it by yourself. Use the new method instead.
+            The np.nan in the indices indicates "aggregation".
+        """
+
         self._s_mat = s_mat
         self.indices = indices
 
@@ -302,37 +323,193 @@ class CrossSectionalHierarchy(Hierarchy):
     @property
     def n(self) -> int:
         """Number of time series in the cross-sectional hierarchy"""
-        return self.s_mat.shape[1]
+        return self.s_mat.shape[0]
 
     @property
     def m(self) -> int:
         """number of bottom level series in the cross-sectional hierarchy."""
-        return self.s_mat.shape[0]
+        return self.s_mat.shape[1]
+
+    def _check_input(
+        self, input: Union[np.ndarray, Dict[int, np.ndarray]], type: str, message: str
+    ):
+        assert isinstance(input, np.ndarray), f"{message} should be an array"
+        assert len(input.shape) == 2, f"{message} should be 2D"
+        if type == "observation":
+            assert input.shape[1] == self.m, f"{message} should be of  (T, {self.m})"
+        if type == "forecast":
+            assert (
+                input.shape[1] == self.n
+            ), f"{message} should be of shape (T, {self.n})"
 
     @classmethod
-    def new(cls, structures: pd.DataFrame) -> "CrossSectionalHierarchy":
-        structures = structures.drop_duplicates().reset_index(drop=True)
-        columns = structures.columns
+    def new(
+        cls, structures: pd.DataFrame, trees: List[Tuple[str, ...]]
+    ) -> "CrossSectionalHierarchy":
+        """Constructor of CrossSectionalHierarchy
+
+        :param structures: DataFrame contains keys for determining cross-section structural. Each row responsents a
+            cross-sectional time series in the bottom level. Each col represents a attribute which determines the
+            cross-sectional structure.
+        :param trees: list of tuples. Each tuple represents top-down a tree structure.
+            A tree structure means that a series can only have one parent series. For example,
+            we have a (Category, SubCategory) sales hierarchy, the tree structure is [("Category", "SubCategory")].
+            Then, the series "Apple" in SubCategory can only have one parent series "Fruit" in the Category.
+            Each string in the tuple represents a level of the tree and a column in the structures.
+            Multiple trees form a grouped cross-sectional hierarchy.
+        :return: CrossSectionalHierarchy object.
+
+        **Examples**
+
+        The following example constructs a cross-sectional hierarchy with 4 bottom-level (SubCategory level) series,
+        2 middle-level (Category level, Fruit and Meat) series and 1 top-level series.
+
+            >>> import pandas as pd
+            >>> df = pd.DataFrame({
+            ...         "Category": ["Fruit", "Fruit", "Meat", "Meat"],
+            ...         "SubCategory": ["Apple", "Orange", "Beef", "Pork"],
+            ...     })
+            >>> ht = CrossSectionalHierarchy.new(df, trees = [("Category", "SubCategory")])
+            >>> ht.s_mat.toarray()
+            array([[1, 1, 1, 1]
+                   [1, 1, 0, 0],
+                   [0, 0, 1, 1],
+                   [1, 0, 0, 0],
+                   [0, 1, 0, 0],
+                   [0, 0, 1, 0],
+                   [0, 0, 0, 1],
+                   [1, 0, 0, 0]])
+            >>> ht.m
+            4
+            >>> ht.n
+            7
+
+        The following example constructs a grouped cross-sectional hierarchy formed by two trees.
+        The first tree is ("Category", "SubCategory") and the second tree is ("Region",).
+
+            >>> df1 = pd.DataFrame({
+            ...         "Category": ["Fruit", "Fruit", "Meat", "Meat"],
+            ...         "SubCategory": ["Apple", "Orange", "Beef", "Pork"],
+            ...     })
+            >>> df2 = df1.copy()
+            >>> df1["Region"] = "North"
+            >>> df2["Region"] = "South"
+            >>> df = pd.concat([df1, df2], axis=0, ignore_index=True)
+            >>> ht = CrossSectionalHierarchy.new(df, trees = [("Category", "SubCategory"), ("Region",)])
+            >>> ht.s_mat.toarray()
+            array([[1, 1, 1, 1, 1, 1, 1, 1],
+                   [1, 1, 0, 0, 1, 1, 0, 0],
+                   [0, 0, 1, 1, 0, 0, 1, 1],
+                   [1, 1, 0, 0, 0, 0, 0, 0],
+                   [0, 0, 1, 1, 0, 0, 0, 0],
+                   [0 ,0, 0, 0, 1, 1, 0, 0],
+                   [0, 0, 0, 0, 0, 0, 1, 1],
+                   [1, 0, 0, 0, 1, 0, 0, 0],
+                   [0, 1, 0, 0, 0, 1, 0, 0],
+                   [0, 0, 1, 0, 0, 0, 1, 0],
+                   [0, 0, 0, 1, 0, 0, 0, 1],
+                   [1, 1, 1, 1, 0, 0, 0, 0],
+                   [0, 0, 0, 0, 1, 1, 1, 1],
+                   [1, 0, 0, 0, 0, 0, 0, 0],
+                   [0, 1, 0, 0, 0, 0, 0, 0],
+                   [0, 0, 1, 0, 0, 0, 0, 0],
+                   [0, 0, 0, 1, 0, 0, 0, 0],
+                   [0, 0, 0, 0, 1, 0, 0, 0],
+                   [0, 0, 0, 0, 0, 1, 0, 0],
+                   [0, 0, 0, 0, 0, 0, 1, 0],
+                   [0, 0, 0, 0, 0, 0, 0, 1]])
+            >>> ht.m
+            8
+            >>> ht.n
+            21
+        """
+        all_columns = []
+        for tree in trees:
+            all_columns.extend(tree)
+        if len(all_columns) != sum([len(tree) for tree in trees]):
+            raise ValueError("duplicated columns in trees")
+        if structures[all_columns].drop_duplicates().shape[0] != structures.shape[0]:
+            raise ValueError("duplicated rows in structures")
+        for tree in trees:
+            assert all(
+                [i in structures.columns for i in tree]
+            ), f"column not found in structures"
+            if len(tree) == 1:
+                continue
+            df = structures.loc[:, tree].drop_duplicates().reset_index(drop=True)
+            for i in range(1, len(tree)):
+                assert (
+                    df.loc[:, tree[: (i + 1)]]
+                    .drop_duplicates()
+                    .groupby(tree[i])
+                    .count()
+                    .max()
+                    == 1
+                ).all(), f"tree {tree} is not a tree"
         indices = pd.DataFrame()
         indptr = np.array([0], dtype="int")
         indices_s = np.zeros(0, dtype="int")
         current_row = 0
-        existing_idxs = []
-        for comb in get_all_combinations(columns):
+        # existing_idxs = []
+        for comb in get_all_combinations(trees):
+            if (
+                structures.loc[:, pd.Index(comb)].drop_duplicates().shape[0]
+                == structures.shape[0]
+            ):
+                continue
             keys = structures.groupby(list(comb))
             keys_dict = []
             for key, idx in keys.indices.items():
-                if len(idx) == 1:
-                    continue
-                if str(idx) in existing_idxs:
-                    continue
-                existing_idxs.append(str(idx))
+                # if len(idx) == 1:
+                #     continue
+                # if str(idx) in existing_idxs:
+                #     continue
+                # existing_idxs.append(str(idx))
                 indptr = np.append(indptr, indptr[-1] + len(idx))
                 current_row += 1
                 indices_s = np.concatenate([indices_s, idx])
                 keys_dict.append(key)
-            tmp_df = pd.DataFrame(keys_dict, columns=list(comb))
+            tmp_df = pd.DataFrame(keys_dict, columns=pd.Index(list(comb)))
             indices = pd.concat([indices, tmp_df], axis=0, ignore_index=True)
+        s_mat = csr_matrix(
+            (np.array([1] * len(indices_s), dtype="int"), indices_s, indptr),
+            shape=(current_row, structures.shape[0]),
+        )
+        total_s = csr_matrix(np.array([1] * structures.shape[0], dtype="int"))
+        s_mat = csr_matrix(
+            vstack(
+                [
+                    total_s,
+                    s_mat,
+                    identity(structures.shape[0], dtype="int", format="csr"),
+                ]
+            )
+        )
+        indices = pd.concat(
+            [
+                pd.DataFrame({key: [np.nan] for key in indices.columns}),
+                indices,
+                structures.copy(),
+            ],
+            axis=0,
+            ignore_index=True,
+        )
+        return cls(s_mat, indices)
+
+    def aggregate_ts(
+        self, bts: np.ndarray, indices: Optional[List[int]] = None
+    ) -> np.ndarray:
+        """Aggregate the bottom level time series to the higher levels.
+
+        :param bts: bottom-level time series of shape (T, m).
+        :param indices: list of integers representing the row absolute indices of
+            self.indices indicates which series will be calculated.
+            If None, all series are calculated.
+        """
+        self._check_aggregate_ts(bts)
+        if indices is None:
+            indices = list(range(self.n))
+        return bts.dot(self.s_mat[indices, :].toarray().T)
 
 
 class CrossTemporalHierarchy(Hierarchy):
