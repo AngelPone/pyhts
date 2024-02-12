@@ -1,4 +1,5 @@
 import numpy as np
+from numpy import ndarray
 import pandas as pd
 from typing import Union, List, Optional, Dict, Iterable, Tuple
 from itertools import combinations, product
@@ -9,7 +10,7 @@ from abc import ABC, abstractmethod
 __all__ = ["CrossSectionalHierarchy", "TemporalHierarchy"]
 
 
-def _lamb_estimate(x: np.ndarray) -> float:
+def _lamb_estimate(x: ndarray) -> float:
     """Estimate :math`\\lambda` used in :ref:`shrinkage` estimator of mint method.
 
     :param x: in-sample 1-step-ahead forecast error.
@@ -63,30 +64,11 @@ class Hierarchy(ABC):
 
     @abstractmethod
     def _check_input(
-        self, input: Union[np.ndarray, Dict[int, np.ndarray]], type: str, message: str
+        self, input: Union[ndarray, Dict[int, ndarray]], type: str, message: str
     ):
-        raise NotImplementedError
+        pass
 
-    def _check_reconcile(
-        self,
-        fcasts: Union[np.ndarray, Dict[int, np.ndarray]],
-        method: str,
-        cov_method: Optional[str],
-        residuals: Optional[Union[np.ndarray, Dict[int, np.ndarray]]],
-    ):
-        self._check_input(fcasts, type="fcasts", message="fcasts")
-        assert method in ["bu", "tdhp", "tdfp", "ols", "wls", "mint"]
-        if method == "wls":
-            assert cov_method in ["structural", "variance"]
-            if method == "variance":
-                assert residuals is not None
-                self._check_input(residuals, "forecast", "residuals")
-        if method == "mint":
-            assert residuals is not None
-            self._check_input(residuals, "forecast", "residuals")
-            assert cov_method in ["shrinkage", "sample"]
-
-    def _check_aggregate_ts(self, bts: np.ndarray):
+    def _check_aggregate_ts(self, bts: ndarray):
         self._check_input(bts, type="observation", message="bts")
 
     def _construct_u_mat(self, immutable_set: Optional[List[int]] = None) -> csr_matrix:
@@ -105,8 +87,12 @@ class Hierarchy(ABC):
             return hstack([u_up, u_mat]).T
         return csr_matrix(u_mat.T)
 
+    def compute_W(self, residuals, method) -> Union[ndarray, csr_matrix]:
+        method = getattr(self, f"_W_{method}")
+        return method(residuals)
+
     # TODO: support for immutable_set
-    def compute_g_mat(self, W) -> np.ndarray:
+    def compute_g_mat(self, W) -> ndarray:
         """Compute G matrix given the weight_matrix."""
 
         m = self.m
@@ -133,30 +119,41 @@ class Hierarchy(ABC):
         else:
             return J.toarray() - J.toarray().dot(W).dot(u.toarray()).dot(inv_dot)
 
-    def compute_W(
-        self, residuals: Optional[np.ndarray], method: str, cov_method: Optional[str]
-    ) -> Union[np.ndarray, csr_matrix]:
-        if method == "ols":
-            return csr_matrix(identity(self.n))
-        elif method == "wls":
-            if cov_method == "structural":
-                return csr_matrix(
-                    diags(
-                        self.s_mat.dot(np.array([[1]] * self.m)).reshape(-1),
-                        format="csr",
-                    )
-                )
-            else:
-                assert residuals is not None
-                return csr_matrix(diags(residuals.var(axis=0)))
-        else:
-            assert residuals is not None
-            W = residuals.T.dot(residuals)
-            if cov_method == "sample":
-                return lg.inv(W)
-            lamb = _lamb_estimate(residuals)
-            W = lamb * np.diag(np.diag(W)) + (1 - lamb) * W
-            return lg.inv(W)
+    def _W_ols(self) -> csr_matrix:
+        return csr_matrix(identity(self.n, dtype="int8", format="csr"))
+
+    def _W_structural(self) -> csr_matrix:
+        return csr_matrix(
+            diags(
+                self.s_mat.dot(np.array([[1]] * self.m)).toarray().reshape(-1),
+                format="csr",
+            )
+        )
+
+    # def compute_W(
+    #     self, residuals: Optional[ndarray], method: str, cov_method: Optional[str]
+    # ) -> Union[ndarray, csr_matrix]:
+    #     if method == "ols":
+    #         return csr_matrix(identity(self.n))
+    #     elif method == "wls":
+    #         if cov_method == "structural":
+    #             return csr_matrix(
+    #                 diags(
+    #                     self.s_mat.dot(np.array([[1]] * self.m)).reshape(-1),
+    #                     format="csr",
+    #                 )
+    #             )
+    #         else:
+    #             assert residuals is not None
+    #             return csr_matrix(diags(residuals.var(axis=0)))
+    #     else:
+    #         assert residuals is not None
+    #         W = residuals.T.dot(residuals)
+    #         if cov_method == "sample":
+    #             return lg.inv(W)
+    #         lamb = _lamb_estimate(residuals)
+    #         W = lamb * np.diag(np.diag(W)) + (1 - lamb) * W
+    #         return lg.inv(W)
 
 
 class TemporalHierarchy(Hierarchy):
@@ -212,8 +209,8 @@ class TemporalHierarchy(Hierarchy):
         return cls(csr_matrix(vstack(rows)), unique_periods)
 
     def aggregate_ts(
-        self, bts: np.ndarray, agg_periods: Optional[List[int]] = None
-    ) -> Dict[int, np.ndarray]:
+        self, bts: ndarray, agg_periods: Optional[List[int]] = None
+    ) -> Dict[int, ndarray]:
         """Aggregate the bottom level time series to the higher levels.
 
         :param bts: univariate time series of shape (T,).
@@ -223,7 +220,7 @@ class TemporalHierarchy(Hierarchy):
             values are the aggregated time series of shape (T//agg_period,).
         """
         self._check_aggregate_ts(bts)
-        output: Dict[int, np.ndarray] = {}
+        output: Dict[int, ndarray] = {}
 
         if len(bts) % self.m != 0:
             truncted_len = len(bts) - len(bts) % self.m
@@ -241,14 +238,14 @@ class TemporalHierarchy(Hierarchy):
             output[key] = self._temporal_aggregate(bts, key)
         return output
 
-    def _temporal_aggregate(self, bts: np.ndarray, agg_period: int) -> np.ndarray:
+    def _temporal_aggregate(self, bts: ndarray, agg_period: int) -> ndarray:
         return bts.reshape((-1, agg_period)).sum(axis=1)
 
     def _check_input(
-        self, input: Union[np.ndarray, Dict[int, np.ndarray]], type: str, message: str
+        self, input: Union[ndarray, Dict[int, ndarray]], type: str, message: str
     ):
         if type == "observation":
-            assert isinstance(input, np.ndarray)
+            assert isinstance(input, ndarray)
             assert (
                 len(input.shape) == 1
             ), "TemporalHierarchy can be only applied to univariate time series"
@@ -259,38 +256,51 @@ class TemporalHierarchy(Hierarchy):
             for key in self.indices:
                 assert key in input.keys(), f"{key} not in {message}"
 
-    def _input_to_mat(self, input: Dict[int, np.ndarray]) -> np.ndarray:
-        series_list: List[np.ndarray] = []
+    def _input_to_mat(self, input: Dict[int, ndarray]) -> ndarray:
+        series_list: List[ndarray] = []
         for key in self.indices:
             series_list.insert(0, input[key].reshape((-1, max(self.indices) // key)))
         return np.concatenate(series_list, axis=1)
 
+    def _W_wlsv(self, residuals: Dict[int, ndarray]) -> csr_matrix:
+        vars = []
+        for key in self.indices:
+            vars.extend([np.var(residuals[key])] * (max(self.indices) // key))
+        return diags(vars, format="csr")
+
+    def _check_reconcile(
+        self,
+        fcasts: Union[ndarray, Dict[int, ndarray]],
+        method: str,
+        residuals: Optional[Union[ndarray, Dict[int, ndarray]]],
+    ):
+        self._check_input(fcasts, type="fcasts", message="fcasts")
+        assert method in ["bu", "tdhp", "tdfp", "ols", "structural", "wlsv"]
+        if method in ["wlsv"]:
+            self._check_input(residuals, type="residuals", message="residuals")
+
     def reconcile(
         self,
-        fcasts: Dict[int, np.ndarray],
+        fcasts: Dict[int, ndarray],
         method: str,
-        cov_method: Optional[str] = None,
-        residuals: Optional[Dict[int, np.ndarray]] = None,
-    ) -> np.ndarray:
+        residuals: Optional[Dict[int, ndarray]] = None,
+    ) -> ndarray:
         """Reconciliation method.
 
         :param fcasts: dict of forecasts. keys are the aggregation periods.
             values are the forecasts of shape (h//agg_period,).
-        :param method: method of reconciliation. "bu", "tdfp", "tdhp", "ols", "wls", "mint".
-        :param cov_method: method of covariance estimation.
-            for "wls", it should be one of "structural" and "variance",
-            for "mint", it should be one of "sample" and "shrinkage".
+        :param method: method of reconciliation. "bu", "tdfp", "tdhp", "ols", "structural", "wlsv","shrinkage".
+           - **wlsv**: series variance scaling
+           - **structural**: structural scaling
+           - **ols**: no scaling
         :param residuals: dict of residuals used for covariance estimation.
             keys are the aggregation periods.
             values are the residuals of shape (T//agg_period,).
             Required for "variance", "sample", "shrinkage" cov_method.
         :return: reconciled forecasts of shape (h,).
         """
-        self._check_reconcile(fcasts, method, cov_method, residuals)
-        residuals_mat = None
-        if residuals is not None:
-            residuals_mat = self._input_to_mat(residuals)
-        W = self.compute_W(residuals_mat, method, cov_method)
+        self._check_reconcile(fcasts, method, residuals)
+        W = self.compute_W(residuals, method)
         G = self.compute_g_mat(W)
         fcasts_mat = self._input_to_mat(fcasts)
         return G.dot(fcasts_mat.T).reshape((-1,))
@@ -331,9 +341,9 @@ class CrossSectionalHierarchy(Hierarchy):
         return self.s_mat.shape[1]
 
     def _check_input(
-        self, input: Union[np.ndarray, Dict[int, np.ndarray]], type: str, message: str
+        self, input: Union[ndarray, Dict[int, ndarray]], type: str, message: str
     ):
-        assert isinstance(input, np.ndarray), f"{message} should be an array"
+        assert isinstance(input, ndarray), f"{message} should be an array"
         assert len(input.shape) == 2, f"{message} should be 2D"
         if type == "observation":
             assert input.shape[1] == self.m, f"{message} should be of  (T, {self.m})"
@@ -497,8 +507,8 @@ class CrossSectionalHierarchy(Hierarchy):
         return cls(s_mat, indices)
 
     def aggregate_ts(
-        self, bts: np.ndarray, indices: Optional[List[int]] = None
-    ) -> np.ndarray:
+        self, bts: ndarray, indices: Optional[List[int]] = None
+    ) -> ndarray:
         """Aggregate the bottom level time series to the higher levels.
 
         :param bts: bottom-level time series of shape (T, m).
@@ -510,6 +520,48 @@ class CrossSectionalHierarchy(Hierarchy):
         if indices is None:
             indices = list(range(self.n))
         return bts.dot(self.s_mat[indices, :].toarray().T)
+
+    def _check_reconcile(
+        self,
+        fcasts: ndarray,
+        method: str,
+        residuals: Optional[ndarray],
+    ):
+        self._check_input(fcasts, type="forecast", message="fcasts")
+        assert method in [
+            "bu",
+            "tdhp",
+            "tdfp",
+            "ols",
+            "structural",
+            "wlsv",
+            "shrinkage",
+            "sample",
+        ]
+        if method in ["wlsv", "sample", "shrinkage"]:
+            self._check_input(residuals, type="residuals", message="residuals")
+
+    def _W_wlsv(self, residuals: ndarray) -> csr_matrix:
+        return csr_matrix(diags(residuals.var(axis=0), format="csr"))
+
+    def reconcile(
+        self,
+        fcasts: ndarray,
+        method: str,
+        residuals: Optional[ndarray] = None,
+    ) -> ndarray:
+        """Reconciliation method.
+
+        :param fcasts: forecasts of shape (h, n).
+        :param method: method of reconciliation. "bu", "tdfp", "tdhp", "ols", "structural", "wlsv","shrinkage".
+        :param residuals: residuals used for covariance estimation. of shape (T, n).
+            Required for "variance", "sample", "shrinkage" method.
+        :return: reconciled forecasts of shape (h, m).
+        """
+        self._check_reconcile(fcasts, method, residuals)
+        W = self.compute_W(residuals, method)
+        G = self.compute_g_mat(W)
+        return G.dot(fcasts.T).T
 
 
 class CrossTemporalHierarchy(Hierarchy):
@@ -686,7 +738,7 @@ class CrossTemporalHierarchy(Hierarchy):
         assert input is not None, f"{message} should not be None"
         if self.type == "cs":
             assert isinstance(
-                input, np.ndarray
+                input, ndarray
             ), "input should be an array for cross-sectional hierarchy"
             assert len(input.shape) == 2, "array should be 2D"
             if type == "forecast":
@@ -699,7 +751,7 @@ class CrossTemporalHierarchy(Hierarchy):
         else:
             assert self.indices_tmp is not None, "indices_tmp should not be None"
             if type == "observation":
-                assert isinstance(input, np.ndarray), "input should be vector"
+                assert isinstance(input, ndarray), "input should be vector"
                 if self.type == "te":
                     assert len(input.shape) == 1, "array should be 1D"
                 else:
@@ -713,7 +765,7 @@ class CrossTemporalHierarchy(Hierarchy):
                 ), f"should have forecasts for agg_periods {self.indices_tmp.unique()}"
                 length = input[self.k].shape[0]
                 for key, value in input.items():
-                    assert isinstance(value, np.ndarray), "value should be an vector"
+                    assert isinstance(value, ndarray), "value should be an vector"
                     assert len(value.shape) == 1, "array should be 1D"
                     assert value.shape[0] == length * (
                         self.k // key
@@ -733,7 +785,7 @@ class CrossTemporalHierarchy(Hierarchy):
             row_indices.append(row_idx[0])
         return row_indices
 
-    def _temporal_aggregate(self, bts: np.ndarray, agg_period: int) -> np.ndarray:
+    def _temporal_aggregate(self, bts: ndarray, agg_period: int) -> ndarray:
         if len(bts.shape) == 1:
             return bts.reshape((-1, agg_period)).sum(axis=1).reshape((-1, 1))
         if len(bts.shape) == 2:
@@ -741,7 +793,7 @@ class CrossTemporalHierarchy(Hierarchy):
         raise ValueError("bts should be 1D or 2D")
 
     # TODO: test input to matrix with aggregate_ts
-    def _input_to_mat(self, input) -> np.ndarray:
+    def _input_to_mat(self, input) -> ndarray:
         if self.type == "cs":
             return input
         if self.type == "te":
@@ -770,8 +822,8 @@ class CrossTemporalHierarchy(Hierarchy):
             )
 
     def aggregate_ts(
-        self, bts: np.ndarray, indices: Optional[List[Dict]] = None
-    ) -> Union[np.ndarray, Dict[int, np.ndarray]]:
+        self, bts: ndarray, indices: Optional[List[Dict]] = None
+    ) -> Union[ndarray, Dict[int, ndarray]]:
         """Aggregate bottom-level time series.
 
         :param bts: bottom-level time series, array-like of shape (T, m)
@@ -856,10 +908,10 @@ class CrossTemporalHierarchy(Hierarchy):
 
     def reconcile(
         self,
-        base_forecasts: Union[np.ndarray, Dict[int, np.ndarray]],
+        base_forecasts: Union[ndarray, Dict[int, ndarray]],
         method: str,
         cov_method: Optional[str] = None,
-        residuals: Optional[np.ndarray] = None,
+        residuals: Optional[ndarray] = None,
     ):
         """ Point forecast reconciliation
 
@@ -932,3 +984,8 @@ class CrossTemporalHierarchy(Hierarchy):
             u_up = identity(n)[immutable_set]
             return hstack([u_up, u_mat]).T
         return u_mat.T
+
+
+if __name__ == "__main__":
+    ht = TemporalHierarchy.new([1, 2, 4])
+    ht.compute_W(None, "bu")
