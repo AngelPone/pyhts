@@ -17,6 +17,7 @@
 *.pkl
 .RData
 .Rhistory
+.Rproj.user
 
 ### macOS ###
 # General
