@@ -56,8 +56,3 @@ for (i in c(2, 3, 4, 6, 12)) {
   write.csv(cs_bf, sprintf("data/tourism_baseforecast_%s.csv", i), row.names = FALSE)
   write.csv(cs_resids, sprintf("data/tourism_residuals_%s.csv", i), row.names = FALSE)
 }
-
-# Temporal hierarchy
-
-
-

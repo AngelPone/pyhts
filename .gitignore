@@ -18,6 +18,10 @@
 .RData
 .Rhistory
 .Rproj.user
+*.Rproj
+examples/tourism/data/*.csv
+!examples/tourism/data/tourism.csv
+!examples/tourism/data/tourism_S.csv
 
 ### macOS ###
 # General

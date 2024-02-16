@@ -975,38 +975,3 @@ class CrossSectionalHierarchy(Hierarchy):
 #             u_up = identity(n)[immutable_set]
 #             return hstack([u_up, u_mat]).T
 #         return u_mat.T
-
-
-if __name__ == "__main__":
-    ht = TemporalHierarchy.new([1, 2, 3, 4, 6, 12])
-    # rmse of FoReco::thfrec
-    foreco = pd.read_csv(
-        "examples/data/tourism_temporal.csv",
-    )
-    # read the base forecast
-    basef = {
-        i: pd.read_csv(f"examples/data/tourism_baseforecast_{i}.csv").values[
-            0 : 12 // i,
-        ]
-        for i in [1, 2, 3, 4, 6, 12]
-    }
-    # read the residuals
-    residuals = {
-        i: pd.read_csv(f"examples/data/tourism_residuals_{i}.csv").values
-        for i in [1, 2, 3, 4, 6, 12]
-    }
-    # read the data
-    S = pd.read_csv("examples/data/tourism_S.csv", index_col=0).values
-    dt = pd.read_csv("examples/data/tourism.csv")
-    bts = dt.iloc[:, 4:].values.T
-    allts = bts.dot(S.T)
-    tts = allts[216:, :]
-    tts.shape
-    wlsv = []
-    for i in range(555):
-        basef_i = {j: basef[j][:, i] for j in basef}
-        residuals_i = {j: residuals[j][:, i] for j in residuals}
-        recf = ht.reconcile(basef_i, "wlsv", residuals=residuals_i)
-        wlsv.append(np.sqrt(np.mean((recf - tts[:, i]) ** 2)))
-    wlsv = np.array(wlsv)
-    assert np.allclose(wlsv, foreco["wlsv"])

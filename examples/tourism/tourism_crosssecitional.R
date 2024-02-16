@@ -27,11 +27,11 @@ library(FoReco)
 
 output <- list()
 
-for (method in c("ols", "struc", "wlsv", "shr")) {
+for (method in c("ols", "struc", "wls", "shr")) {
   output[[method]] <- sapply(1:6, function(i) {
     bf <- bf[[i]]
     resids <- resids[[i]]
-    recf <- htsrec(bf, "ols", S[1:(NROW(S) - NCOL(S)),])$recf
+    recf <- htsrec(bf, method, S[1:(NROW(S) - NCOL(S)),], res = resids)$recf
     alldt <- apply(dt[217:228,], 2, function(x){
       k <- c(1,2,3,4,6,12)[i]
       apply(matrix(x, ncol=k, byrow=TRUE), 1, sum)
