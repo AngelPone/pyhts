@@ -12,6 +12,11 @@ A python package for hierarchical forecasting, inspired by the [hts](https://cra
 - Use different base forecasters for different hierarchical levels.
 - Sklearn-like API.
 
+## Refactor TODO
+
+- [ ]  CrossTemporalHierarchy test
+- [ ]  CrossTemporalHierarchy reconciliation example
+
 
 ## Quick Demo
 

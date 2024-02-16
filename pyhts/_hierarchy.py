@@ -555,175 +555,106 @@ class CrossSectionalHierarchy(Hierarchy):
         return G.dot(fcasts.T).T
 
 
-# class CrossTemporalHierarchy(Hierarchy):
-#     """Class for a hierarchy structure.
+class CrossTemporalHierarchy(Hierarchy):
+    """Class for CrossTemporalHierarchy"""
 
-#     **Attributes**
+    def __init__(
+        self,
+        s_cs: csr_matrix,
+        s_tem: csr_matrix,
+        indices_cs: pd.DataFrame,
+        indices_temp: List[int],
+    ) -> None:
 
-#         .. py:attribute:: s_cs
+        self.s_cs = s_cs
+        self.s_temp = s_tem
+        self.indices_cs = indices_cs
+        self.indices_temp = indices_temp
 
-#             summing matrix for cross-sectional hierarchy
+    @property
+    def s_mat(self) -> csr_matrix:
+        return csr_matrix(kron(self.s_cs, self.s_temp, format="csr"))
 
-#         .. py:attribute:: s_temp
-#     """
+    @property
+    def n(self) -> int:
+        return self.s_cs.shape[0] * self.s_temp.shape[0]
 
-#     def __init__(
-#         self,
-#         s_cs: csr_matrix,
-#         s_temp: csr_matrix,
-#         indices_cs: Optional[pd.DataFrame],
-#         indices_tmp: Optional[List[int]],
-#     ):
-#         self.s_cs = s_cs
-#         self.s_temp = s_temp
-#         self.indices_cs = indices_cs
-#         self.indices_tmp = indices_tmp
+    @property
+    def m(self) -> int:
+        return self.s_cs.shape[1] * self.s_temp.shape[1]
 
-#         # cross-sectional numbers
-#         if s_cs is None:
-#             self.m = 1
-#             self.n = 1
-#         else:
-#             (self.n, self.m) = s_cs.shape
-#         if s_temp is None:
-#             self.K = 1
-#             self.k = 1
-#         else:
-#             (self.K, self.k) = s_temp.shape
+    @classmethod
+    def new(
+        cls,
+        structures: pd.DataFrame,
+        trees: List[Tuple[str, ...]],
+        agg_periods: Iterable[int],
+    ) -> "CrossTemporalHierarchy":
+        """Constructor
 
-#     @property
-#     def s_mat(self):
-#         """summing matrix"""
-#         if self.indices_tmp is None:
-#             return self.s_cs
-#         elif self.indices_cs is None:
-#             return self.s_temp
-#         else:
-#             return kron(self.s_cs, self.s_temp)
+        :param structure: DataFrame contains keys for determining cross-section structural. Each row responsents a
+            cross-sectional time series in the bottom level. Each col represents a attribute of the time series.
+            The attributes are used to define the cross-sectional structure of the hierarchical time series.
+        :param trees: list of tuples. Each tuple represents top-down a tree structure.
+            See :ref:`CrossSectionalHierarchy.new` for more details.
+        :param agg_periods: list of aggregation periods used to construct temporal hierarchy.
+        :return: CrossTemporalHierarchy object.
+        """
+        ht_temp = TemporalHierarchy.new(agg_periods)
+        ht_cs = CrossSectionalHierarchy.new(structures, trees)
+        return cls(ht_cs.s_mat, ht_temp.s_mat, ht_cs.indices, ht_temp.indices)
 
-#     # TODO: support for excludes and includes
-#     @classmethod
-#     def new(
-#         cls,
-#         df: Optional[pd.DataFrame] = None,
-#         structures: Optional[List[str]] = None,
-#         # excludes: Optional[List[Dict]] = None,
-#         # includes: Optional[List[Dict]] = None,
-#         agg_periods: Optional[List[int]] = None,
-#     ) -> "Hierarchy":
-#         """Construct cross-sectional/temporal/cross-temporal hierarchy. If only agg_periods is specified, \
-#         a temporal hierarchy is constructed. If only structures is specified, a cross-sectional hierarchy is \
-#         constructed. If both are specified, a cross-temporal hierarchy is constructed.
+    def _check_input(
+        self, input: Union[ndarray, Dict[int, ndarray]], type: str, message: str
+    ):
+        assert input is not None, f"{message} should not be None"
+        if type == "forecast":
+            assert isinstance(input, dict), f"{message} should be dict"
+            for key in self.indices_temp:
+                assert key in input.keys(), f"{key} not in {message}"
+                assert isinstance(input[key], ndarray), f"{message} should be ndarray"
+                assert len(input[key].shape) == 2, f"{message} should be 2D"
+                assert (
+                    input[key].shape[1] == self.s_cs.shape[0]
+                ), f"{message} should be of shape (-1, {self.s_cs.shape[0]})"
+        if type == "observation":
+            assert isinstance(input, ndarray), f"{message} should be ndarray"
+            assert len(input.shape) == 2, f"{message} should be 2D"
+            assert (
+                input.shape[1] == self.s_cs.shape[1]
+            ), f"{message} should be of shape (-1, {self.s_cs.shape[1]})"
 
-#         **Examples** TODO
-#             >>> import pandas as pd
+    def _temporal_aggregate(self, bts: ndarray, agg_period: int) -> ndarray:
+        return bts.reshape((-1, agg_period, bts.shape[1])).sum(axis=1)
 
+    def aggregate_ts(
+        self, bts: ndarray, indices: Optional[Dict[int, List[int]]] = None
+    ) -> Dict[int, ndarray]:
+        """Aggregate the bottom level time series to the higher levels.
 
-#         :param df: DataFrame contains keys for determining cross-section structural. Each row responsents a \
-#         cross-sectional time series in the bottom level. Each col represents a attribute of the time series. \
-#         The attributes are used to define the cross-sectional structure of the hierarchical time series.
-#         :param structures: Columns to use. Use all columns by default.
-#         :param excludes: middle levels excluded from the hierarchy, identified by attribute values. \
-#         For example, in a (Category, Subcategory, Product) sales Hierarchy, [{"Subcategory": "Fruit"}] means \
-#         excluding the "Fruit" time series, which is sum of all products in the "Fruit" subcategory.
-#         :param includes: same structure as excludes, but only the specified series are included in the hierarchy.
-#         :param agg_periods: list of aggregation periods used to construct temporal hierarchy. \
-#         For example, [1, 2, 4] for a quarterly time series means aggregating the quarterly time series to \
-#         half-yearly and yearly levels.
-#         :return: Hierarchy object.
-#         """
-#         s_mat_cs: Optional[csr_matrix] = None
-#         s_te = None
-#         indices_cs = None
-#         indices_temp = None
+        :param bts: bottom-level time series at the highest frequency.
+        :param indices: dict. keys are the aggregation periods. values are the row absolute indices of
+            self.indices_cs indicates which series will be calculated at the given aggregation period.
+        :return: aggregated time series. Dict. keys are the aggregation periods.
 
-#         if df is not None:
-#             if structures is not None:
-#                 df = df.loc[:, structures]
-#             df = df.drop_duplicates().reset_index(drop=True)
-#             columns = df.columns
-#             indices = pd.DataFrame()
-#             indptr = np.array([0])
-#             indices_s = np.zeros(0, dtype="int")
-#             current_row = 0
-#             existing_idxs = []
-#             for comb in get_all_combinations(columns):
-#                 keys = df.groupby(list(comb))
-#                 keys_dict = []
-#                 for key, idx in keys.indices.items():
-#                     if len(idx) == 1:
-#                         continue
-#                     if str(idx) in existing_idxs:
-#                         continue
-#                     existing_idxs.append(str(idx))
-#                     indptr = np.append(indptr, indptr[-1] + len(idx))
-#                     current_row += 1
-#                     indices_s = np.concatenate([indices_s, idx])
-#                     keys_dict.append(key)
-#                 tmp_df = pd.DataFrame(keys_dict, columns=list(comb))
-#                 indices = pd.concat([indices, tmp_df], axis=0, ignore_index=True)
-#             s_mat = csr_matrix(
-#                 (np.array([1] * len(indices_s), dtype="int"), indices_s, indptr),
-#                 shape=(current_row, df.shape[0]),
-#             )
-#             total_s = csr_matrix(np.array([1] * df.shape[0], dtype="int"))
-#             s_mat_cs = csr_matrix(
-#                 vstack([total_s, s_mat, csr_matrix(identity(df.shape[0], dtype="int"))])
-#             )
-#             indices_cs = pd.concat(
-#                 [pd.DataFrame({key: [np.nan] for key in columns}), indices, df.copy()],
-#                 axis=0,
-#                 ignore_index=True,
-#             )
+        **Examples**
 
-#         if agg_periods is not None:
-#             assert len(agg_periods) > 1, "agg_periods should be a list of length > 1"
-#             assert 1 in agg_periods, "agg_periods should contain 1"
-#             agg_periods = list(set(agg_periods))
-#             agg_periods.sort(reverse=True)
-#             for agg_period in agg_periods:
-#                 assert (
-#                     agg_periods[0] % agg_period == 0
-#                 ), f"agg_period should be a factor of max agg_periods, \
-#                     {agg_periods[0]} % {agg_period} != 0"
+            >>> ht.aggregate_ts(bts, {1: [0, 1], 2: [0, 1, 2]})
 
-#                 s_mat_tmp = np.zeros(
-#                     (agg_periods[0] // agg_period, agg_periods[0]), dtype="int"
-#                 )
-#                 for i in range(agg_periods[0] // agg_period):
-#                     s_mat_tmp[i, i * agg_period : (i + 1) * agg_period] = 1
-#                 if s_te is None:
-#                     s_te = s_mat_tmp
-#                 else:
-#                     s_te = np.concatenate([s_te, s_mat_tmp], axis=0)
-#             s_te = csr_matrix(s_te)
-#             indices_temp = []
-#             for agg_period in agg_periods:
-#                 indices_temp.extend([agg_period] * (agg_periods[0] // agg_period))
+        This example will obtain a dict, keys are 1 and 2. Values are [0, 1] aggregated series
+        at the highest frequency (1) and [0, 1, 2] aggregated series at the second highest frequency (2).
+        """
+        self._check_aggregate_ts(bts)
+        output = {}
+        if indices is None:
+            indices = {
+                key: list(range(self.s_cs.shape[0])) for key in self.indices_temp
+            }
+        for key in indices:
+            cs_bt = self._temporal_aggregate(bts, key)
+            output[key] = cs_bt.dot(self.s_cs[indices[key], :].toarray().T)
+        return output
 
-#         # if excludes is not None:
-#         #     excludes_cs = pd.DataFrame(excludes)
-#         #     if 'agg_period' in excludes.columns:
-#         #         excludes_cs = excludes[excludes['agg_period'].isna()]
-#         #     indices_cs['_idx'] = indices_cs.index
-#         #     assert excludes_cs.columns.isin(indices_cs.columns).all(), "excludes contains columns not in df"
-#         #     excludes_cs = excludes_cs.merge(pd.DataFrame(columns=indices_cs.columns)).merge(indices_cs, how="left", on=list(excludes_cs.columns))
-#         #     exclude_idx = excludes_cs['_idx'].values
-#         #     s_mat_cs = s_mat_cs[~exclude_idx,]
-#         #     indices_cs = indices_cs[~exclude_idx,].drop(columns="_idx")
-
-#         return cls(s_mat_cs, s_te, indices_cs, indices_temp)
-
-#     @property
-#     def type(self):
-#         """Type of the hierarchy, either cross-sectional, temporal or cross-temporal."""
-#         if self.indices_tmp is None and self.indices_cs is not None:
-#             return "cs"
-#         elif self.indices_cs is None and self.indices_tmp is not None:
-#             return "te"
-#         else:
-#             assert self.indices_cs is not None and self.indices_tmp is not None
-#             return "ct"
 
 #     def _check_input(self, input, type="forecast", message="forecast"):
 #         assert input is not None, f"{message} should not be None"
