@@ -7,7 +7,7 @@ from scipy.sparse import block_diag, csr_matrix, identity, vstack, kron, diags, 
 import scipy.linalg as lg
 from abc import ABC, abstractmethod
 
-__all__ = ["CrossSectionalHierarchy", "TemporalHierarchy"]
+__all__ = ["CrossSectionalHierarchy", "TemporalHierarchy", "CrossTemporalHierarchy"]
 
 
 def _lamb_estimate(x: ndarray) -> float:
@@ -565,6 +565,19 @@ class CrossTemporalHierarchy(Hierarchy):
         indices_cs: pd.DataFrame,
         indices_temp: List[int],
     ) -> None:
+        """init
+
+        :param s_cs: summing matrix of the cross-sectional hierarchy.
+        :param s_temp: summing matrix of the temporal hierarchy.
+        :param indices_cs: DataFrame contains keys for determining cross-section structural.
+            Each row responsents a cross-sectional time series and corresponds to a row in the summing matrix.
+            Each col represents a attribute which determines the cross-sectional structure.
+            It is automatically constructed by the new method.
+            Unless you are familiar with the structure of indices, you should not
+            construct it by yourself. Use the new method instead.
+            The np.nan in the indices indicates "aggregation".
+        :param indices_temp: list of integers representing the temporal aggregation periods.
+        """
 
         self.s_cs = s_cs
         self.s_temp = s_tem
@@ -573,6 +586,7 @@ class CrossTemporalHierarchy(Hierarchy):
 
     @property
     def s_mat(self) -> csr_matrix:
+        """summing matrix"""
         return csr_matrix(kron(self.s_cs, self.s_temp, format="csr"))
 
     @property
@@ -617,12 +631,18 @@ class CrossTemporalHierarchy(Hierarchy):
                 assert (
                     input[key].shape[1] == self.s_cs.shape[0]
                 ), f"{message} should be of shape (-1, {self.s_cs.shape[0]})"
+                assert (
+                    input[key].shape[0] % key == 0
+                ), f"{message} should be of length multiple of {key}"
         if type == "observation":
             assert isinstance(input, ndarray), f"{message} should be ndarray"
             assert len(input.shape) == 2, f"{message} should be 2D"
             assert (
                 input.shape[1] == self.s_cs.shape[1]
             ), f"{message} should be of shape (-1, {self.s_cs.shape[1]})"
+            assert (
+                input.shape[0] % max(self.indices_temp) == 0
+            ), f"{message} should be of length multiple of {max(self.indices_temp)}"
 
     def _temporal_aggregate(self, bts: ndarray, agg_period: int) -> ndarray:
         return bts.reshape((-1, agg_period, bts.shape[1])).sum(axis=1)
@@ -654,6 +674,52 @@ class CrossTemporalHierarchy(Hierarchy):
             cs_bt = self._temporal_aggregate(bts, key)
             output[key] = cs_bt.dot(self.s_cs[indices[key], :].toarray().T)
         return output
+
+    def _check_reconcile(
+        self,
+        fcasts: Dict[int, ndarray],
+        method: str,
+        residuals: Optional[Dict[int, ndarray]],
+    ):
+        self._check_input(fcasts, type="forecast", message="fcasts")
+        assert method in ["ols", "structural", "wlsv", "shrinkage"]
+        if method in ["wlsv", "shrinkage"]:
+            assert residuals is not None
+            self._check_input(residuals, type="residuals", message="residuals")
+
+    def _input_to_mat(self, input: Dict[int, ndarray]) -> ndarray:
+        series_list: List[ndarray] = []
+        for i in range(self.s_cs.shape[0]):
+            for key in self.indices_temp:
+                series = input[key][:, i].reshape((-1, max(self.indices_temp) // key))
+                series_list.insert(0, series)
+        return np.concatenate(series_list, axis=1)
+
+    def reconcile(
+        self,
+        fcasts: Dict[int, ndarray],
+        method: str,
+        residuals: Optional[Dict[int, ndarray]] = None,
+    ) -> ndarray:
+        """Reconciliation method.
+
+        :param fcasts: dict of forecasts. keys are the aggregation periods.
+            values are the forecasts of shape (h//agg_period, n).
+        :param method: method of reconciliation. "ols", "structural", "wlsv", "shrinkage".
+        :param residuals: dict of residuals used for covariance estimation.
+            keys are the aggregation periods.
+            values are the residuals of shape (T//agg_period, n).
+            Required for "wlsv", "shrinkage" method.
+        :return: reconciled forecasts of bottom-level at the frequenst temporal level of shape (h, m).
+        """
+        self._check_reconcile(fcasts, method, residuals)
+        residuals_mat = None
+        if residuals is not None:
+            residuals_mat = self._input_to_mat(residuals)
+        W = self.compute_W(residuals_mat, method)
+        G = self.compute_g_mat(W)
+        fcasts_mat = self._input_to_mat(fcasts)
+        return G.dot(fcasts_mat.T).T
 
 
 #     def _check_input(self, input, type="forecast", message="forecast"):
