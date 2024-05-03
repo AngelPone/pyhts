@@ -78,9 +78,10 @@ class Hierarchy(ABC):
         :return:
         """
         s_mat = self.s_mat
+        agg_idx = np.asarray(s_mat.sum(axis=1)).reshape(-1) > 1
         n, m = s_mat.shape
         u1 = identity(n - m, dtype="int8")
-        u2 = 0 - s_mat[: (n - m), :]
+        u2 = 0 - s_mat[agg_idx, :]
         u_mat = hstack([u1, u2])
         if immutable_set:
             u_up = csr_matrix(identity(n, dtype="int8", format="csr"))[immutable_set]
@@ -632,7 +633,7 @@ class CrossTemporalHierarchy(Hierarchy):
                     input[key].shape[1] == self.s_cs.shape[0]
                 ), f"{message} should be of shape (-1, {self.s_cs.shape[0]})"
                 assert (
-                    input[key].shape[0] % key == 0
+                    input[key].shape[0] % (max(self.indices_temp) // key) == 0
                 ), f"{message} should be of length multiple of {key}"
         if type == "observation":
             assert isinstance(input, ndarray), f"{message} should be ndarray"
@@ -689,11 +690,13 @@ class CrossTemporalHierarchy(Hierarchy):
 
     def _input_to_mat(self, input: Dict[int, ndarray]) -> ndarray:
         series_list: List[ndarray] = []
+        agg_idx = np.asarray(self.s_mat.sum(axis=1)).reshape(-1) > 1
         for i in range(self.s_cs.shape[0]):
-            for key in self.indices_temp:
+            for key in self.indices_temp[::-1]:
                 series = input[key][:, i].reshape((-1, max(self.indices_temp) // key))
-                series_list.insert(0, series)
-        return np.concatenate(series_list, axis=1)
+                series_list.append(series)
+        Ynormal = np.concatenate(series_list, axis=1)
+        return np.concatenate([Ynormal[:, agg_idx], Ynormal[:, ~agg_idx]], axis=1)
 
     def reconcile(
         self,
@@ -718,257 +721,56 @@ class CrossTemporalHierarchy(Hierarchy):
             residuals_mat = self._input_to_mat(residuals)
         W = self.compute_W(residuals_mat, method)
         G = self.compute_g_mat(W)
+        # np.linalg.solve(S.T.dot(S), S.T)
         fcasts_mat = self._input_to_mat(fcasts)
-        return G.dot(fcasts_mat.T).T
+        reconciled_f = G.dot(fcasts_mat.T).T  # (h, m)
+        return (
+            reconciled_f.reshape((-1, self.s_cs.shape[1], max(self.indices_temp)))
+            .transpose((0, 2, 1))
+            .reshape((-1, self.s_cs.shape[1]))
+        )
 
 
-#     def _check_input(self, input, type="forecast", message="forecast"):
-#         assert input is not None, f"{message} should not be None"
-#         if self.type == "cs":
-#             assert isinstance(
-#                 input, ndarray
-#             ), "input should be an array for cross-sectional hierarchy"
-#             assert len(input.shape) == 2, "array should be 2D"
-#             if type == "forecast":
-#                 assert input.shape[1] == self.n, f"should have {self.n} forecasts"
-#             if type == "observation":
-#                 assert (
-#                     input.shape[1] == self.m
-#                 ), f"should have {self.m} bottom-level series"
-#             return
-#         else:
-#             assert self.indices_tmp is not None, "indices_tmp should not be None"
-#             if type == "observation":
-#                 assert isinstance(input, ndarray), "input should be vector"
-#                 if self.type == "te":
-#                     assert len(input.shape) == 1, "array should be 1D"
-#                 else:
-#                     assert len(input.shape) == 2, "array should be 2D"
-#             if type == "forecast":
-#                 assert isinstance(
-#                     input, dict
-#                 ), "input should be a dict for temporal hierarchy"
-#                 assert set(input.keys()) == set(
-#                     self.indices_tmp
-#                 ), f"should have forecasts for agg_periods {self.indices_tmp.unique()}"
-#                 length = input[self.k].shape[0]
-#                 for key, value in input.items():
-#                     assert isinstance(value, ndarray), "value should be an vector"
-#                     assert len(value.shape) == 1, "array should be 1D"
-#                     assert value.shape[0] == length * (
-#                         self.k // key
-#                     ), f"should have {length * (self.k // key)} forecasts for agg_period {key}"
+if __name__ == "__main__":
 
-#     def _index_cs(self, indices: pd.DataFrame) -> List:
-#         assert self.indices_cs is not None, "indices_cs should not be None"
-#         bottom_idx = self.indices_cs.dropna(axis=0).reset_index(drop=True)
-#         bottom_idx["_idx"] = bottom_idx.index
-#         row_indices: List[int] = []
-#         for row in range(indices.shape[0]):
-#             row = indices.iloc[row : (row + 1),].dropna(axis=1)
-#             row_idx = row.merge(bottom_idx, how="left", on=list(row.columns))[
-#                 "_idx"
-#             ].values.tolist()
-#             assert not np.isnan(row_idx).any(), f"{ dict(row) } not found"
-#             row_indices.append(row_idx[0])
-#         return row_indices
+    basef = {
+        i: pd.read_csv(f"examples/tourism/data/tourism_baseforecast_{i}.csv").values[
+            0 : 12 // i,
+        ]
+        for i in [1, 2, 3, 4, 6, 12]
+    }
+    # read the residuals
+    residuals = {
+        i: pd.read_csv(f"examples/tourism/data/tourism_residuals_{i}.csv").values
+        for i in [1, 2, 3, 4, 6, 12]
+    }
+    # read the data
+    S = pd.read_csv("examples/tourism/data/tourism_S.csv", index_col=0).values
+    dt = pd.read_csv("examples/tourism/data/tourism.csv")
+    bts = dt.iloc[:, 4:].values.T
 
-#     def _temporal_aggregate(self, bts: ndarray, agg_period: int) -> ndarray:
-#         if len(bts.shape) == 1:
-#             return bts.reshape((-1, agg_period)).sum(axis=1).reshape((-1, 1))
-#         if len(bts.shape) == 2:
-#             return bts.reshape((-1, agg_period, bts.shape[1])).sum(axis=1)
-#         raise ValueError("bts should be 1D or 2D")
+    allts = bts.dot(S.T)
+    tts = allts[216:, :]
 
-#     # TODO: test input to matrix with aggregate_ts
-#     def _input_to_mat(self, input) -> ndarray:
-#         if self.type == "cs":
-#             return input
-#         if self.type == "te":
-#             assert self.indices_tmp is not None, "indices_tmp should not be None"
-#             max_k = max(self.indices_tmp)
-#             return np.concatenate(
-#                 [input[key].reshape(-1, max_k // key) for key in self.indices_tmp],
-#                 axis=1,
-#             )
-#         if self.type == "ct":
-#             assert self.indices_tmp is not None, "indices_tmp should not be None"
-#             n = self.n
-#             max_k = max(self.indices_tmp)
-#             return np.concatenate(
-#                 [
-#                     np.concatenate(
-#                         [
-#                             input[i][:, j].reshape(-1, max_k // i)
-#                             for i in self.indices_tmp
-#                         ],
-#                         axis=1,
-#                     )
-#                     for j in range(n)
-#                 ],
-#                 axis=1,
-#             )
+    foreco = pd.read_csv(
+        "examples/tourism/data/tourism_crosstemporal.csv",
+    )
+    # ht = CrossSectionalHierarchy.new(dt, trees=[("State", "Region", "City"), ("Purpose",)])
+    dt["index"] = dt["City"] + dt["Purpose"]
+    ht = CrossTemporalHierarchy.new(
+        dt, trees=[("index",)], agg_periods=[1, 2, 3, 4, 6, 12]
+    )
 
-#     def aggregate_ts(
-#         self, bts: ndarray, indices: Optional[List[Dict]] = None
-#     ) -> Union[ndarray, Dict[int, ndarray]]:
-#         """Aggregate bottom-level time series.
+    pyhts_method = ["ols"]
+    foreco_method = ["ols"]
 
-#         :param bts: bottom-level time series, array-like of shape (T, m)
-#         :param indices: indices of the series to aggregate. For example:
-#         [{"Category": "Fruit", "SubCategory": "Apple"}, {"Category": "Meat"}] will aggregate the series of \
-#         "Apple" subcategory and "Meat" category.
-#         [{"Category": "Fruit", "agg_period": 12}] will aggregate the series of "Fruit" category at yearly level.
-#         If agg_period is not specified, return most frequencist series, i.e., agg_period = 1
-#         :return: y.
-#         """
-#         output = {}
-#         self._check_input(bts, type="observation")
-#         if self.type != "cs":
-#             assert self.indices_tmp is not None, "indices_tmp should not be None"
-#             max_k = max(self.indices_tmp)
-#             time_window = bts.shape[0]
-#             if time_window % max_k != 0:
-#                 T_ = time_window // max_k * max_k
-#                 bts = bts[(bts.shape[0] - T_) :,]
-#                 Warning(
-#                     f"the observations at the first {time_window - T_} timestamps are dropped"
-#                 )
-#         # filter series accorrding to indices
-#         if indices is not None:
-#             assert isinstance(indices, list), "indices should be a list of dict"
-#             assert all(
-#                 [isinstance(i, dict) for i in indices]
-#             ), "each element in indices should be a dict"
+    def get_total_bottom(array):
+        return np.concatenate([array[:, 0:1], array[:, -304:]], axis=1)
 
-#             indices_df = pd.DataFrame(indices)
-#             # pure cross-sectional aggregation
-#             if self.type == "cs" or (
-#                 "agg_period" not in indices_df.columns and self.type == "ct"
-#             ):
-#                 match_idx = self._index_cs(indices_df)
-#                 assert len(match_idx) > 0, "no series found"
-#                 return np.stack([bts[:, i].sum(axis=1) for i in match_idx], axis=1)
-#             # pure temporal aggregation
-#             elif self.type == "te":
-#                 assert (
-#                     "agg_period" in indices_df.columns
-#                 ), "agg_period should be specified"
-#                 assert (
-#                     indices_df.shape[1] == 1
-#                 ), "non agg_period parameters are specified to aggregate a temporal hierarchy."
-#                 assert (len(bts.shape) == 1) or (
-#                     bts.shape[1] == 1
-#                 ), "temporal hierarchy can only be applied to univariate time series."
-#                 agg_periods: List[int] = indices_df["agg_period"].unique().tolist()
-#                 return {i: self._temporal_aggregate(bts, i) for i in agg_periods}
-#             else:
-#                 assert self.indices_tmp is not None, "indices_tmp should not be None"
-#                 if "agg_period" in indices_df.columns:
-#                     indices_df = indices_df.fillna({"agg_period": 1})
-#                 for agg_period in indices_df["agg_period"].unique():
-#                     assert agg_period in set(
-#                         self.indices_tmp
-#                     ), f"agg_period {agg_period} not found"
-#                     cs = indices_df[indices_df["agg_period"] == agg_period].drop(
-#                         columns="agg_period"
-#                     )
-#                     if cs.shape[1] > 0:
-#                         idx = self._index_cs(cs)
-#                         agg_ts = np.stack([bts[:, i].sum(axis=1) for i in idx], axis=1)
-#                         output[agg_period] = self._temporal_aggregate(
-#                             agg_ts, agg_period
-#                         )
-#                     else:
-#                         bts = bts.sum(axis=1)
-#                         output[agg_period] = self._temporal_aggregate(bts, agg_period)
-
-#                 return output
-#         elif self.type == "cs":
-#             return bts.dot(self.s_cs.toarray().T)
-#         # temporal hierarchy and cross-temporal hierarchy
-#         else:
-#             if self.type == "ct":
-#                 bts = bts.dot(self.s_cs.toarray().T)
-#             for period in set(self.indices_tmp):
-#                 output[period] = self._temporal_aggregate(bts, period)
-#             return output
-
-#     def reconcile(
-#         self,
-#         base_forecasts: Union[ndarray, Dict[int, ndarray]],
-#         method: str,
-#         cov_method: Optional[str] = None,
-#         residuals: Optional[ndarray] = None,
-#     ):
-#         """ Point forecast reconciliation
-
-#         :param base_forecasts: base forecasts, array of shape (h, n) for cross-sectional hierarchy, \
-#             vector of shape (h, ) for temporal hierarchy, and dict of arrays of shape (h_k, n) \
-#             for cross-temporal hierarchy, each value corresponds to a frequency.
-#         :param method: method to reconcile forecasts, choices include "ols", "wls", "mint".
-#         :param cov_method: method to calculate variance covariance matrix of base forecast errors, \
-#             only used for "wls" and "mint" method, \
-#             for "wls", choices include "structural", "variance", \
-#             for "mint", choices include "shrinkage", "sample". \
-#             We recommend using "shrinkage" for better performance.
-#         :param residuals: residuals of in-sample base forecasts, array of shape (T, n) for \
-#             cross-sectional hierarchy, vector of shape (T, ) for temporal hierarchy, and dict of arrays \
-#             of shape (T_k, n) for cross-temporal hierarchy, each value corresponds to a frequency. \
-#             It is required for "variance", "shrinkage" and "sample" cov_method.
-#         """
-#         # check inputs
-#         assert method in [
-#             "ols",
-#             "wls",
-#             "mint",
-#         ], "method should be one of 'ols', 'wls', 'mint'"
-#         self._check_input(base_forecasts, type="forecast", message="base forecasts")
-
-#         S_mat = self.s_mat
-#         if method == "ols":
-#             W = identity(S_mat.shape[0])
-#         elif method == "wls":
-#             if cov_method == "structural":
-#                 W = S_mat.dot(np.array([1] * S_mat.shape[0]).reshape((-1, 1)))
-#             elif cov_method == "variance":
-#                 self._check_input(residuals, type="forecast", message="residuals")
-#                 residuals = self._input_to_mat(residuals)
-#                 W = diags(1 / residuals.var(axis=0))
-#             else:
-#                 raise ValueError(
-#                     "cov_method for wls should be one of 'structural', 'variance'"
-#                 )
-#         else:
-#             self._check_input(residuals, type="forecast", message="residuals")
-#             residuals = self._input_to_mat(residuals)
-#             W = residuals.dot(residuals.T) / residuals.shape[0]
-#             if cov_method == "shrinkage":
-#                 lamb = _lamb_estimate(residuals)
-#                 W = lamb * np.diag(np.diag(W)) + (1 - lamb) * W
-#             elif cov_method == "sample":
-#                 W = W
-#             else:
-#                 raise ValueError(
-#                     "cov_method for mint should be one of 'shrinkage', 'sample'"
-#                 )
-#             W = np.linalg.inv(W)
-
-#         G = self.compute_g_mat(W)
-#         return G.dot(self._input_to_mat(base_forecasts).T).T
-
-#     def _construct_u_mat(self, immutable_set: Optional[List[int]] = None):
-#         """construct U matrix used in solution.
-
-#         :param immutable_set:
-#         :return:
-#         """
-#         s_mat = self.s_mat
-#         n, m = s_mat.shape
-#         u1 = identity(n - m)
-#         u2 = 0 - s_mat[: (n - m), :]
-#         u_mat = vstack([u1, u2])
-#         if immutable_set:
-#             u_up = identity(n)[immutable_set]
-#             return hstack([u_up, u_mat]).T
-#         return u_mat.T
+    basef_ = {i: get_total_bottom(basef[i]) for i in [1, 2, 3, 4, 6, 12]}
+    residuals_ = {i: get_total_bottom(residuals[i]) for i in [1, 2, 3, 4, 6, 12]}
+    tts = tts[:, -304:]
+    for pm, fm in zip(pyhts_method, foreco_method):
+        recf = ht.reconcile(basef_, pm, residuals_)
+        res = np.sqrt(np.mean((recf - tts) ** 2))
+        assert np.allclose(res, foreco[fm])
